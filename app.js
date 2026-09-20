@@ -2,7 +2,7 @@ import { generateProblem, parseAnswer } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, personMix, writePersonMix } from "./storage.js";
 import { renderProblemView } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
-import { progressStars } from "./stars.js";
+import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -181,6 +181,7 @@ function startRound() {
     streak: 0,
     bestStreak: 0,
     lastKey: "",
+    attempts: [],
   };
 
   els.playWho.textContent = `${round.learner} · ${meta.label} · ${round.difficulty}`;
@@ -201,6 +202,7 @@ function paintProblem(reveal = false) {
 function nextProblem() {
   awaitingAdvance = false;
   current = generateProblem(round.ops, round.difficulty, round.lastKey);
+  current.missed = false;
   round.lastKey = current.key;
   round.asked += 1;
   els.input.value = "";
@@ -213,24 +215,55 @@ function nextProblem() {
 
 function paintStars() {
   const row = els.starRow;
-  if (!round?.limit) {
+  if (!round) {
     row.hidden = true;
     row.replaceChildren();
+    delete row.dataset.stars;
+    delete row.dataset.compact;
     return;
   }
   row.hidden = false;
-  const want = progressStars(round.correct, round.limit);
-  if (want < row.childElementCount) {
-    row.replaceChildren();
+  const want = round.limit
+    ? progressStars(round.correct, round.limit)
+    : unlimitedStars(round.attempts);
+  const compact = !round.limit && compactStarCount(want);
+  const prev = Number(row.dataset.stars || 0);
+  const wasCompact = row.dataset.compact === "1";
+
+  if (compact) {
+    if (!wasCompact || prev !== want) {
+      row.replaceChildren();
+      const wrap = document.createElement("span");
+      wrap.className = want > prev || !wasCompact ? "star-compact is-in" : "star-compact";
+      const num = document.createElement("span");
+      num.className = "star-count";
+      num.textContent = String(want);
+      const icon = document.createElement("span");
+      icon.className = "star";
+      icon.textContent = "★";
+      icon.setAttribute("aria-hidden", "true");
+      wrap.append(num, document.createTextNode(" "), icon);
+      row.append(wrap);
+    }
+  } else {
+    if (wasCompact || want < prev) {
+      row.replaceChildren();
+    }
+    for (let i = row.querySelectorAll(".star").length; i < want; i += 1) {
+      const star = document.createElement("span");
+      star.className = "star is-in";
+      star.textContent = "★";
+      star.setAttribute("aria-hidden", "true");
+      row.append(star);
+    }
   }
-  for (let i = row.childElementCount; i < want; i += 1) {
-    const star = document.createElement("span");
-    star.className = "star is-in";
-    star.textContent = "★";
-    star.setAttribute("aria-hidden", "true");
-    row.append(star);
-  }
-  row.setAttribute("aria-label", `Correct progress: ${want} of 5 stars`);
+
+  row.dataset.stars = String(want);
+  row.dataset.compact = compact ? "1" : "0";
+  row.setAttribute(
+    "aria-label",
+    compact ? `${want} stars` : `Correct progress: ${want} star${want === 1 ? "" : "s"}`,
+  );
 }
 
 function updateProgress() {
@@ -267,8 +300,22 @@ function mark(correct) {
   }
 }
 
+function recordAttempt(correct) {
+  if (round.limit) return;
+  if (round.oneTry) {
+    round.attempts.push(correct);
+    return;
+  }
+  if (correct) {
+    round.attempts.push(!current.missed);
+    return;
+  }
+  current.missed = true;
+}
+
 function afterAnswer(correct) {
   round.answered += 1;
+  recordAttempt(correct);
   mark(correct);
   updateProgress();
 

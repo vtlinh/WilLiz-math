@@ -31,5 +31,6 @@ Addition and subtraction are written as vertical column arithmetic. Multiplicati
 
 - A child can start a round in one screen and get immediate right/wrong feedback.
 - A perfect score (100% correct, at least one answer) on Pictures, Hard, or Challenge plays confetti and fireworks. Easy and Medium do not.
-- A quiz earns a small star at the bottom of the play screen for each 20% of the round answered correctly, up to five. Practice and sprint hide the tray.
+- A quiz earns a small star at the bottom of the play screen for each 20% of the round answered correctly, up to five.
+- Unlimited practice and sprint award a star for each all-correct set of 10 problems, counted from the first problem. After 7 stars the tray switches to `X ★`.
 - The same files work locally and at `https://vtlinh.github.io/WilLiz-math/` after Pages is enabled.

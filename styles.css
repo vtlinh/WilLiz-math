@@ -632,6 +632,24 @@ legend {
   animation: star-in 420ms cubic-bezier(0.22, 1.35, 0.36, 1);
 }
 
+.star-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.star-compact.is-in {
+  animation: star-in 420ms cubic-bezier(0.22, 1.35, 0.36, 1);
+}
+
+.star-count {
+  font-variant-numeric: tabular-nums;
+}
+
 @keyframes star-in {
   from {
     transform: scale(0.2) translateY(10px);
@@ -734,7 +752,8 @@ body.celebrate-static .results-headline {
     transition: none;
   }
 
-  .star.is-in {
+  .star.is-in,
+  .star-compact.is-in {
     animation: none;
   }
 }

@@ -14,6 +14,7 @@ activation: always_on
 - Division must be exact. Subtraction must not produce a negative answer.
 - `parseAnswer` accepts integers only, including a leading unicode minus (`−`).
 - Practice: wrong answers stay on the same problem so the learner can retry. Quiz and sprint: one try, then reveal and advance.
-- Quiz progress stars use `progressStars(correct, limit)`: one star animates in for each 20% of the quiz answered correctly, up to five. Hide the tray in practice and sprint.
+- Quiz progress stars use `progressStars(correct, limit)`: one star animates in for each 20% of the quiz answered correctly, up to five.
+- Unlimited practice and sprint use `unlimitedStars(attempts)`: one star for each all-correct set of 10 problems, counted from the first problem. A retried miss is not totally correct. After 7 stars, show `X ★` instead of more icons.
 - Do not skip uniqueness forever; avoiding the immediate previous prompt is enough.
 - After changing generation, run `node --experimental-default-type=module test-problems.mjs`.
