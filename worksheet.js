@@ -241,10 +241,6 @@ export function planDivision(dividend, divisor) {
     quotient: dividend / divisor,
     quotientSlots,
     steps,
-    table: Array.from({ length: 9 }, (_, index) => {
-      const n = index + 1;
-      return { n, value: n * divisor };
-    }),
   };
 }
 
@@ -281,16 +277,6 @@ export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = 
   const root = document.createElement("div");
   root.className = "sheet sheet-div";
   root.dataset.op = "div";
-
-  const table = document.createElement("ol");
-  table.className = "div-table";
-  const used = new Set(plan.steps.map((step) => step.q).filter(Boolean));
-  for (const entry of plan.table) {
-    const item = document.createElement("li");
-    item.textContent = `${entry.n} – ${entry.value}`;
-    if (reveal && used.has(entry.n)) item.classList.add("is-used");
-    table.append(item);
-  }
 
   const work = document.createElement("div");
   work.className = "div-work";
@@ -348,7 +334,7 @@ export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = 
     );
   }
 
-  root.append(table, work);
+  root.append(work);
   return root;
 }
 

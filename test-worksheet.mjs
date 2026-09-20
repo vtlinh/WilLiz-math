@@ -39,13 +39,12 @@ assert(long.steps[0].product === 120, "first subtract 120");
 assert(long.steps[1].product === 96, "then 96");
 assert(long.steps[2].product === 72, "then 72");
 assert(long.steps.at(-1).remainder === 0, "exact remainder");
-assert(long.table[4].value === 120, "5 × 24 table");
+assert(!("table" in long), "no times-table cheat");
 assert(long.quotientSlots.join("") === "543", "slots skip leading empties");
 
 const short = planDivision(20, 5);
 assert(short.quotient === 4, "20 ÷ 5");
 assert(short.steps.length === 1, "one division step");
-assert(short.table[0].value === 5, "1 × 5");
 
 const twelve = planDivision(144, 12);
 assert(twelve.quotient === 12, "144 ÷ 12");

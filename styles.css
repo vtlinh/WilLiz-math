@@ -515,25 +515,7 @@ legend {
 }
 
 .sheet-div {
-  display: flex;
-  align-items: flex-start;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-
-.div-table {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-family: "Fraunces", Georgia, serif;
-  font-variant-numeric: tabular-nums;
-  font-size: 1.05rem;
-  line-height: 1.45;
-}
-
-.div-table li.is-used {
-  font-weight: 800;
-  color: var(--sage-deep);
+  width: fit-content;
 }
 
 .div-work {
@@ -1039,15 +1021,6 @@ body.celebrate-static .results-headline {
   .sheet-cell {
     min-height: 1.2rem;
     font-size: clamp(1.05rem, 4vw, 1.45rem);
-  }
-
-  .sheet-div {
-    gap: 12px;
-  }
-
-  .div-table {
-    font-size: 0.85rem;
-    line-height: 1.25;
   }
 
   .div-divisor {

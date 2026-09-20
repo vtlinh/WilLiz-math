@@ -26,7 +26,7 @@ Answers are entered only with the on-screen keypad, on each working line of the 
 
 On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
 
-Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication. Division is written as long division with a divisor times table and bring-down working.
+Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication. Division is written as long division with bring-down working and no times-table cheat.
 
 ## Non-goals
 
