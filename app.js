@@ -8,7 +8,10 @@ const els = {
   setup: document.getElementById("setup-screen"),
   play: document.getElementById("play-screen"),
   results: document.getElementById("results-screen"),
-  learnerRow: document.getElementById("learner-row"),
+  learnerMenu: document.getElementById("learner-menu"),
+  learnerBtn: document.getElementById("learner-btn"),
+  learnerAvatar: document.getElementById("learner-avatar"),
+  learnerPanel: document.getElementById("learner-panel"),
   opRow: document.getElementById("op-row"),
   difficultyRow: document.getElementById("difficulty-row"),
   modeRow: document.getElementById("mode-row"),
@@ -81,7 +84,9 @@ function restoreSettings() {
 }
 
 function syncSetupUi() {
-  for (const button of els.learnerRow.querySelectorAll("[data-learner]")) {
+  els.learnerAvatar.textContent = settings.learner.slice(0, 1);
+  els.learnerBtn.setAttribute("aria-label", `${settings.learner}, change who is practicing`);
+  for (const button of els.learnerPanel.querySelectorAll("[data-learner]")) {
     button.classList.toggle("is-selected", button.dataset.learner === settings.learner);
   }
   for (const button of els.opRow.querySelectorAll("[data-op]")) {
@@ -116,7 +121,16 @@ function selectLearner(name) {
   syncSetupUi();
 }
 
+function setLearnerOpen(open) {
+  if (open) setSettingsOpen(false);
+  els.learnerPanel.classList.toggle("hidden", !open);
+  els.learnerPanel.hidden = !open;
+  els.learnerBtn.classList.toggle("is-open", open);
+  els.learnerBtn.setAttribute("aria-expanded", String(open));
+}
+
 function setSettingsOpen(open) {
+  if (open) setLearnerOpen(false);
   els.settingsPanel.classList.toggle("hidden", !open);
   els.settingsBackdrop.classList.toggle("hidden", !open);
   els.settingsPanel.hidden = !open;
@@ -164,6 +178,7 @@ function startRound() {
   persistSettings();
   clearTimer();
   stopCelebration();
+  setLearnerOpen(false);
   setSettingsOpen(false);
 
   const meta = modeMeta(settings.mode);
@@ -407,10 +422,19 @@ function pressKey(key) {
   els.input.focus();
 }
 
-els.learnerRow.addEventListener("click", (event) => {
+els.learnerBtn.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setLearnerOpen(els.learnerPanel.hidden);
+});
+els.learnerPanel.addEventListener("click", (event) => {
+  event.stopPropagation();
   const button = event.target.closest("[data-learner]");
   if (!button) return;
   selectLearner(button.dataset.learner);
+  setLearnerOpen(false);
+});
+document.addEventListener("click", (event) => {
+  if (!els.learnerMenu.contains(event.target)) setLearnerOpen(false);
 });
 
 els.opRow.addEventListener("click", (event) => {
@@ -442,7 +466,9 @@ els.settingsClose.addEventListener("click", () => setSettingsOpen(false));
 els.settingsDone.addEventListener("click", () => setSettingsOpen(false));
 els.settingsBackdrop.addEventListener("click", () => setSettingsOpen(false));
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") setSettingsOpen(false);
+  if (event.key !== "Escape") return;
+  setLearnerOpen(false);
+  setSettingsOpen(false);
 });
 
 els.startBtn.addEventListener("click", startRound);

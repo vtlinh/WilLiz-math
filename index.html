@@ -21,10 +21,22 @@
   <body>
     <div class="page">
       <header class="action-bar">
-        <div class="chip-row account-row" id="learner-row" role="group" aria-label="Who is practicing">
-          <button type="button" class="chip is-selected" data-learner="Will">Will</button>
-          <button type="button" class="chip" data-learner="Liz">Liz</button>
-          <button type="button" class="chip" data-learner="Guest">Guest</button>
+        <div class="learner-menu" id="learner-menu">
+          <button
+            type="button"
+            id="learner-btn"
+            class="icon-btn avatar-btn"
+            aria-expanded="false"
+            aria-controls="learner-panel"
+            aria-label="Will, change who is practicing"
+          >
+            <span id="learner-avatar" class="avatar" aria-hidden="true">W</span>
+          </button>
+          <div id="learner-panel" class="learner-panel hidden" hidden role="menu" aria-label="Who is practicing">
+            <button type="button" class="learner-option is-selected" data-learner="Will" role="menuitem">Will</button>
+            <button type="button" class="learner-option" data-learner="Liz" role="menuitem">Liz</button>
+            <button type="button" class="learner-option" data-learner="Guest" role="menuitem">Guest</button>
+          </div>
         </div>
         <button
           type="button"
