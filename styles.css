@@ -607,6 +607,42 @@ legend {
   grid-template-columns: 1fr;
 }
 
+.star-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 1.7rem;
+  margin-top: 14px;
+}
+
+.star-row[hidden] {
+  display: none;
+}
+
+.star {
+  display: inline-block;
+  color: var(--gold);
+  font-size: 1.28rem;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(61, 39, 16, 0.15);
+}
+
+.star.is-in {
+  animation: star-in 420ms cubic-bezier(0.22, 1.35, 0.36, 1);
+}
+
+@keyframes star-in {
+  from {
+    transform: scale(0.2) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
 .results-headline {
   font-family: "Fraunces", Georgia, serif;
   font-size: 1.45rem;
@@ -696,5 +732,9 @@ body.celebrate-static .results-headline {
   .ghost,
   .keypad button {
     transition: none;
+  }
+
+  .star.is-in {
+    animation: none;
   }
 }

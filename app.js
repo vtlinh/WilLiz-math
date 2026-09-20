@@ -2,6 +2,7 @@ import { generateProblem, parseAnswer } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, personMix, writePersonMix } from "./storage.js";
 import { renderProblemView } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
+import { progressStars } from "./stars.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -21,6 +22,7 @@ const els = {
   feedback: document.getElementById("feedback"),
   keypad: document.getElementById("keypad"),
   endBtn: document.getElementById("end-btn"),
+  starRow: document.getElementById("star-row"),
   headline: document.getElementById("results-headline"),
   statCorrect: document.getElementById("stat-correct"),
   statAccuracy: document.getElementById("stat-accuracy"),
@@ -183,6 +185,7 @@ function startRound() {
 
   els.playWho.textContent = `${round.learner} · ${meta.label} · ${round.difficulty}`;
   showScreen("play");
+  paintStars();
   nextProblem();
 
   if (meta.timed) {
@@ -208,8 +211,31 @@ function nextProblem() {
   updateProgress();
 }
 
+function paintStars() {
+  const row = els.starRow;
+  if (!round?.limit) {
+    row.hidden = true;
+    row.replaceChildren();
+    return;
+  }
+  row.hidden = false;
+  const want = progressStars(round.correct, round.limit);
+  if (want < row.childElementCount) {
+    row.replaceChildren();
+  }
+  for (let i = row.childElementCount; i < want; i += 1) {
+    const star = document.createElement("span");
+    star.className = "star is-in";
+    star.textContent = "★";
+    star.setAttribute("aria-hidden", "true");
+    row.append(star);
+  }
+  row.setAttribute("aria-label", `Correct progress: ${want} of 5 stars`);
+}
+
 function updateProgress() {
   if (!round) return;
+  paintStars();
   if (round.timed) {
     const remaining = round.endsAt - Date.now();
     els.playProgress.textContent = formatTime(remaining);
