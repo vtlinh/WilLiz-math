@@ -15,7 +15,7 @@ After Pages is enabled, the app is served at:
 1. Tap the avatar on the left of the action bar to pick who is practicing.
 2. Open the settings icon on the right to choose operations, difficulty, appearance, and mode. Dark mode is the default. Changes save as you tap; use ← to go back.
 3. Start a practice, quiz, or 60-second sprint.
-4. Enter an answer with the keypad, then press **Submit**. The answer field does not type and does not open a phone keyboard.
+4. Fill every working line of the worksheet with the keypad (partial products, long-division steps, or the column total), then press **Submit**. There is no separate final-only box, and the keypad does not open a phone keyboard.
 
 Each learner’s last mix and personal bests are stored in the browser, so Will and Liz keep their own operations, difficulty, appearance, and mode.
 

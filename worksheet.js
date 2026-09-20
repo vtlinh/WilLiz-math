@@ -1,5 +1,53 @@
+import { parseAnswer } from "./problems.js";
+
 function digitList(value) {
   return String(value).split("").map((d) => (d === "-" ? "−" : d));
+}
+
+function remainValue(step) {
+  if (step.bringDown === null || step.bringDown === undefined) return step.remainder;
+  return Number(`${step.remainder}${step.bringDown}`);
+}
+
+export function worksheetFields(problem) {
+  if (problem.difficulty === "pictures") {
+    return [{ id: "total", answer: problem.answer }];
+  }
+  if (problem.op === "mul") {
+    const plan = planMultiplication(problem.a, problem.b);
+    if (plan.partials.length > 1) {
+      return [
+        ...plan.partials.map((row, index) => ({ id: `partial-${index}`, answer: row.value })),
+        { id: "total", answer: plan.total },
+      ];
+    }
+    return [{ id: "total", answer: plan.total }];
+  }
+  if (problem.op === "div") {
+    const plan = planDivision(problem.a, problem.b);
+    const fields = [{ id: "quotient", answer: plan.quotient }];
+    plan.steps.forEach((step, index) => {
+      fields.push({ id: `product-${index}`, answer: step.product });
+      fields.push({ id: `remain-${index}`, answer: remainValue(step) });
+    });
+    return fields;
+  }
+  if (problem.op === "add") {
+    return [{ id: "total", answer: problem.a + problem.b }];
+  }
+  if (problem.op === "sub") {
+    return [{ id: "total", answer: problem.a - problem.b }];
+  }
+  return [{ id: "total", answer: problem.answer }];
+}
+
+export function fieldsReady(fills) {
+  return fills.length > 0 && fills.every((fill) => parseAnswer(fill) !== null);
+}
+
+export function fieldsMatch(fills, fields) {
+  if (fills.length !== fields.length) return false;
+  return fills.every((fill, index) => parseAnswer(fill) === fields[index].answer);
 }
 
 function padLeft(chars, cols) {
@@ -72,7 +120,16 @@ function cell(text, className = "") {
   return span;
 }
 
-function row(cols, cells, { op = "", className = "" } = {}) {
+function markFill(el, { slot = null, active = false, reveal = false } = {}) {
+  if (reveal || slot == null) return;
+  el.classList.add("is-fill");
+  if (active) el.classList.add("is-active");
+  el.dataset.slot = String(slot);
+  el.setAttribute("role", "button");
+  el.setAttribute("aria-label", "Fill this line");
+}
+
+function row(cols, cells, { op = "", className = "", slot = null, active = false, reveal = false } = {}) {
   const wrap = document.createElement("div");
   wrap.className = `sheet-row ${className}`.trim();
   wrap.style.setProperty("--cols", String(cols));
@@ -81,6 +138,7 @@ function row(cols, cells, { op = "", className = "" } = {}) {
     if (item instanceof HTMLElement) wrap.append(item);
     else wrap.append(cell(item));
   }
+  markFill(wrap, { slot, active, reveal });
   return wrap;
 }
 
@@ -96,7 +154,7 @@ function typedCells(value, cols) {
   return padLeft(digitList(value.replace("-", "−")), cols);
 }
 
-export function renderMultiplicationSheet(problem, { typed = "", reveal = false } = {}) {
+export function renderMultiplicationSheet(problem, { fills = [], active = 0, reveal = false } = {}) {
   const plan = planMultiplication(problem.a, problem.b);
   const root = document.createElement("div");
   root.className = "sheet";
@@ -115,16 +173,35 @@ export function renderMultiplicationSheet(problem, { typed = "", reveal = false 
   root.append(row(plan.cols, plan.mul, { op: "×" }));
   root.append(rule(plan.cols));
 
+  let nextSlot = 0;
   if (plan.partials.length > 1) {
     for (const partial of plan.partials) {
-      const cells = reveal ? partial.cells : padLeft([], plan.cols);
-      root.append(row(plan.cols, cells, { op: partial.plus ? "+" : "", className: "is-partial" }));
+      const slot = nextSlot;
+      nextSlot += 1;
+      const cells = reveal ? partial.cells : typedCells(fills[slot], plan.cols);
+      root.append(
+        row(plan.cols, cells, {
+          op: partial.plus ? "+" : "",
+          className: "is-partial",
+          slot,
+          active: active === slot,
+          reveal,
+        }),
+      );
     }
     root.append(rule(plan.cols));
   }
 
-  const total = reveal ? plan.totalCells : typedCells(typed, plan.cols);
-  root.append(row(plan.cols, total, { className: "is-total" }));
+  const totalSlot = nextSlot;
+  const total = reveal ? plan.totalCells : typedCells(fills[totalSlot], plan.cols);
+  root.append(
+    row(plan.cols, total, {
+      className: "is-total",
+      slot: totalSlot,
+      active: active === totalSlot,
+      reveal,
+    }),
+  );
   return root;
 }
 
@@ -181,17 +258,23 @@ function placeDigits(length, text, endIndex) {
   return cells;
 }
 
-function divisionRow(cols, values, { op = "", arrow = "", className = "" } = {}) {
+function divisionRow(cols, values, { op = "", arrow = "", className = "", slot = null, active = false, reveal = false } = {}) {
   const wrap = document.createElement("div");
   wrap.className = `div-digits ${className}`.trim();
   wrap.style.setProperty("--cols", String(cols));
   wrap.append(cell(op, "is-op"));
   for (const value of values) wrap.append(cell(value));
   wrap.append(cell(arrow, "is-arrow"));
+  markFill(wrap, { slot, active, reveal });
   return wrap;
 }
 
-export function renderDivisionSheet(problem, { typed = "", reveal = false } = {}) {
+function placedFill(cols, typed, endIndex) {
+  if (!typed || typed === "-" || typed === "−") return Array(cols).fill("");
+  return placeDigits(cols, typed.replace("-", "−"), endIndex);
+}
+
+export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = false } = {}) {
   const plan = planDivision(problem.a, problem.b);
   const cols = plan.digits.length;
   const root = document.createElement("div");
@@ -223,23 +306,45 @@ export function renderDivisionSheet(problem, { typed = "", reveal = false } = {}
 
   const topSlots = reveal
     ? plan.quotientSlots
-    : padLeft(typed && typed !== "-" && typed !== "−" ? digitList(typed.replace("-", "−")) : [], cols);
-  work.append(line(topSlots, { className: "is-quotient" }));
+    : padLeft(fills[0] && fills[0] !== "-" && fills[0] !== "−" ? digitList(String(fills[0]).replace("-", "−")) : [], cols);
+  work.append(
+    line(topSlots, { className: "is-quotient", slot: 0, active: active === 0, reveal }),
+  );
   work.append(line(plan.digits, { className: "is-dividend", divisor: true }));
 
-  if (reveal) {
-    for (const step of plan.steps) {
-      work.append(
-        line(placeDigits(cols, step.product, step.endIndex), {
-          op: "−",
-          arrow: step.bringDown !== null ? "↓" : "",
-          className: "is-sub",
-        }),
-      );
-      const remCells = placeDigits(cols, step.remainder, step.endIndex);
-      if (step.bringDown !== null) remCells[step.endIndex + 1] = String(step.bringDown);
-      work.append(line(remCells, { className: "is-remain" }));
-    }
+  let nextSlot = 1;
+  for (const step of plan.steps) {
+    const productSlot = nextSlot;
+    nextSlot += 1;
+    const productCells = reveal
+      ? placeDigits(cols, step.product, step.endIndex)
+      : placedFill(cols, fills[productSlot], step.endIndex);
+    work.append(
+      line(productCells, {
+        op: "−",
+        arrow: step.bringDown !== null ? "↓" : "",
+        className: "is-sub",
+        slot: productSlot,
+        active: active === productSlot,
+        reveal,
+      }),
+    );
+
+    const remainSlot = nextSlot;
+    nextSlot += 1;
+    const remainEnd = step.bringDown !== null ? step.endIndex + 1 : step.endIndex;
+    const remCells = reveal
+      ? placeDigits(cols, step.remainder, step.endIndex)
+      : placedFill(cols, fills[remainSlot], remainEnd);
+    if (reveal && step.bringDown !== null) remCells[step.endIndex + 1] = String(step.bringDown);
+    work.append(
+      line(remCells, {
+        className: "is-remain",
+        slot: remainSlot,
+        active: active === remainSlot,
+        reveal,
+      }),
+    );
   }
 
   root.append(table, work);
@@ -296,7 +401,7 @@ export function planSubtraction(a, b) {
   };
 }
 
-function renderColumnSheet(problem, plan, { typed = "", reveal = false, op, symbol }) {
+function renderColumnSheet(problem, plan, { fills = [], active = 0, reveal = false, op, symbol }) {
   const root = document.createElement("div");
   root.className = "sheet";
   root.dataset.op = op;
@@ -304,7 +409,14 @@ function renderColumnSheet(problem, plan, { typed = "", reveal = false, op, symb
   root.append(row(plan.cols, plan.top));
   root.append(row(plan.cols, plan.bottom, { op: symbol }));
   root.append(rule(plan.cols));
-  root.append(row(plan.cols, reveal ? plan.totalCells : typedCells(typed, plan.cols), { className: "is-total" }));
+  root.append(
+    row(plan.cols, reveal ? plan.totalCells : typedCells(fills[0], plan.cols), {
+      className: "is-total",
+      slot: 0,
+      active: active === 0,
+      reveal,
+    }),
+  );
   return root;
 }
 
@@ -346,7 +458,7 @@ function pictureSide(count, icon, label) {
   return side;
 }
 
-export function renderPictureSheet(problem, { typed = "", reveal = false } = {}) {
+export function renderPictureSheet(problem, { fills = [], active = 0, reveal = false } = {}) {
   const root = document.createElement("div");
   root.className = "sheet sheet-pic";
   root.dataset.op = problem.op;
@@ -395,7 +507,9 @@ export function renderPictureSheet(problem, { typed = "", reveal = false } = {})
   eq.textContent = "=";
   const answer = document.createElement("div");
   answer.className = "pic-answer";
+  const typed = fills[0] ?? "";
   answer.textContent = reveal ? String(problem.answer) : typed && typed !== "-" ? typed : "";
+  markFill(answer, { slot: 0, active: active === 0, reveal });
   rowWrap.append(eq, answer);
   root.append(rowWrap);
   return root;

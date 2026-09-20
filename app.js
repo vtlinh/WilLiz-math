@@ -1,6 +1,6 @@
-import { generateProblem, parseAnswer } from "./problems.js";
+import { generateProblem } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
-import { renderProblemView } from "./worksheet.js";
+import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
 import { creditsAnswer } from "./scoring.js";
@@ -270,14 +270,21 @@ function startRound() {
 }
 
 function paintProblem(reveal = false) {
-  els.problem.replaceChildren(renderProblemView(current, { typed: els.input.value, reveal }));
+  els.problem.replaceChildren(
+    renderProblemView(current, { fills: current.fills, active: current.active, reveal }),
+  );
   els.problem.classList.toggle("is-sheet", Boolean(current.op));
+  els.form.classList.add("is-sheet-fill");
+  els.input.hidden = true;
 }
 
 function nextProblem() {
   awaitingAdvance = false;
   current = generateProblem(round.ops, round.difficulty, round.lastKey);
   current.missed = false;
+  current.fields = worksheetFields(current);
+  current.fills = current.fields.map(() => "");
+  current.active = 0;
   round.lastKey = current.key;
   round.asked += 1;
   els.input.value = "";
@@ -414,9 +421,8 @@ function afterAnswer(correct) {
 function submitAnswer(event) {
   event.preventDefault();
   if (!round || awaitingAdvance) return;
-  const value = parseAnswer(els.input.value);
-  if (value === null) return;
-  afterAnswer(value === current.answer);
+  if (!fieldsReady(current.fills)) return;
+  afterAnswer(fieldsMatch(current.fills, current.fields));
 }
 
 function bestKey() {
@@ -492,14 +498,26 @@ function toggleOp(op) {
   syncSetupUi();
 }
 
+function setActiveSlot(index) {
+  if (!current || awaitingAdvance) return;
+  if (!Number.isInteger(index) || index < 0 || index >= current.fills.length) return;
+  current.active = index;
+  paintProblem(false);
+}
+
 function pressKey(key) {
+  if (!current || awaitingAdvance) return;
+  const slot = current.active ?? 0;
+  let value = current.fills[slot] ?? "";
   if (key === "back") {
-    els.input.value = els.input.value.slice(0, -1);
+    value = value.slice(0, -1);
   } else if (key === "-" || key === "−") {
-    els.input.value = els.input.value.startsWith("-") ? els.input.value.slice(1) : `-${els.input.value}`;
+    value = value.startsWith("-") ? value.slice(1) : `-${value}`;
   } else {
-    els.input.value += key;
+    value += key;
   }
+  current.fills[slot] = value;
+  els.input.value = value;
   paintProblem(false);
 }
 
@@ -586,6 +604,11 @@ els.againBtn.addEventListener("click", startRound);
 els.setupBtn.addEventListener("click", () => {
   stopCelebration();
   setSettingsOpen(true);
+});
+els.problem.addEventListener("click", (event) => {
+  const slot = event.target.closest("[data-slot]");
+  if (!slot) return;
+  setActiveSlot(Number(slot.dataset.slot));
 });
 els.keypad.addEventListener("click", (event) => {
   const button = event.target.closest("[data-key]");

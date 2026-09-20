@@ -1,4 +1,12 @@
-import { planAddition, planDivision, planMultiplication, planSubtraction } from "./worksheet.js";
+import {
+  fieldsMatch,
+  fieldsReady,
+  planAddition,
+  planDivision,
+  planMultiplication,
+  planSubtraction,
+  worksheetFields,
+} from "./worksheet.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -70,5 +78,35 @@ assert(subBorrow.carries.join(",") === ",1", "borrow in ones");
 const subWide = planSubtraction(100, 1);
 assert(subWide.total === 99, "100 − 1");
 assert(subWide.cols === 3, "keep three columns");
+
+const mulLines = worksheetFields({ a: 124, b: 26, op: "mul", answer: 3224, difficulty: "hard" });
+assert(mulLines.map((field) => field.answer).join(",") === "744,2480,3224", "fill each mul line");
+
+const fourteen = worksheetFields({ a: 14, b: 14, op: "mul", answer: 196, difficulty: "medium" });
+assert(fourteen.map((field) => field.answer).join(",") === "56,140,196", "14 × 14 working lines");
+
+const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
+assert(oneMul.length === 1 && oneMul[0].answer === 48, "single-digit mul is one total");
+
+const pic = worksheetFields({ a: 2, b: 3, op: "mul", answer: 6, difficulty: "pictures" });
+assert(pic.length === 1 && pic[0].answer === 6, "pictures stay one blank");
+
+const addLine = worksheetFields({ a: 12, b: 42, op: "add", answer: 54, difficulty: "easy" });
+assert(addLine.length === 1 && addLine[0].answer === 54, "addition total");
+
+const subLine = worksheetFields({ a: 42, b: 17, op: "sub", answer: 25, difficulty: "easy" });
+assert(subLine.length === 1 && subLine[0].answer === 25, "subtraction total");
+
+const divLines = worksheetFields({ a: 13032, b: 24, op: "div", answer: 543, difficulty: "hard" });
+assert(
+  divLines.map((field) => field.answer).join(",") === "543,120,103,96,72,72,0",
+  "quotient plus each subtract and bring-down",
+);
+
+assert(fieldsReady(["56", "140", "196"]), "all lines filled");
+assert(!fieldsReady(["56", "", "196"]), "blank line is not ready");
+assert(fieldsMatch(["744", "2480", "3224"], mulLines), "matching every mul line");
+assert(!fieldsMatch(["744", "2480", "77"], mulLines), "final only is not enough");
+assert(fieldsMatch(["543", "120", "103", "96", "72", "72", "0"], divLines), "matching every div line");
 
 console.log("worksheet checks passed");

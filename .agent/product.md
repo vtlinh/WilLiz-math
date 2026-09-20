@@ -22,7 +22,7 @@ There is no Skip. Practice stays on a problem until the answer is correct, then 
 
 During practice the action bar is only ← back and an X/Y score. Leaving an unfinished or unlimited session asks for confirmation.
 
-Answers are entered only with the on-screen keypad. The answer field is not editable and must not open a system keyboard.
+Answers are entered only with the on-screen keypad, on each working line of the worksheet (partial products, long-division steps, or the column total). Pictures keep one blank. There is no separate final-only answer box, and the keypad must not open a system keyboard. Submit counts only when every line is filled and correct.
 
 On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
 

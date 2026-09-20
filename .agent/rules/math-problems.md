@@ -9,8 +9,10 @@ activation: always_on
 - `pictures` is a hardness setting that only generates easy, countable problems (add/sub up to 8, mul/div factors up to 4) and renders objects to count instead of the column/long worksheets.
 - Addition is shown as vertical column addition: addends stacked, `+` on the left of the lower number, a rule, then the total. Do not show `a + b` as a single inline equation only.
 - Subtraction is shown the same way, stacked with `−` on the left of the lower number. Do not show `a − b` as a single inline equation only.
-- Multiplication is shown as long multiplication: stacked factors, a rule, partial products when the multiplier has more than one digit, then the total. Do not show `a × b` as a single inline equation only.
-- Division is shown as long division: a 1–9 times table for the divisor on the left, and the bracket, quotient, subtract-and-bring-down working on the right. Do not show `a ÷ b` as a single inline equation only.
+- Multiplication is shown as long multiplication: stacked factors, a rule, partial products when the multiplier has more than one digit, then the total. Do not show `a × b` as a single inline equation only. Each partial product and the total is a fillable line. A one-digit multiplier has only the total line.
+- Division is shown as long division: a 1–9 times table for the divisor on the left, and the bracket, quotient, subtract-and-bring-down working on the right. Do not show `a ÷ b` as a single inline equation only. The quotient, each subtract product, and each remainder (with the brought-down digit) are fillable lines.
+- Addition and subtraction have one fillable line: the total. Pictures stay one blank. Carries are shown only after reveal and are not filled.
+- `worksheetFields(problem)` lists every line the learner must fill. Submit scores the problem only when every slot is filled and every slot matches. The keypad writes the active line; tapping a line selects it. The separate answer box stays hidden.
 - Division must be exact. Subtraction must not produce a negative answer.
 - `parseAnswer` accepts integers only, including a leading unicode minus (`−`).
 - The play answer field is keypad-only: `readonly`, no system keyboard, and no typing into the field.

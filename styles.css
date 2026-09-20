@@ -478,6 +478,33 @@ legend {
   min-height: 2rem;
 }
 
+.sheet-row.is-fill,
+.div-digits.is-fill,
+.pic-answer.is-fill {
+  cursor: pointer;
+}
+
+.sheet-row.is-fill .sheet-cell:not(.is-op),
+.div-digits.is-fill .sheet-cell:not(.is-op):not(.is-arrow) {
+  border-bottom: 2px solid color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.sheet-row.is-active,
+.div-digits.is-active {
+  background: color-mix(in srgb, var(--sage) 16%, transparent);
+  border-radius: 8px;
+}
+
+.sheet-row.is-active .sheet-cell:not(.is-op),
+.div-digits.is-active .sheet-cell:not(.is-op):not(.is-arrow) {
+  border-bottom-color: var(--sage);
+}
+
+.pic-answer.is-active {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sage) 35%, transparent);
+}
+
 .sheet-div {
   display: flex;
   align-items: flex-start;
@@ -610,6 +637,15 @@ legend {
 .answer-form {
   display: flex;
   gap: 10px;
+}
+
+.answer-form.is-sheet-fill #answer-input,
+#answer-input[hidden] {
+  display: none;
+}
+
+.answer-form.is-sheet-fill .primary {
+  flex: 1;
 }
 
 #answer-input {
