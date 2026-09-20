@@ -11,7 +11,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 
 ## What a round is
 
-The top action bar keeps one avatar on the left. Tapping it opens Will, Liz, or Guest. A settings icon on the right opens the Settings page, with ← back at the top. Every mix change saves immediately; there is no Save or Done. Settings holds:
+The top action bar keeps one avatar on the left and WilLiz Math immediately to its right. Tapping the avatar opens Will, Liz, or Guest. A settings icon on the right opens the Settings page, with ← back at the top. Every mix change saves immediately; there is no Save or Done. Settings holds:
 
 1. Operations: addition, subtraction, multiplication, division (at least one).
 2. Difficulty: Easy, Pictures, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows objects to count.

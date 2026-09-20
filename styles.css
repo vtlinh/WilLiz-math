@@ -94,6 +94,23 @@ body {
   backdrop-filter: blur(12px);
 }
 
+.action-start {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.app-title {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.15rem, 4vw, 1.45rem);
+  font-weight: 680;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .learner-menu {
   position: relative;
   flex: 0 0 auto;
@@ -191,28 +208,14 @@ body {
   margin: 0;
 }
 
-body.is-settings .masthead,
 body.is-settings footer {
   display: none;
-}
-
-.masthead {
-  margin-bottom: 22px;
 }
 
 .mix-summary {
   margin: 0 0 18px;
   color: var(--muted);
   font-weight: 700;
-}
-
-.eyebrow {
-  margin: 0 0 6px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--sage);
 }
 
 h1,
@@ -222,25 +225,13 @@ h2,
   font-optical-sizing: auto;
 }
 
-h1 {
-  margin: 0;
-  font-size: clamp(2.4rem, 7vw, 4.2rem);
-  line-height: 0.95;
-}
-
 h2 {
   margin: 0 0 18px;
   font-size: 1.7rem;
 }
 
-.lede,
 footer p {
   color: var(--muted);
-}
-
-.lede {
-  max-width: 38rem;
-  font-size: 1.05rem;
 }
 
 .panel {
