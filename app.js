@@ -231,22 +231,17 @@ function lockHomeHistory() {
   history.pushState({ screen: "setup", trap: true }, "", screenUrl("setup"));
 }
 
-function armHomeHistory() {
-  lockHomeHistory();
-  lockHomeHistory();
-}
-
 function showScreen(name, { replace = false } = {}) {
   paintScreen(name);
   const state = { screen, trap: false };
   const url = screenUrl(screen);
   if (replace) {
     history.replaceState(state, "", url);
-    armHomeHistory();
+    lockHomeHistory();
     return;
   }
   if (history.state?.screen !== screen) history.pushState(state, "", url);
-  armHomeHistory();
+  lockHomeHistory();
 }
 
 function handleHistoryPop() {
@@ -257,30 +252,7 @@ function handleHistoryPop() {
     return;
   }
   paintScreen(next);
-  if (screen !== "setup") return;
-  armHomeHistory();
-  window.setTimeout(armHomeHistory, 0);
-}
-
-function stayOnHome() {
-  paintScreen("setup");
-  history.replaceState({ screen: "setup", trap: false }, "", screenUrl("setup"));
-  armHomeHistory();
-}
-
-function swallowHomeNavigate(event) {
-  if (event.navigationType !== "traverse" || screen !== "setup" || !event.canIntercept) return;
-  try {
-    event.intercept({
-      focusReset: "manual",
-      scroll: "manual",
-      handler() {
-        stayOnHome();
-      },
-    });
-  } catch {
-    stayOnHome();
-  }
+  if (screen === "setup") lockHomeHistory();
 }
 
 function modeMeta(mode) {
@@ -762,9 +734,6 @@ restoreSettings();
 const launchScreen = location.hash === "#settings" ? "settings" : "setup";
 showScreen(launchScreen, { replace: true });
 window.addEventListener("popstate", handleHistoryPop);
-if (window.navigation?.addEventListener) {
-  window.navigation.addEventListener("navigate", swallowHomeNavigate, { capture: true });
-}
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(() => {
