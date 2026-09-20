@@ -1,4 +1,4 @@
-import { planDivision, planMultiplication } from "./worksheet.js";
+import { planAddition, planDivision, planMultiplication } from "./worksheet.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -42,5 +42,19 @@ assert(short.table[0].value === 5, "1 × 5");
 const twelve = planDivision(144, 12);
 assert(twelve.quotient === 12, "144 ÷ 12");
 assert(twelve.steps.map((step) => step.q).join("") === "12", "12 steps");
+
+const addEasy = planAddition(12, 42);
+assert(addEasy.total === 54, "12 + 42");
+assert(addEasy.top.join("") === "12", "add top");
+assert(addEasy.bottom.join("") === "42", "add bottom");
+assert(addEasy.carries.every((c) => !c), "no carry");
+
+const addCarry = planAddition(25, 17);
+assert(addCarry.total === 42, "25 + 17");
+assert(addCarry.carries.join(",") === "1,", "carry into tens");
+
+const addWide = planAddition(99, 3);
+assert(addWide.total === 102, "99 + 3");
+assert(addWide.cols === 3, "sum needs 3 columns");
 
 console.log("worksheet checks passed");

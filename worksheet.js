@@ -246,9 +246,46 @@ export function renderDivisionSheet(problem, { typed = "", reveal = false } = {}
   return root;
 }
 
+export function planAddition(a, b) {
+  const total = a + b;
+  const cols = Math.max(String(a).length, String(b).length, String(total).length);
+  const top = padLeft(digitList(a), cols);
+  const bottom = padLeft(digitList(b), cols);
+  const carries = Array(cols).fill("");
+  let carry = 0;
+  for (let i = cols - 1; i >= 0; i -= 1) {
+    const n = Number(top[i] || 0) + Number(bottom[i] || 0) + carry;
+    carry = Math.floor(n / 10);
+    if (i > 0 && carry) carries[i - 1] = String(carry);
+  }
+  return {
+    cols,
+    top,
+    bottom,
+    carries,
+    total,
+    totalCells: padLeft(digitList(total), cols),
+  };
+}
+
+export function renderAdditionSheet(problem, { typed = "", reveal = false } = {}) {
+  const plan = planAddition(problem.a, problem.b);
+  const root = document.createElement("div");
+  root.className = "sheet";
+  root.dataset.op = "add";
+
+  if (reveal) root.append(row(plan.cols, plan.carries, { className: "is-carry" }));
+  root.append(row(plan.cols, plan.top));
+  root.append(row(plan.cols, plan.bottom, { op: "+" }));
+  root.append(rule(plan.cols));
+  root.append(row(plan.cols, reveal ? plan.totalCells : typedCells(typed, plan.cols), { className: "is-total" }));
+  return root;
+}
+
 export function renderProblemView(problem, options = {}) {
   if (problem.op === "mul") return renderMultiplicationSheet(problem, options);
   if (problem.op === "div") return renderDivisionSheet(problem, options);
+  if (problem.op === "add") return renderAdditionSheet(problem, options);
   const text = document.createElement("div");
   text.className = "problem-inline";
   text.textContent = options.reveal ? `${problem.prompt} = ${problem.answer}` : problem.prompt;
