@@ -12,12 +12,18 @@ export function numericDifficulty(difficulty) {
   return difficulty === "pictures" ? "easy" : difficulty;
 }
 
+export function playOps(ops, difficulty) {
+  const list = Array.isArray(ops) ? ops : [];
+  return difficulty === "pictures" ? list.filter((op) => op !== "div") : [...list];
+}
+
 export function generateProblem(ops, difficulty, previousKey = "") {
-  if (!ops.length) {
+  const pool = playOps(ops, difficulty);
+  if (!pool.length) {
     throw new Error("At least one operation is required");
   }
 
-  const chosen = pick(ops);
+  const chosen = pick(pool);
   const level = numericDifficulty(difficulty);
   const pictures = difficulty === "pictures";
   let a;

@@ -33,7 +33,7 @@ icon-512.png
 1. `storage.js` reads `localStorage` key `williz-math-v1` and normalizes it to `{ lastLearner, people, bests }`.
 2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`, `theme`. Theme defaults to `dark`. Switching learners restores that mix immediately. The settings page saves each tap inline and returns with ←.
 3. A legacy `settings` blob is migrated onto that learner once, then replaced by `people`.
-4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`.
+4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`. Pictures rounds use `playOps` so division is never in the mix.
 5. Addition, subtraction, multiplication, and division are rendered by `worksheet.js`. Pictures difficulty uses the counting-object sheet with drawings from `pictures.js` (fruit, toys, pencils/pens/erasers). `worksheetFields(problem)` lists every fillable working line.
 6. The keypad writes `current.fills[current.active]`. Submit uses `fieldsReady` / `fieldsMatch` so every line must be filled and correct. Practice retries on a miss; quiz and sprint advance after one try.
 7. Quiz rounds paint a bottom star tray with `progressStars(correct, limit)` so a star animates in at each 20% correct. Unlimited rounds use `unlimitedStars(attempts)` for each all-correct set of 10 from the first problem, then `X ★` after 7 icons.

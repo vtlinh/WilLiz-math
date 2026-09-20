@@ -6,7 +6,7 @@ activation: always_on
 # Math problems
 
 - Generate problems in `problems.js`. Keep `app.js` as UI and round state.
-- `pictures` is a hardness setting that only generates easy, countable problems (add/sub up to 8, mul/div factors up to 4) and renders kid-friendly drawings of fruit, toys, and school supplies (pens, pencils, erasers, crayons) to count instead of the column/long worksheets.
+- `pictures` is a hardness setting that only generates easy, countable problems (add/sub up to 8, mul factors up to 4) and renders kid-friendly drawings of fruit, toys, and school supplies (pens, pencils, erasers, crayons) to count instead of the column/long worksheets. Pictures never includes division: `playOps` drops `div`, the ÷ chip is disabled, and `generateProblem` will not pick it.
 - Addition is shown as vertical column addition: addends stacked, `+` on the left of the lower number, a rule, then the total. Do not show `a + b` as a single inline equation only.
 - Subtraction is shown the same way, stacked with `−` on the left of the lower number. Do not show `a − b` as a single inline equation only.
 - Multiplication is shown as long multiplication: stacked factors, a rule, partial products when the multiplier has more than one digit, then the total. Do not show `a × b` as a single inline equation only. Each partial product and the total is a fillable line. A one-digit multiplier has only the total line.

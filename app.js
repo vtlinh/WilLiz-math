@@ -1,4 +1,4 @@
-import { generateProblem } from "./problems.js";
+import { generateProblem, playOps } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
 import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
@@ -108,9 +108,12 @@ function syncSetupUi() {
     button.classList.toggle("is-selected", button.dataset.learner === settings.learner);
   }
   for (const button of els.opRow.querySelectorAll("[data-op]")) {
-    const on = settings.ops.includes(button.dataset.op);
+    const blocked = settings.difficulty === "pictures" && button.dataset.op === "div";
+    const on = !blocked && settings.ops.includes(button.dataset.op);
+    button.disabled = blocked;
     button.classList.toggle("is-selected", on);
     button.setAttribute("aria-pressed", String(on));
+    button.title = blocked ? "Pictures has no division" : "";
   }
   for (const button of els.difficultyRow.querySelectorAll("[data-difficulty]")) {
     const on = button.dataset.difficulty === settings.difficulty;
@@ -127,7 +130,9 @@ function syncSetupUi() {
   }
   applyTheme();
   const symbols = { add: "+", sub: "−", mul: "×", div: "÷" };
-  const ops = settings.ops.map((op) => symbols[op]).join(" ") || "no operations";
+  const ops = playOps(settings.ops, settings.difficulty)
+    .map((op) => symbols[op])
+    .join(" ") || "no operations";
   els.mixSummary.textContent = `${settings.learner} · ${modeMeta(settings.mode).label} · ${settings.difficulty} · ${ops}`;
   if (settings.ops.length) els.setupError.hidden = true;
 }
@@ -229,7 +234,8 @@ function clearTimer() {
 }
 
 function startRound() {
-  if (!settings.ops.length) {
+  const ops = playOps(settings.ops, settings.difficulty);
+  if (!ops.length) {
     els.setupError.hidden = false;
     setSettingsOpen(true);
     return;
@@ -245,7 +251,7 @@ function startRound() {
   round = {
     ...meta,
     learner: settings.learner,
-    ops: [...settings.ops],
+    ops,
     difficulty: settings.difficulty,
     mode: settings.mode,
     startedAt: Date.now(),
@@ -489,6 +495,7 @@ function finishRound({ to = "results" } = {}) {
 }
 
 function toggleOp(op) {
+  if (settings.difficulty === "pictures" && op === "div") return;
   if (settings.ops.includes(op)) {
     settings.ops = settings.ops.filter((item) => item !== op);
   } else {

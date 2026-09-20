@@ -309,6 +309,12 @@ legend {
   color: var(--ink);
 }
 
+.chip:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .chip.is-selected,
 .seg-btn.is-selected,
 .mode-card.is-selected {
@@ -378,7 +384,7 @@ legend {
 }
 
 .primary:hover,
-.chip:hover,
+.chip:hover:not(:disabled),
 .seg-btn:hover,
 .mode-card:hover,
 .ghost:hover,
