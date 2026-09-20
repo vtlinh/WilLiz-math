@@ -121,7 +121,7 @@ function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0, left
   }
 }
 
-function appendAdditionSlots(slots, values, cols, line, step = 0) {
+function appendAdditionSlots(slots, values, cols, line, step = 0, { includeCarries = true } = {}) {
   const rows = values.map((value) => padLeft(digitList(value), cols).map((d) => (d === "" || d === "−" ? 0 : Number(d))));
   let carry = 0;
   for (let col = cols - 1; col >= 0; col -= 1) {
@@ -136,7 +136,7 @@ function appendAdditionSlots(slots, values, cols, line, step = 0) {
       col,
       answer: write,
     });
-    if (next && col > 0) {
+    if (includeCarries && next && col > 0) {
       pushSlot(slots, {
         id: `${line}-c${col}`,
         kind: "carry",
@@ -210,6 +210,7 @@ function multiplicationSlots(a, b, cols, partials, total) {
       cols,
       "total",
       partials.length,
+      { includeCarries: false },
     );
   } else {
     appendProductSlots(slots, {

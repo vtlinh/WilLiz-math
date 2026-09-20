@@ -93,12 +93,20 @@ assert(subWide.cols === 3, "keep three columns");
 const mulLines = worksheetFields({ a: 124, b: 26, op: "mul", answer: 3224, difficulty: "hard" });
 assert(
   mulLines.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:4,carry:2,digit:2,carry:1,digit:6,digit:8,digit:4,digit:2,digit:4,digit:2,carry:1,digit:2,carry:1,digit:3",
+    "digit:4,carry:2,digit:2,carry:1,digit:6,digit:8,digit:4,digit:2,digit:4,digit:2,digit:2,digit:3",
   "124 × 26 fills each place product, not folded carries",
 );
 assert(mulLines.some((field) => field.line === "partial-0"), "ones partial");
 assert(mulLines.some((field) => field.line === "partial-1"), "tens partial");
 assert(mulLines.some((field) => field.line === "total"), "product total");
+assert(
+  mulLines.filter((field) => field.line === "total").every((field) => field.kind === "digit"),
+  "final product has no carry boxes",
+);
+assert(
+  mulLines.some((field) => field.line.startsWith("partial-") && field.kind === "carry"),
+  "partials still keep carry boxes",
+);
 assert(
   mulLines.filter((field) => field.line === "partial-1" && field.kind === "digit").every((field) => field.col < 3),
   "tens partial 248 starts at the tens, no shift zero",
@@ -111,7 +119,7 @@ assert(
 );
 
 const eleven = worksheetFields({ a: 11, b: 29, op: "mul", answer: 319, difficulty: "challenge" });
-assert(eleven.map((field) => field.answer).join(",") === "9,9,2,2,9,1,1,3", "11 × 29 is 99, then 22 shifted, then 319");
+assert(eleven.map((field) => field.answer).join(",") === "9,9,2,2,9,1,3", "11 × 29 is 99, then 22 shifted, then 319");
 assert(
   eleven.filter((field) => field.line === "partial-1").map((field) => field.answer).join(",") === "2,2",
   "tens of 11 × 29 is 22 shifted left, not 220",
@@ -120,7 +128,7 @@ assert(
 const nineByThirteen = worksheetFields({ a: 9, b: 13, op: "mul", answer: 117, difficulty: "easy" });
 assert(
   nineByThirteen.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:7,carry:2,digit:9,digit:7,digit:1,carry:1,digit:1",
+    "digit:7,carry:2,digit:9,digit:7,digit:1,digit:1",
   "9 × 13 is 7 with carry 2, then 9 shifted, then 117",
 );
 const onesPartial = nineByThirteen.filter((field) => field.line === "partial-0");
@@ -146,7 +154,7 @@ assert(
 const twentySix = worksheetFields({ a: 26, b: 12, op: "mul", answer: 312, difficulty: "medium" });
 assert(
   twentySix.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:2,carry:1,digit:4,digit:6,digit:2,digit:2,digit:1,carry:1,digit:3",
+    "digit:2,carry:1,digit:4,digit:6,digit:2,digit:2,digit:1,digit:3",
   "26 × 12 ones is 40 + 12: 2, carry 1, tens 4",
 );
 const twentySixOnes = twentySix.filter((field) => field.line === "partial-0");
