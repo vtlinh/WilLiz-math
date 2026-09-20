@@ -644,6 +644,17 @@ footer {
   text-align: center;
 }
 
+.celebrate-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+
+body.celebrate-static .results-headline {
+  color: var(--gold);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

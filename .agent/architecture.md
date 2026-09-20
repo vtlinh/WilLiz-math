@@ -9,9 +9,11 @@ app.js              round state and UI
 storage.js          per-learner settings and bests
 problems.js         generateProblem, parseAnswer
 worksheet.js        long multiplication and long division layouts
+celebrate.js        perfect-score confetti and fireworks
 test-problems.mjs   Node checks for the generator
 test-storage.mjs    Node checks for per-learner storage
-test-worksheet.mjs  Node checks for multiplication layout
+test-worksheet.mjs  Node checks for worksheet layouts
+test-celebrate.mjs  Node checks for when a perfect score celebrates
 .github/workflows/pages.yml
 ```
 

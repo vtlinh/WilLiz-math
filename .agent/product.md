@@ -30,4 +30,5 @@ Addition and subtraction are written as vertical column arithmetic. Multiplicati
 ## Success
 
 - A child can start a round in one screen and get immediate right/wrong feedback.
+- A perfect score (100% correct, at least one answer) on Pictures, Hard, or Challenge plays confetti and fireworks. Easy and Medium do not.
 - The same files work locally and at `https://vtlinh.github.io/WilLiz-math/` after Pages is enabled.

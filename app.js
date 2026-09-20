@@ -1,6 +1,7 @@
 import { generateProblem, parseAnswer } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, personMix, writePersonMix } from "./storage.js";
 import { renderProblemView } from "./worksheet.js";
+import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -160,6 +161,7 @@ function startRound() {
   els.setupError.hidden = true;
   persistSettings();
   clearTimer();
+  stopCelebration();
   setSettingsOpen(false);
 
   const meta = modeMeta(settings.mode);
@@ -279,6 +281,11 @@ function finishRound() {
   clearTimer();
   const elapsed = Date.now() - round.startedAt;
   const accuracy = round.answered ? Math.round((round.correct / round.answered) * 100) : 0;
+  const celebrate = shouldCelebrate({
+    answered: round.answered,
+    correct: round.correct,
+    difficulty: round.difficulty,
+  });
   const store = loadStore();
   store.bests ??= {};
   const key = bestKey();
@@ -302,6 +309,7 @@ function finishRound() {
       : "This mix now has a saved best.";
   round = null;
   showScreen("results");
+  if (celebrate) playCelebration();
 }
 
 function toggleOp(op) {
@@ -372,6 +380,7 @@ els.form.addEventListener("submit", submitAnswer);
 els.endBtn.addEventListener("click", finishRound);
 els.againBtn.addEventListener("click", startRound);
 els.setupBtn.addEventListener("click", () => {
+  stopCelebration();
   showScreen("setup");
   setSettingsOpen(true);
 });
