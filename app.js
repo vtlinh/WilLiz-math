@@ -491,16 +491,7 @@ function bestKey() {
 
 function requestLeaveSession() {
   if (screen !== "play" || !round) return;
-  if (!isPracticePlay()) {
-    finishRound();
-    return;
-  }
-  const unfinished = round.asked > 0 && (!round.limit || round.answered < round.limit);
-  if (unfinished || !round.limit) {
-    setLeaveOpen(true);
-    return;
-  }
-  leavePractice();
+  setLeaveOpen(true);
 }
 
 function leavePractice() {
