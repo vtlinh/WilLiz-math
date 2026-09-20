@@ -17,3 +17,5 @@ Checks:
 node --experimental-default-type=module test-problems.mjs
 node --experimental-default-type=module test-storage.mjs
 ```
+
+After those pass, merge the commits into `main` and push. See `.agent/rules/git.md`.
