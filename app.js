@@ -190,7 +190,7 @@ function startRound() {
 
 function paintProblem(reveal = false) {
   els.problem.replaceChildren(renderProblemView(current, { typed: els.input.value, reveal }));
-  els.problem.classList.toggle("is-sheet", current.op === "mul");
+  els.problem.classList.toggle("is-sheet", current.op === "mul" || current.op === "div");
 }
 
 function nextProblem() {

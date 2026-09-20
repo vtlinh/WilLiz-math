@@ -418,6 +418,77 @@ legend {
   min-height: 2rem;
 }
 
+.sheet-div {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.div-table {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: "Fraunces", Georgia, serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.div-table li.is-used {
+  font-weight: 800;
+  color: var(--sage-deep);
+}
+
+.div-work {
+  min-width: 0;
+}
+
+.div-digits {
+  display: grid;
+  grid-template-columns: 1.1rem repeat(var(--cols), minmax(1.2rem, 1.6rem)) 1.1rem;
+  justify-content: start;
+}
+
+.div-digits.is-sub {
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 4px;
+}
+
+.div-line {
+  display: flex;
+  align-items: stretch;
+}
+
+.div-divisor {
+  display: grid;
+  place-items: center;
+  min-width: 2.6rem;
+  padding: 0 0.35rem 0 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.div-divisor.is-spacer {
+  visibility: hidden;
+}
+
+.div-digits.is-dividend {
+  border-top: 2px solid var(--ink);
+  border-left: 2px solid var(--ink);
+  border-top-left-radius: 10px;
+}
+
+.div-digits.is-quotient {
+  margin-left: 0;
+}
+
+.sheet-cell.is-arrow {
+  color: var(--ink);
+  font-size: 1.1rem;
+}
+
 .answer-form {
   display: flex;
   gap: 10px;

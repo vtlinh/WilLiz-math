@@ -128,8 +128,127 @@ export function renderMultiplicationSheet(problem, { typed = "", reveal = false 
   return root;
 }
 
+export function planDivision(dividend, divisor) {
+  const digits = String(dividend).split("").map(Number);
+  const quotientSlots = Array(digits.length).fill("");
+  const steps = [];
+  let remainder = 0;
+  let started = false;
+
+  for (let i = 0; i < digits.length; i += 1) {
+    remainder = remainder * 10 + digits[i];
+    const q = Math.floor(remainder / divisor);
+    if (!started && q === 0 && i < digits.length - 1) {
+      continue;
+    }
+    started = true;
+    const product = q * divisor;
+    const next = remainder - product;
+    steps.push({
+      take: remainder,
+      q,
+      product,
+      remainder: next,
+      endIndex: i,
+      bringDown: i < digits.length - 1 ? digits[i + 1] : null,
+    });
+    quotientSlots[i] = String(q);
+    remainder = next;
+  }
+
+  return {
+    dividend,
+    divisor,
+    digits,
+    quotient: dividend / divisor,
+    quotientSlots,
+    steps,
+    table: Array.from({ length: 9 }, (_, index) => {
+      const n = index + 1;
+      return { n, value: n * divisor };
+    }),
+  };
+}
+
+function placeDigits(length, text, endIndex) {
+  const cells = Array(length).fill("");
+  const digits = String(text).split("");
+  const start = endIndex - digits.length + 1;
+  digits.forEach((digit, index) => {
+    const at = start + index;
+    if (at >= 0 && at < length) cells[at] = digit;
+  });
+  return cells;
+}
+
+function divisionRow(cols, values, { op = "", arrow = "", className = "" } = {}) {
+  const wrap = document.createElement("div");
+  wrap.className = `div-digits ${className}`.trim();
+  wrap.style.setProperty("--cols", String(cols));
+  wrap.append(cell(op, "is-op"));
+  for (const value of values) wrap.append(cell(value));
+  wrap.append(cell(arrow, "is-arrow"));
+  return wrap;
+}
+
+export function renderDivisionSheet(problem, { typed = "", reveal = false } = {}) {
+  const plan = planDivision(problem.a, problem.b);
+  const cols = plan.digits.length;
+  const root = document.createElement("div");
+  root.className = "sheet sheet-div";
+  root.dataset.op = "div";
+
+  const table = document.createElement("ol");
+  table.className = "div-table";
+  const used = new Set(plan.steps.map((step) => step.q).filter(Boolean));
+  for (const entry of plan.table) {
+    const item = document.createElement("li");
+    item.textContent = `${entry.n} – ${entry.value}`;
+    if (reveal && used.has(entry.n)) item.classList.add("is-used");
+    table.append(item);
+  }
+
+  const work = document.createElement("div");
+  work.className = "div-work";
+
+  const line = (values, options = {}) => {
+    const wrap = document.createElement("div");
+    wrap.className = "div-line";
+    const label = document.createElement("span");
+    label.className = options.divisor ? "div-divisor" : "div-divisor is-spacer";
+    label.textContent = String(plan.divisor);
+    wrap.append(label, divisionRow(cols, values, options));
+    return wrap;
+  };
+
+  const topSlots = reveal
+    ? plan.quotientSlots
+    : padLeft(typed && typed !== "-" && typed !== "−" ? digitList(typed.replace("-", "−")) : [], cols);
+  work.append(line(topSlots, { className: "is-quotient" }));
+  work.append(line(plan.digits, { className: "is-dividend", divisor: true }));
+
+  if (reveal) {
+    for (const step of plan.steps) {
+      work.append(
+        line(placeDigits(cols, step.product, step.endIndex), {
+          op: "−",
+          arrow: step.bringDown !== null ? "↓" : "",
+          className: "is-sub",
+        }),
+      );
+      const remCells = placeDigits(cols, step.remainder, step.endIndex);
+      if (step.bringDown !== null) remCells[step.endIndex + 1] = String(step.bringDown);
+      work.append(line(remCells, { className: "is-remain" }));
+    }
+  }
+
+  root.append(table, work);
+  return root;
+}
+
 export function renderProblemView(problem, options = {}) {
   if (problem.op === "mul") return renderMultiplicationSheet(problem, options);
+  if (problem.op === "div") return renderDivisionSheet(problem, options);
   const text = document.createElement("div");
   text.className = "problem-inline";
   text.textContent = options.reveal ? `${problem.prompt} = ${problem.answer}` : problem.prompt;

@@ -19,7 +19,7 @@ The top action bar keeps account picking on the left (Will, Liz, Guest) and a se
 
 There is no Skip. Practice allows a retry on the same problem. Quiz and sprint allow one try, then reveal and advance.
 
-Multiplication is written as long multiplication (stacked factors, partial products, total), matching school worksheet form.
+Multiplication is written as long multiplication (stacked factors, partial products, total). Division is written as long division with a divisor times table and bring-down working.
 
 ## Non-goals
 

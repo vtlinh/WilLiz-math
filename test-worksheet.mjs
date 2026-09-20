@@ -1,4 +1,4 @@
-import { planMultiplication } from "./worksheet.js";
+import { planDivision, planMultiplication } from "./worksheet.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -24,4 +24,23 @@ const easy = planMultiplication(4, 5);
 assert(easy.total === 20, "4 × 5");
 assert(easy.cols >= 2, "enough columns for 20");
 
-console.log("multiplication worksheet checks passed");
+const long = planDivision(13032, 24);
+assert(long.quotient === 543, "13032 ÷ 24");
+assert(long.steps.map((step) => step.q).join("") === "543", "quotient steps");
+assert(long.steps[0].product === 120, "first subtract 120");
+assert(long.steps[1].product === 96, "then 96");
+assert(long.steps[2].product === 72, "then 72");
+assert(long.steps.at(-1).remainder === 0, "exact remainder");
+assert(long.table[4].value === 120, "5 × 24 table");
+assert(long.quotientSlots.join("") === "543", "slots skip leading empties");
+
+const short = planDivision(20, 5);
+assert(short.quotient === 4, "20 ÷ 5");
+assert(short.steps.length === 1, "one division step");
+assert(short.table[0].value === 5, "1 × 5");
+
+const twelve = planDivision(144, 12);
+assert(twelve.quotient === 12, "144 ÷ 12");
+assert(twelve.steps.map((step) => step.q).join("") === "12", "12 steps");
+
+console.log("worksheet checks passed");
