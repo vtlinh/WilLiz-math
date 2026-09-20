@@ -226,12 +226,9 @@ function screenUrl(name) {
   return name === "setup" ? "./" : `./#${name}`;
 }
 
-let homeTrapSeq = 0;
-
 function lockHomeHistory() {
   if (screen !== "setup") return;
-  homeTrapSeq += 1;
-  history.pushState({ screen: "setup", trap: true }, "", `./#home-${homeTrapSeq}`);
+  history.pushState({ screen: "setup", trap: true }, "", screenUrl("setup"));
 }
 
 function armHomeHistory() {
@@ -273,13 +270,17 @@ function stayOnHome() {
 
 function swallowHomeNavigate(event) {
   if (event.navigationType !== "traverse" || screen !== "setup" || !event.canIntercept) return;
-  event.intercept({
-    focusReset: "manual",
-    scroll: "manual",
-    handler() {
-      stayOnHome();
-    },
-  });
+  try {
+    event.intercept({
+      focusReset: "manual",
+      scroll: "manual",
+      handler() {
+        stayOnHome();
+      },
+    });
+  } catch {
+    stayOnHome();
+  }
 }
 
 function modeMeta(mode) {

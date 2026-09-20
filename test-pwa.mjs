@@ -38,7 +38,6 @@ assert(app.includes("serviceWorker.register"), "register service worker");
 assert(app.includes("history.back()"), "settings back uses browser history");
 assert(app.includes("function lockHomeHistory"), "home back is swallowed so the app does not quit");
 assert(app.includes("function armHomeHistory"), "home stacks more than one trap entry");
-assert(app.includes("#home-"), "home trap uses a distinct history url");
 assert(app.includes("function swallowHomeNavigate"), "home back intercepts Navigation API traversals");
 assert(app.includes('navigationType !== "traverse"'), "only back/forward traversals are swallowed on home");
 assert(app.includes("handleHistoryPop"), "system back is wired to in-app screens");
