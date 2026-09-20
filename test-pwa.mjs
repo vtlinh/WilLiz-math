@@ -30,5 +30,11 @@ assert(app.includes("function leavePractice"), "practice back has a leave path")
 assert(!app.includes('finishRound({ to: "setup" })'), "practice back shows results, not home");
 assert(html.includes("See results"), "leave confirm opens results");
 assert(html.indexOf('id="keypad"') < html.indexOf('id="submit-btn"'), "Submit sits below the keypad");
+const keypad = html.slice(html.indexOf('id="keypad"'), html.indexOf("</div>", html.indexOf('id="keypad"')));
+assert(
+  keypad.indexOf('data-key="1"') < keypad.indexOf('data-key="4"') &&
+    keypad.indexOf('data-key="4"') < keypad.indexOf('data-key="7"'),
+  "numpad is 1–3, then 4–6, then 7–9",
+);
 
 console.log("pwa install checks passed");
