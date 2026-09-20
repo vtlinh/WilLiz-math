@@ -8,8 +8,10 @@ styles.css          layout and theme
 app.js              round state and UI
 storage.js          per-learner settings and bests
 problems.js         generateProblem, parseAnswer
+worksheet.js        vertical long-multiplication layout
 test-problems.mjs   Node checks for the generator
 test-storage.mjs    Node checks for per-learner storage
+test-worksheet.mjs  Node checks for multiplication layout
 .github/workflows/pages.yml
 ```
 
@@ -19,7 +21,8 @@ test-storage.mjs    Node checks for per-learner storage
 2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`. Switching learners restores that mix immediately.
 3. A legacy `settings` blob is migrated onto that learner once, then replaced by `people`.
 4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`.
-5. Submit parses the input with `parseAnswer`. Practice retries on a miss; quiz and sprint advance after one try.
+5. Multiplication is rendered by `worksheet.js` as long multiplication. Other operations still use the inline prompt until they get their own sheets.
+6. Submit parses the input with `parseAnswer`. Practice retries on a miss; quiz and sprint advance after one try.
 6. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves.
 
 ## Problem rules

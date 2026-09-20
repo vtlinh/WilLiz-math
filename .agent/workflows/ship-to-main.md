@@ -9,6 +9,7 @@ description: Merge the current branch to main after tests pass
 ```bash
 node --experimental-default-type=module test-problems.mjs
 node --experimental-default-type=module test-storage.mjs
+node --experimental-default-type=module test-worksheet.mjs
 ```
 
 2. If either command fails, stop and fix.

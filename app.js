@@ -1,5 +1,6 @@
 import { generateProblem, parseAnswer } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, personMix, writePersonMix } from "./storage.js";
+import { renderProblemView } from "./worksheet.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -187,15 +188,20 @@ function startRound() {
   }
 }
 
+function paintProblem(reveal = false) {
+  els.problem.replaceChildren(renderProblemView(current, { typed: els.input.value, reveal }));
+  els.problem.classList.toggle("is-sheet", current.op === "mul");
+}
+
 function nextProblem() {
   awaitingAdvance = false;
   current = generateProblem(round.ops, round.difficulty, round.lastKey);
   round.lastKey = current.key;
   round.asked += 1;
-  els.problem.textContent = current.prompt;
   els.input.value = "";
   els.feedback.textContent = "";
   els.feedback.className = "feedback";
+  paintProblem(false);
   els.input.focus();
   updateProgress();
 }
@@ -224,10 +230,12 @@ function mark(correct) {
     round.bestStreak = Math.max(round.bestStreak, round.streak);
     els.feedback.textContent = "Nice. That’s right.";
     els.feedback.className = "feedback is-good";
+    paintProblem(true);
   } else {
     round.streak = 0;
     els.feedback.textContent = `Not quite. ${current.prompt} = ${current.answer}`;
     els.feedback.className = "feedback is-bad";
+    paintProblem(true);
   }
 }
 
@@ -309,13 +317,12 @@ function toggleOp(op) {
 function pressKey(key) {
   if (key === "back") {
     els.input.value = els.input.value.slice(0, -1);
-    return;
-  }
-  if (key === "-" || key === "−") {
+  } else if (key === "-" || key === "−") {
     els.input.value = els.input.value.startsWith("-") ? els.input.value.slice(1) : `-${els.input.value}`;
-    return;
+  } else {
+    els.input.value += key;
   }
-  els.input.value += key;
+  paintProblem(false);
   els.input.focus();
 }
 
@@ -358,6 +365,9 @@ document.addEventListener("keydown", (event) => {
 });
 
 els.startBtn.addEventListener("click", startRound);
+els.input.addEventListener("input", () => {
+  if (current && !awaitingAdvance) paintProblem(false);
+});
 els.form.addEventListener("submit", submitAnswer);
 els.endBtn.addEventListener("click", finishRound);
 els.againBtn.addEventListener("click", startRound);

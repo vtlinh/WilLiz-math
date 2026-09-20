@@ -32,6 +32,7 @@ Problem generation can be checked with:
 ```bash
 node --experimental-default-type=module test-problems.mjs
 node --experimental-default-type=module test-storage.mjs
+node --experimental-default-type=module test-worksheet.mjs
 ```
 
 ## GitHub Pages

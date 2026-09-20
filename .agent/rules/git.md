@@ -11,6 +11,7 @@ activation: always_on
 ```bash
 node --experimental-default-type=module test-problems.mjs
 node --experimental-default-type=module test-storage.mjs
+node --experimental-default-type=module test-worksheet.mjs
 ```
 
 - If those pass and the change is UI-only, still merge. Full browser verification can follow when no more follow-ups are queued.
