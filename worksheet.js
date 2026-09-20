@@ -235,10 +235,16 @@ function multiplicationSlots(a, b, cols, partials, total) {
   return slots;
 }
 
+export function displayDigit(value) {
+  if (value === 0 || value === "0") return "0";
+  if (value === "" || value == null) return "";
+  return String(value);
+}
+
 function cell(text, className = "") {
   const span = document.createElement("span");
   span.className = `sheet-cell ${className}`.trim();
-  span.textContent = text || "";
+  span.textContent = displayDigit(text);
   return span;
 }
 

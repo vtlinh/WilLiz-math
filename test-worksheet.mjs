@@ -5,6 +5,7 @@ import {
   planDivision,
   planMultiplication,
   planSubtraction,
+  displayDigit,
   worksheetFields,
   worksheetSections,
 } from "./worksheet.js";
@@ -50,6 +51,16 @@ assert(short.steps.length === 1, "one division step");
 const twelve = planDivision(144, 12);
 assert(twelve.quotient === 12, "144 ÷ 12");
 assert(twelve.steps.map((step) => step.q).join("") === "12", "12 steps");
+
+const twoTwenty = planDivision(220, 20);
+assert(twoTwenty.digits.join(",") === "2,2,0", "220 keeps the ones zero");
+assert(twoTwenty.digits.map(displayDigit).join("") === "220", "rendered dividend stays 220");
+assert(twoTwenty.quotient === 11, "220 ÷ 20 is 11");
+assert(twoTwenty.steps.map((step) => step.q).join("") === "11", "220 ÷ 20 steps");
+assert(twoTwenty.steps.at(-1).remainder === 0, "220 ÷ 20 is exact, no leftover remainder");
+assert(displayDigit(0) === "0", "zero digit is visible");
+assert(displayDigit("0") === "0", "zero string is visible");
+assert(displayDigit("") === "", "empty stays empty");
 
 const addEasy = planAddition(12, 42);
 assert(addEasy.total === 54, "12 + 42");
@@ -119,6 +130,12 @@ assert(divLines.some((field) => field.kind === "bring"), "bring-down is its own 
 
 const shortDiv = worksheetFields({ a: 20, b: 5, op: "div", answer: 4, difficulty: "easy" });
 assert(shortDiv.map((field) => field.answer).join(",") === "4,2,0,0", "20 ÷ 5 fills quotient, product, remainder");
+
+const twoTwentyFields = worksheetFields({ a: 220, b: 20, op: "div", answer: 11, difficulty: "challenge" });
+assert(
+  twoTwentyFields.map((field) => field.answer).join(",") === "1,2,0,2,0,1,2,0,0",
+  "220 ÷ 20 fills 11, then 20 / 2↓0, then 20 / 0",
+);
 
 const divSteps = worksheetSections(divLines);
 assert(divSteps.length === 3, "13032 ÷ 24 has three working steps");
