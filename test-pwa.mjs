@@ -41,7 +41,9 @@ assert(app.includes("handleHistoryPop"), "system back is wired to in-app screens
 const popHandler = app.slice(app.indexOf("function handleHistoryPop"), app.indexOf("function modeMeta"));
 assert(popHandler.includes("lockHomeHistory()"), "home trap is re-armed after a pop");
 assert(popHandler.includes("isLeaveOpen()"), "system back sees an open leave dialog");
-assert(popHandler.includes("setLeaveOpen(false)"), "system back dismisses an open leave dialog");
+assert(popHandler.includes("fromHistory: true"), "system back pops the leave history entry");
+assert(app.includes("./#play/leave"), "leave dialog has its own history URL");
+assert(app.includes("leave: true"), "leave dialog push stays on the play screen");
 assert(!popHandler.includes("setTimeout"), "home does not stack extra trap entries after pop");
 assert(!app.includes("function armHomeHistory"), "home does not stack multiple trap entries");
 assert(css.includes(".icon-btn.is-hidden"), "home hides the session back control");

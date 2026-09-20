@@ -204,12 +204,25 @@ function syncPlayChrome() {
   if (practice) paintPlayStat();
 }
 
-function setLeaveOpen(open) {
+function leaveUrl() {
+  return "./#play/leave";
+}
+
+function setLeaveOpen(open, { fromHistory = false } = {}) {
+  const wasOpen = isLeaveOpen();
   els.leaveDialog.classList.toggle("hidden", !open);
   els.leaveBackdrop.classList.toggle("hidden", !open);
   els.leaveDialog.hidden = !open;
   els.leaveBackdrop.hidden = !open;
   document.body.classList.toggle("leave-open", open);
+  if (fromHistory || wasOpen === open) return;
+  if (open && !history.state?.leave) {
+    history.pushState({ screen: "play", leave: true }, "", leaveUrl());
+    return;
+  }
+  if (!open && history.state?.leave) {
+    history.replaceState({ screen: "play", trap: false }, "", screenUrl("play"));
+  }
 }
 
 function isLeaveOpen() {
@@ -249,13 +262,17 @@ function showScreen(name, { replace = false } = {}) {
 }
 
 function handleHistoryPop() {
+  if (isLeaveOpen()) {
+    setLeaveOpen(false, { fromHistory: true });
+    if (round) {
+      if (history.state?.screen !== "play") showScreen("play");
+      else paintScreen("play");
+    }
+    return;
+  }
   const next = history.state?.screen === "play" && !round ? "setup" : history.state?.screen || "setup";
   if (screen === "play" && round && next !== "play") {
     showScreen("play");
-    if (isLeaveOpen()) {
-      setLeaveOpen(false);
-      return;
-    }
     requestLeaveSession();
     return;
   }
