@@ -23,7 +23,7 @@ test-worksheet.mjs  Node checks for multiplication layout
 4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`.
 5. Multiplication is rendered by `worksheet.js` as long multiplication. Other operations still use the inline prompt until they get their own sheets.
 6. Submit parses the input with `parseAnswer`. Practice retries on a miss; quiz and sprint advance after one try.
-6. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves.
+7. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves.
 
 ## Problem rules
 
