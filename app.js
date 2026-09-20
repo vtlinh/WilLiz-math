@@ -212,6 +212,10 @@ function setLeaveOpen(open) {
   document.body.classList.toggle("leave-open", open);
 }
 
+function isLeaveOpen() {
+  return !els.leaveDialog.hidden;
+}
+
 function paintScreen(name) {
   screen = name === "play" || name === "settings" || name === "results" ? name : "setup";
   els.setup.classList.toggle("hidden", screen !== "setup");
@@ -248,6 +252,10 @@ function handleHistoryPop() {
   const next = history.state?.screen === "play" && !round ? "setup" : history.state?.screen || "setup";
   if (screen === "play" && round && next !== "play") {
     showScreen("play");
+    if (isLeaveOpen()) {
+      setLeaveOpen(false);
+      return;
+    }
     requestLeaveSession();
     return;
   }
@@ -682,6 +690,10 @@ els.sessionBack.addEventListener("click", () => {
   if (screen === "setup" || screen === "results") return;
   if (screen === "settings") {
     setSettingsOpen(false);
+    return;
+  }
+  if (isLeaveOpen()) {
+    setLeaveOpen(false);
     return;
   }
   requestLeaveSession();
