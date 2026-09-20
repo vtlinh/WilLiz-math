@@ -24,6 +24,14 @@ assert(actionBar.includes('id="setup-title"'), "Settings title lives in the acti
 assert(!html.includes("settings-head"), "no second settings status bar");
 assert(!html.includes("settings-back"), "settings uses the global back button");
 
+const worksheet = readFileSync(new URL("./worksheet.js", import.meta.url), "utf8");
+const mulRender = worksheet.slice(
+  worksheet.indexOf("export function renderMultiplicationSheet"),
+  worksheet.indexOf("export function planDivision"),
+);
+assert(!mulRender.includes("sheet-eq"), "multiplication has no horizontal a × b = line");
+assert(!mulRender.includes(" × "), "multiplication does not repeat the equation above the stack");
+
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert(app.includes("serviceWorker.register"), "register service worker");
 assert(app.includes("function leavePractice"), "practice back has a leave path");

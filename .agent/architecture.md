@@ -42,7 +42,8 @@ icon-512.png
 ## Problem rules
 
 - Subtraction answers are never negative.
-- Division is exact integer division; the divisor is never zero.
+- Division is exact integer division by a one-digit divisor (2–9).
+- Multiplication puts the larger factor on top.
 - Challenge multiplication uses larger factors; Easy stays in small whole numbers.
 
 Keep generation in `problems.js` so `test-problems.mjs` can import it without the DOM.

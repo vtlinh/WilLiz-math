@@ -47,10 +47,11 @@ export function generateProblem(ops, difficulty, previousKey = "") {
       const min = pictures ? 1 : level === "challenge" ? 8 : 1;
       a = randInt(min, max);
       b = randInt(min, max);
+      if (b > a) [a, b] = [b, a];
       answer = a * b;
     } else {
       const max = pictures ? 4 : { easy: 5, medium: 12, hard: 15, challenge: 20 }[level];
-      b = randInt(2, max);
+      b = randInt(2, Math.min(max, 9));
       answer = randInt(1, max);
       a = b * answer;
     }

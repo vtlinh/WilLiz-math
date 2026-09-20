@@ -18,9 +18,13 @@ for (const op of ops) {
         assert(problem.answer === problem.a - problem.b, "sub");
         assert(problem.answer >= 0, "sub non-negative");
       }
-      if (op === "mul") assert(problem.answer === problem.a * problem.b, "mul");
+      if (op === "mul") {
+        assert(problem.answer === problem.a * problem.b, "mul");
+        assert(problem.a >= problem.b, "larger factor on top");
+      }
       if (op === "div") {
         assert(problem.b !== 0, "div by zero");
+        assert(problem.b >= 2 && problem.b <= 9, "one-digit divisor");
         assert(problem.a / problem.b === problem.answer, "div exact");
         assert(Number.isInteger(problem.answer), "div integer");
       }

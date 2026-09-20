@@ -335,11 +335,6 @@ export function renderMultiplicationSheet(problem, { fills = [], active = 0, rev
   root.className = "sheet";
   root.dataset.op = "mul";
 
-  const eq = document.createElement("p");
-  eq.className = "sheet-eq";
-  eq.textContent = reveal ? `${problem.a} × ${problem.b} = ${plan.total}` : `${problem.a} × ${problem.b} =`;
-  root.append(eq);
-
   root.append(row(plan.cols, plan.top));
   root.append(row(plan.cols, plan.mul, { op: "×" }));
   root.append(rule(plan.cols));
