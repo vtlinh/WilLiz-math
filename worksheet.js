@@ -86,7 +86,7 @@ function pushSlot(slots, field) {
   });
 }
 
-function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0 }) {
+function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0, leftoverAs = "digit" }) {
   const { steps, leftover, sourceLen } = timesDigitSteps(a, digit);
   for (let i = 0; i < steps.length; i += 1) {
     const item = steps[i];
@@ -114,7 +114,7 @@ function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0 }) {
     const last = steps.at(-1);
     pushSlot(slots, {
       id: `${line}-lead`,
-      kind: "digit",
+      kind: leftoverAs === "carry" ? "carry" : "digit",
       line,
       step,
       col: cols - sourceLen + last.sourceIndex - shift - 1,
@@ -203,6 +203,7 @@ function multiplicationSlots(a, b, cols, partials, total) {
         cols,
         line: `partial-${index}`,
         step: index,
+        leftoverAs: "carry",
       });
     }
     appendAdditionSlots(

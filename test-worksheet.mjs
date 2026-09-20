@@ -117,6 +117,26 @@ assert(
   "tens of 11 × 29 is 22 shifted left, not 220",
 );
 
+const nineByThirteen = worksheetFields({ a: 9, b: 13, op: "mul", answer: 117, difficulty: "easy" });
+assert(
+  nineByThirteen.map((field) => `${field.kind}:${field.answer}`).join(",") ===
+    "digit:7,carry:2,digit:9,digit:7,digit:1,carry:1,digit:1",
+  "9 × 13 is 7 with carry 2, then 9 shifted, then 117",
+);
+assert(
+  nineByThirteen.filter((field) => field.line === "partial-0").map((field) => `${field.kind}:${field.answer}`).join(",") ===
+    "digit:7,carry:2",
+  "9 × 3 is 7 in the ones and 2 as a carry, not 27",
+);
+assert(
+  nineByThirteen.filter((field) => field.line === "partial-1").map((field) => field.answer).join(",") === "9",
+  "9 × 1 on the tens row is only 9, not 90",
+);
+assert(
+  nineByThirteen.filter((field) => field.line === "partial-1").every((field) => field.col === 1),
+  "the 9 sits in the tens column",
+);
+
 const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
 assert(oneMul.map((field) => field.answer).join(",") === "8,4", "12 × 4 ones then tens");
 assert(oneMul.every((field) => field.unit === "cell"), "mul slots are single digits");
