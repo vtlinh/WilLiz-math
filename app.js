@@ -228,7 +228,6 @@ function screenUrl(name) {
 
 function lockHomeHistory() {
   if (screen !== "setup") return;
-  if (history.state?.screen === "setup" && history.state?.trap) return;
   history.pushState({ screen: "setup", trap: true }, "", screenUrl("setup"));
 }
 
@@ -253,7 +252,7 @@ function handleHistoryPop() {
     return;
   }
   paintScreen(next);
-  lockHomeHistory();
+  if (screen === "setup") window.setTimeout(lockHomeHistory, 0);
 }
 
 function modeMeta(mode) {
