@@ -46,3 +46,7 @@ One-time setup in the GitHub repo:
 If you prefer branch publishing instead of Actions, set **Source** to **Deploy from a branch**, choose `main` and `/ (root)`, and save. The root `index.html` is already the homepage.
 
 `.nojekyll` is included so GitHub Pages serves the files as a static site without Jekyll processing.
+
+## Agent context
+
+Coding-agent instructions live in [`.agent/`](.agent/README.md). Start at [AGENTS.md](AGENTS.md).

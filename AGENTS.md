@@ -1,0 +1,14 @@
+# AGENTS
+
+WilLiz Math is a static arithmetic practice site for GitHub Pages.
+
+Before changing behavior or deploy setup, read `.agent/README.md` and the files it lists.
+
+- Product: `.agent/product.md`
+- Code map: `.agent/architecture.md`
+- Rules: `.agent/rules/`
+- Repeatable steps: `.agent/workflows/`
+
+Preview: `python3 -m http.server 4173`
+
+Generator checks: `node --experimental-default-type=module test-problems.mjs`
