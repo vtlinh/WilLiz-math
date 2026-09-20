@@ -13,11 +13,11 @@ After Pages is enabled, the app is served at:
 ## Use it
 
 1. Tap the avatar on the left of the action bar to pick who is practicing.
-2. Open the settings icon on the right to choose operations, difficulty, and mode. Changes save as you tap; use ← to go back.
+2. Open the settings icon on the right to choose operations, difficulty, appearance, and mode. Dark mode is the default. Changes save as you tap; use ← to go back.
 3. Start a practice, quiz, or 60-second sprint.
 4. Type an answer or use the keypad, then press **Check**.
 
-Each learner’s last mix and personal bests are stored in the browser, so Will and Liz keep their own operations, difficulty, and mode.
+Each learner’s last mix and personal bests are stored in the browser, so Will and Liz keep their own operations, difficulty, appearance, and mode.
 
 ## Local preview
 

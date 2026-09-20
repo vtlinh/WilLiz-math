@@ -22,7 +22,7 @@ test-stars.mjs      Node checks for quiz and unlimited progress stars
 ## Runtime flow
 
 1. `storage.js` reads `localStorage` key `williz-math-v1` and normalizes it to `{ lastLearner, people, bests }`.
-2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`. Switching learners restores that mix immediately. The settings page saves each tap inline and returns with ←.
+2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`, `theme`. Theme defaults to `dark`. Switching learners restores that mix immediately. The settings page saves each tap inline and returns with ←.
 3. A legacy `settings` blob is migrated onto that learner once, then replaced by `people`.
 4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`.
 5. Addition, subtraction, multiplication, and division are rendered by `worksheet.js`. Pictures difficulty uses the counting-object sheet instead.

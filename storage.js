@@ -4,13 +4,19 @@ export const DEFAULT_MIX = {
   ops: ["add", "sub"],
   difficulty: "easy",
   mode: "practice",
+  theme: "dark",
 };
+
+export function normalizeTheme(theme) {
+  return theme === "light" ? "light" : "dark";
+}
 
 export function defaultMix() {
   return {
     ops: [...DEFAULT_MIX.ops],
     difficulty: DEFAULT_MIX.difficulty,
     mode: DEFAULT_MIX.mode,
+    theme: DEFAULT_MIX.theme,
   };
 }
 
@@ -20,6 +26,7 @@ function copyMix(mix) {
     ops: Array.isArray(source.ops) ? [...source.ops] : [...DEFAULT_MIX.ops],
     difficulty: source.difficulty || DEFAULT_MIX.difficulty,
     mode: source.mode || DEFAULT_MIX.mode,
+    theme: normalizeTheme(source.theme),
   };
 }
 

@@ -1,9 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1d4336" />
+    <meta name="theme-color" content="#121816" />
+    <script>
+      try {
+        const raw = JSON.parse(localStorage.getItem("williz-math-v1"));
+        const learner = raw?.lastLearner;
+        const theme = raw?.people?.[learner]?.theme;
+        if (theme === "light") document.documentElement.dataset.theme = "light";
+      } catch {
+        // First visit stays on the default dark theme.
+      }
+    </script>
     <meta
       name="description"
       content="WilLiz Math — a focused arithmetic practice studio for addition, subtraction, multiplication, and division."
@@ -86,6 +96,14 @@
               <button type="button" class="seg-btn" data-difficulty="medium" aria-checked="false">Medium</button>
               <button type="button" class="seg-btn" data-difficulty="hard" aria-checked="false">Hard</button>
               <button type="button" class="seg-btn" data-difficulty="challenge" aria-checked="false">Challenge</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="block">
+            <legend>Appearance</legend>
+            <div class="seg theme-row" id="theme-row" role="radiogroup" aria-label="Appearance">
+              <button type="button" class="seg-btn is-selected" data-theme="dark" aria-checked="true">Dark</button>
+              <button type="button" class="seg-btn" data-theme="light" aria-checked="false">Light</button>
             </div>
           </fieldset>
 

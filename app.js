@@ -1,5 +1,5 @@
 import { generateProblem, parseAnswer } from "./problems.js";
-import { STORAGE_KEY, normalizeStore, personMix, writePersonMix } from "./storage.js";
+import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
 import { renderProblemView } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
@@ -15,6 +15,7 @@ const els = {
   opRow: document.getElementById("op-row"),
   difficultyRow: document.getElementById("difficulty-row"),
   modeRow: document.getElementById("mode-row"),
+  themeRow: document.getElementById("theme-row"),
   setupError: document.getElementById("setup-error"),
   startBtn: document.getElementById("start-btn"),
   playWho: document.getElementById("play-who"),
@@ -45,6 +46,7 @@ const settings = {
   ops: ["add", "sub"],
   difficulty: "easy",
   mode: "practice",
+  theme: "dark",
 };
 
 let round = null;
@@ -74,6 +76,13 @@ function applyMix(mix) {
   settings.ops = [...mix.ops];
   settings.difficulty = mix.difficulty;
   settings.mode = mix.mode;
+  settings.theme = normalizeTheme(mix.theme);
+}
+
+function applyTheme() {
+  document.documentElement.dataset.theme = settings.theme;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = settings.theme === "light" ? "#1d4336" : "#121816";
 }
 
 function restoreSettings() {
@@ -102,6 +111,12 @@ function syncSetupUi() {
   for (const button of els.modeRow.querySelectorAll("[data-mode]")) {
     button.classList.toggle("is-selected", button.dataset.mode === settings.mode);
   }
+  for (const button of els.themeRow.querySelectorAll("[data-theme]")) {
+    const on = button.dataset.theme === settings.theme;
+    button.classList.toggle("is-selected", on);
+    button.setAttribute("aria-checked", String(on));
+  }
+  applyTheme();
   const symbols = { add: "+", sub: "−", mul: "×", div: "÷" };
   const ops = settings.ops.map((op) => symbols[op]).join(" ") || "no operations";
   els.mixSummary.textContent = `${settings.learner} · ${modeMeta(settings.mode).label} · ${settings.difficulty} · ${ops}`;
@@ -458,6 +473,14 @@ els.modeRow.addEventListener("click", (event) => {
   const button = event.target.closest("[data-mode]");
   if (!button) return;
   settings.mode = button.dataset.mode;
+  persistSettings();
+  syncSetupUi();
+});
+
+els.themeRow.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-theme]");
+  if (!button) return;
+  settings.theme = normalizeTheme(button.dataset.theme);
   persistSettings();
   syncSetupUi();
 });

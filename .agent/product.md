@@ -6,7 +6,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 
 - **Will** and **Liz** are first-class learners.
 - **Guest** is a third preset for anyone else.
-- Each person’s last mix (operations, difficulty, mode) is remembered in `localStorage`, so switching learners does not ask them to set it up again.
+- Each person’s last mix (operations, difficulty, mode, appearance) is remembered in `localStorage`, so switching learners does not ask them to set it up again. Dark mode is the default.
 - Personal bests stay in that same browser store, keyed by person and mix.
 
 ## What a round is
@@ -15,7 +15,8 @@ The top action bar keeps one avatar on the left. Tapping it opens Will, Liz, or 
 
 1. Operations: addition, subtraction, multiplication, division (at least one).
 2. Difficulty: Easy, Pictures, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows objects to count.
-3. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, or a 60-second sprint.
+3. Appearance: Dark (default) or Light.
+4. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, or a 60-second sprint.
 
 There is no Skip. Practice allows a retry on the same problem. Quiz and sprint allow one try, then reveal and advance.
 
