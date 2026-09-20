@@ -38,6 +38,8 @@ assert(app.includes("serviceWorker.register"), "register service worker");
 assert(app.includes("history.back()"), "settings back uses browser history so home back is not swallowed");
 assert(app.includes("handleHistoryPop"), "system back is wired to in-app screens");
 assert(css.includes(".icon-btn.is-hidden"), "home hides the session back control");
+assert(css.includes("#difficulty-row"), "difficulty row can wrap so Challenge is not clipped");
+assert(!css.includes("repeat(5, minmax(0, 1fr))"), "difficulty is not forced into five clipped columns");
 assert(app.includes("function leavePractice"), "practice back has a leave path");
 assert(!app.includes('finishRound({ to: "setup" })'), "practice back shows results, not home");
 const leaveFn = app.slice(app.indexOf("function requestLeaveSession"), app.indexOf("function leavePractice"));

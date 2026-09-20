@@ -326,7 +326,7 @@ legend {
 }
 
 .seg {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(5.75rem, 1fr));
 }
 
 .theme-row {
@@ -967,9 +967,13 @@ body.celebrate-static .results-headline {
     gap: 6px;
   }
 
+  #difficulty-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
   .seg {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 4px;
+    gap: 6px;
   }
 
   .theme-row {
@@ -1007,7 +1011,7 @@ body.celebrate-static .results-headline {
   }
 
   #settings-screen {
-    overflow: hidden;
+    overflow: auto;
   }
 
   #play-screen {
