@@ -410,7 +410,7 @@ legend {
   grid-template-columns: 1fr 1fr;
 }
 
-.play-actions:has(#skip-btn[hidden]) {
+.play-actions {
   grid-template-columns: 1fr;
 }
 

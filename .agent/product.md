@@ -17,7 +17,7 @@ The top action bar keeps account picking on the left (Will, Liz, Guest) and a se
 2. Difficulty: Easy, Medium, Hard, Challenge.
 3. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, or a 60-second sprint.
 
-Practice allows Skip. Quiz and sprint hide Skip and allow one try per problem.
+There is no Skip. Practice allows a retry on the same problem. Quiz and sprint allow one try, then reveal and advance.
 
 ## Non-goals
 

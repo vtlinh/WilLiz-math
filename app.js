@@ -18,7 +18,6 @@ const els = {
   input: document.getElementById("answer-input"),
   feedback: document.getElementById("feedback"),
   keypad: document.getElementById("keypad"),
-  skipBtn: document.getElementById("skip-btn"),
   endBtn: document.getElementById("end-btn"),
   headline: document.getElementById("results-headline"),
   statCorrect: document.getElementById("stat-correct"),
@@ -180,7 +179,6 @@ function startRound() {
   };
 
   els.playWho.textContent = `${round.learner} · ${meta.label} · ${round.difficulty}`;
-  els.skipBtn.hidden = meta.oneTry;
   showScreen("play");
   nextProblem();
 
@@ -258,12 +256,6 @@ function submitAnswer(event) {
   const value = parseAnswer(els.input.value);
   if (value === null) return;
   afterAnswer(value === current.answer);
-}
-
-function skipProblem() {
-  if (!round || awaitingAdvance) return;
-  round.streak = 0;
-  nextProblem();
 }
 
 function bestKey() {
@@ -367,7 +359,6 @@ document.addEventListener("keydown", (event) => {
 
 els.startBtn.addEventListener("click", startRound);
 els.form.addEventListener("submit", submitAnswer);
-els.skipBtn.addEventListener("click", skipProblem);
 els.endBtn.addEventListener("click", finishRound);
 els.againBtn.addEventListener("click", startRound);
 els.setupBtn.addEventListener("click", () => {
