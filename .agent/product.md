@@ -11,7 +11,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 
 ## What a round is
 
-The top action bar keeps one avatar on the left and WilLiz Math immediately to its right. Tapping the avatar opens Will, Liz, or Guest. A settings icon on the right opens the Settings page, with ← back at the top. Every mix change saves immediately; there is no Save or Done. Settings holds:
+On the home page the action bar keeps one avatar on the left, WilLiz Math immediately to its right, and a settings icon on the right. Tapping the avatar opens Will, Liz, or Guest. Settings opens as a page with ← back at the top. Every mix change saves immediately; there is no Save or Done. The avatar and settings button do not appear during an exercise. Settings holds:
 
 1. Operations: addition, subtraction, multiplication, division (at least one).
 2. Difficulty: Pictures, Easy, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows kid-friendly drawings of fruit, toys, and school supplies to count. Pictures has no division.
@@ -20,7 +20,7 @@ The top action bar keeps one avatar on the left and WilLiz Math immediately to i
 
 There is no Skip. Practice stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right. Quiz and sprint allow one try, then reveal and advance.
 
-There is no End round button. The action-bar ← ends the session: practice asks to confirm and returns home; quiz and sprint finish to the results screen. During practice the bar is only ← and an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
+There is no End round button. During an exercise the action bar has no avatar and no settings icon. ← ends the session: practice asks to confirm and returns home; quiz and sprint finish to the results screen. Practice also shows an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
 
 Answers are entered only with the on-screen keypad, on each working line of the worksheet (partial products, long-division steps, or the column total). Pictures keep one blank. There is no separate final-only answer box, and the keypad must not open a system keyboard. Submit counts only when every line is filled and correct.
 

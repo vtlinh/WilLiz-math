@@ -181,14 +181,16 @@ function paintPlayStat() {
 }
 
 function syncPlayChrome() {
+  const play = screen === "play";
   const practice = isPracticePlay();
-  els.sessionBack.hidden = screen !== "play";
-  els.actionHome.hidden = practice;
+  els.sessionBack.hidden = !play;
+  els.actionHome.hidden = play;
   els.playStat.hidden = !practice;
-  els.settingsBtn.hidden = screen === "settings" || practice;
+  els.settingsBtn.hidden = play || screen === "settings";
   els.settingsBtn.classList.toggle("is-open", screen === "settings");
   els.settingsBtn.setAttribute("aria-expanded", String(screen === "settings"));
   els.playMeta.hidden = practice;
+  if (play) setLearnerOpen(false);
   if (practice) paintPlayStat();
 }
 
