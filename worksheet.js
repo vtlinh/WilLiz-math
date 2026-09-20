@@ -33,6 +33,17 @@ export function fieldsMatch(fills, fields) {
   return fills.every((fill, index) => parseAnswer(fill) === fields[index].answer);
 }
 
+export function worksheetSections(fields) {
+  if (!fields.length) return [[]];
+  if (!fields.some((field) => field.step != null)) {
+    return [fields.map((_, index) => index)];
+  }
+  const max = Math.max(...fields.map((field) => field.step ?? 0));
+  return Array.from({ length: max + 1 }, (_, step) =>
+    fields.filter((field) => (field.step ?? 0) === step).map((field) => field.index ?? fields.indexOf(field)),
+  ).filter((group) => group.length);
+}
+
 function padLeft(chars, cols) {
   const list = [...chars];
   if (list.length > cols) return list.slice(-cols);
@@ -75,34 +86,37 @@ function pushSlot(slots, field) {
   });
 }
 
-function appendProductSlots(slots, { a, digit, shift, cols, line }) {
+function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0 }) {
   const { steps, leftover, sourceLen } = timesDigitSteps(a, digit);
   for (let s = 0; s < shift; s += 1) {
     pushSlot(slots, {
       id: `${line}-shift-${s}`,
       kind: "digit",
       line,
+      step,
       col: cols - 1 - s,
       answer: 0,
     });
   }
   for (let i = 0; i < steps.length; i += 1) {
-    const step = steps[i];
-    const col = cols - sourceLen + step.sourceIndex - shift;
+    const item = steps[i];
+    const col = cols - sourceLen + item.sourceIndex - shift;
     pushSlot(slots, {
-      id: `${line}-d${step.sourceIndex}`,
+      id: `${line}-d${item.sourceIndex}`,
       kind: "digit",
       line,
+      step,
       col,
-      answer: step.write,
+      answer: item.write,
     });
-    if (step.carryOut && i < steps.length - 1) {
+    if (item.carryOut && i < steps.length - 1) {
       pushSlot(slots, {
-        id: `${line}-c${step.sourceIndex}`,
+        id: `${line}-c${item.sourceIndex}`,
         kind: "carry",
         line,
+        step,
         col: col - 1,
-        answer: step.carryOut,
+        answer: item.carryOut,
       });
     }
   }
@@ -112,13 +126,14 @@ function appendProductSlots(slots, { a, digit, shift, cols, line }) {
       id: `${line}-lead`,
       kind: "digit",
       line,
+      step,
       col: cols - sourceLen + last.sourceIndex - shift - 1,
       answer: leftover,
     });
   }
 }
 
-function appendAdditionSlots(slots, values, cols, line) {
+function appendAdditionSlots(slots, values, cols, line, step = 0) {
   const rows = values.map((value) => padLeft(digitList(value), cols).map((d) => (d === "" || d === "−" ? 0 : Number(d))));
   let carry = 0;
   for (let col = cols - 1; col >= 0; col -= 1) {
@@ -129,6 +144,7 @@ function appendAdditionSlots(slots, values, cols, line) {
       id: `${line}-d${col}`,
       kind: "digit",
       line,
+      step,
       col,
       answer: write,
     });
@@ -137,6 +153,7 @@ function appendAdditionSlots(slots, values, cols, line) {
         id: `${line}-c${col}`,
         kind: "carry",
         line,
+        step,
         col: col - 1,
         answer: next,
       });
@@ -195,6 +212,7 @@ function multiplicationSlots(a, b, cols, partials, total) {
         shift: partial.shift,
         cols,
         line: `partial-${index}`,
+        step: index,
       });
     }
     appendAdditionSlots(
@@ -202,6 +220,7 @@ function multiplicationSlots(a, b, cols, partials, total) {
       partials.map((row) => row.value),
       cols,
       "total",
+      partials.length,
     );
   } else {
     appendProductSlots(slots, {
@@ -210,6 +229,7 @@ function multiplicationSlots(a, b, cols, partials, total) {
       shift: 0,
       cols,
       line: "total",
+      step: 0,
     });
   }
   return slots;
@@ -276,41 +296,45 @@ function slotLabel(kind) {
   return "Fill this digit";
 }
 
-function slotCell(field, fills, active, reveal) {
+function slotCell(field, fills, active, reveal, { locked = false } = {}) {
   const shown = reveal ? String(field.answer) : fills[field.index] ?? "";
   const el = cell(shown, slotKindClass(field.kind));
   markFill(el, {
-    slot: field.index,
-    active: active === field.index,
+    slot: locked ? null : field.index,
+    active: !locked && active === field.index,
     reveal,
     label: slotLabel(field.kind),
   });
   return el;
 }
 
-function cellsFromSlots(cols, fields, fills, active, reveal) {
-  const byCol = new Map(fields.map((field) => [field.col, field]));
+function cellsFromSlots(cols, fields, fills, active, reveal, { section = Infinity } = {}) {
+  const visible = fields.filter((field) => (field.step ?? 0) <= section);
+  const byCol = new Map(visible.map((field) => [field.col, field]));
   return emptyCols(cols).map((_, col) => {
     const field = byCol.get(col);
-    return field ? slotCell(field, fills, active, reveal) : "";
+    if (!field) return "";
+    return slotCell(field, fills, active, reveal, { locked: !reveal && (field.step ?? 0) < section });
   });
 }
 
-function appendFillLine(root, cols, slots, { line, op = "", className = "", fills, active, reveal }) {
+function appendFillLine(root, cols, slots, { line, op = "", className = "", fills, active, reveal, section = Infinity }) {
   const carries = slots.filter((field) => field.line === line && field.kind === "carry");
   const digits = slots.filter((field) => field.line === line && field.kind === "digit");
   if (carries.length) {
-    root.append(row(cols, cellsFromSlots(cols, carries, fills, active, reveal), { className: "is-carry" }));
+    root.append(
+      row(cols, cellsFromSlots(cols, carries, fills, active, reveal, { section }), { className: "is-carry" }),
+    );
   }
   root.append(
-    row(cols, cellsFromSlots(cols, digits, fills, active, reveal), {
+    row(cols, cellsFromSlots(cols, digits, fills, active, reveal, { section }), {
       op,
       className,
     }),
   );
 }
 
-export function renderMultiplicationSheet(problem, { fills = [], active = 0, reveal = false } = {}) {
+export function renderMultiplicationSheet(problem, { fills = [], active = 0, reveal = false, section = Infinity } = {}) {
   const plan = planMultiplication(problem.a, problem.b);
   const root = document.createElement("div");
   root.className = "sheet";
@@ -327,6 +351,7 @@ export function renderMultiplicationSheet(problem, { fills = [], active = 0, rev
 
   if (plan.partials.length > 1) {
     for (const [index, partial] of plan.partials.entries()) {
+      if (!reveal && index > section) continue;
       appendFillLine(root, plan.cols, plan.slots, {
         line: `partial-${index}`,
         op: partial.plus ? "+" : "",
@@ -334,18 +359,22 @@ export function renderMultiplicationSheet(problem, { fills = [], active = 0, rev
         fills,
         active,
         reveal,
+        section,
       });
     }
-    root.append(rule(plan.cols));
+    if (reveal || section >= plan.partials.length) root.append(rule(plan.cols));
   }
 
-  appendFillLine(root, plan.cols, plan.slots, {
-    line: "total",
-    className: "is-total",
-    fills,
-    active,
-    reveal,
-  });
+  if (reveal || plan.partials.length <= 1 || section >= plan.partials.length) {
+    appendFillLine(root, plan.cols, plan.slots, {
+      line: "total",
+      className: "is-total",
+      fills,
+      active,
+      reveal,
+      section,
+    });
+  }
   return root;
 }
 
@@ -389,7 +418,7 @@ export function planDivision(dividend, divisor) {
   return plan;
 }
 
-function placedNumberSlots(slots, { value, endIndex, idPrefix, kind, line }) {
+function placedNumberSlots(slots, { value, endIndex, idPrefix, kind, line, step = 0 }) {
   const digits = String(value).split("").map(Number);
   const start = endIndex - digits.length + 1;
   digits.forEach((digit, index) => {
@@ -397,6 +426,7 @@ function placedNumberSlots(slots, { value, endIndex, idPrefix, kind, line }) {
       id: `${idPrefix}-${index}`,
       kind,
       line,
+      step,
       col: start + index,
       answer: digit,
     });
@@ -410,6 +440,7 @@ function divisionSlots(plan) {
       id: `q-${index}`,
       kind: "digit",
       line: "quotient",
+      step: index,
       col: step.endIndex,
       answer: step.q,
     });
@@ -419,6 +450,7 @@ function divisionSlots(plan) {
       idPrefix: `p-${index}`,
       kind: "product",
       line: `product-${index}`,
+      step: index,
     });
     placedNumberSlots(slots, {
       value: step.remainder,
@@ -426,12 +458,14 @@ function divisionSlots(plan) {
       idPrefix: `r-${index}`,
       kind: "remain",
       line: `remain-${index}`,
+      step: index,
     });
     if (step.bringDown !== null) {
       pushSlot(slots, {
         id: `b-${index}`,
         kind: "bring",
         line: `remain-${index}`,
+        step: index,
         col: step.endIndex + 1,
         answer: step.bringDown,
       });
@@ -453,7 +487,7 @@ function divisionRow(cols, values, { op = "", arrow = "", className = "" } = {})
   return wrap;
 }
 
-export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = false } = {}) {
+export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = false, section = Infinity } = {}) {
   const plan = planDivision(problem.a, problem.b);
   const cols = plan.digits.length;
   const root = document.createElement("div");
@@ -475,20 +509,23 @@ export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = 
 
   const lineSlots = (name) => plan.slots.filter((field) => field.line === name);
   work.append(
-    line(cellsFromSlots(cols, lineSlots("quotient"), fills, active, reveal), { className: "is-quotient" }),
+    line(cellsFromSlots(cols, lineSlots("quotient"), fills, active, reveal, { section }), {
+      className: "is-quotient",
+    }),
   );
   work.append(line(plan.digits, { className: "is-dividend", divisor: true }));
 
   for (const [index, step] of plan.steps.entries()) {
+    if (!reveal && index > section) continue;
     work.append(
-      line(cellsFromSlots(cols, lineSlots(`product-${index}`), fills, active, reveal), {
+      line(cellsFromSlots(cols, lineSlots(`product-${index}`), fills, active, reveal, { section }), {
         op: "−",
         arrow: step.bringDown !== null ? "↓" : "",
         className: "is-sub",
       }),
     );
     work.append(
-      line(cellsFromSlots(cols, lineSlots(`remain-${index}`), fills, active, reveal), {
+      line(cellsFromSlots(cols, lineSlots(`remain-${index}`), fills, active, reveal, { section }), {
         className: "is-remain",
       }),
     );

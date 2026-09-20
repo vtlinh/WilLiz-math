@@ -22,7 +22,7 @@ There is no Skip. Practice stays on a problem until the answer is correct, then 
 
 There is no End round button. During an exercise the action bar has no avatar and no settings icon. ← ends the session: practice asks to confirm and returns home; quiz and sprint finish to the results screen. Practice also shows an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
 
-Answers are entered only with the on-screen keypad. Multiplication is filled one digit at a time from right to left, including carries; a two-digit multiplier needs both partial products, the total, and any carries. Long division fills every quotient, multiply, subtract, and bring-down box, not just the final quotient. Column totals are filled by line. Pictures keep one blank. There is no separate final-only answer box, and the keypad must not open a system keyboard. Submit counts only when every slot is filled and correct.
+Answers are entered only with the on-screen keypad. Multi-step multiplication and division use **Next** to move to the next working section; the last section uses **Submit**. Multiplication is filled one digit at a time from right to left, including carries. Long division fills one quotient digit at a time, then that step’s multiply, subtract, and bring-down boxes. Column totals are filled by line. Pictures keep one blank. There is no separate final-only answer box, and the keypad must not open a system keyboard.
 
 The play equation is centered in the problem area. On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
 

@@ -1,6 +1,6 @@
 import { generateProblem, playOps } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
-import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields } from "./worksheet.js";
+import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields, worksheetSections } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
 import { creditsAnswer } from "./scoring.js";
@@ -25,6 +25,7 @@ const els = {
   problem: document.getElementById("problem"),
   form: document.getElementById("answer-form"),
   input: document.getElementById("answer-input"),
+  submitBtn: document.getElementById("submit-btn"),
   feedback: document.getElementById("feedback"),
   keypad: document.getElementById("keypad"),
   starRow: document.getElementById("star-row"),
@@ -275,13 +276,27 @@ function startRound() {
   }
 }
 
+function isLastSection() {
+  return !current?.sections || current.section >= current.sections.length - 1;
+}
+
+function syncSubmitLabel() {
+  els.submitBtn.textContent = isLastSection() ? "Submit" : "Next";
+}
+
 function paintProblem(reveal = false) {
   els.problem.replaceChildren(
-    renderProblemView(current, { fills: current.fills, active: current.active, reveal }),
+    renderProblemView(current, {
+      fills: current.fills,
+      active: current.active,
+      reveal,
+      section: current.section ?? 0,
+    }),
   );
   els.problem.classList.toggle("is-sheet", Boolean(current.op));
   els.form.classList.add("is-sheet-fill");
   els.input.hidden = true;
+  syncSubmitLabel();
 }
 
 function nextProblem() {
@@ -290,7 +305,9 @@ function nextProblem() {
   current.missed = false;
   current.fields = worksheetFields(current);
   current.fills = current.fields.map(() => "");
-  current.active = 0;
+  current.sections = worksheetSections(current.fields);
+  current.section = 0;
+  current.active = current.sections[0]?.[0] ?? 0;
   round.lastKey = current.key;
   round.asked += 1;
   els.input.value = "";
@@ -427,11 +444,40 @@ function afterAnswer(correct) {
   }
 }
 
+function sectionSlice() {
+  const indexes = current.sections[current.section] ?? [];
+  return {
+    indexes,
+    fields: indexes.map((index) => current.fields[index]),
+    fills: indexes.map((index) => current.fills[index]),
+  };
+}
+
 function submitAnswer(event) {
   event.preventDefault();
   if (!round || awaitingAdvance) return;
-  if (!fieldsReady(current.fills)) return;
-  afterAnswer(fieldsMatch(current.fills, current.fields));
+  const slice = sectionSlice();
+  if (!fieldsReady(slice.fills)) return;
+  const ok = fieldsMatch(slice.fills, slice.fields);
+  if (!isLastSection()) {
+    if (!ok) {
+      current.missed = true;
+      if (round.oneTry) {
+        afterAnswer(false);
+        return;
+      }
+      els.feedback.textContent = "Not quite. Try this step again.";
+      els.feedback.className = "feedback is-bad";
+      return;
+    }
+    current.section += 1;
+    current.active = current.sections[current.section][0];
+    els.feedback.textContent = "";
+    els.feedback.className = "feedback";
+    paintProblem(false);
+    return;
+  }
+  afterAnswer(ok);
 }
 
 function bestKey() {
@@ -515,6 +561,7 @@ function toggleOp(op) {
 function setActiveSlot(index) {
   if (!current || awaitingAdvance) return;
   if (!Number.isInteger(index) || index < 0 || index >= current.fills.length) return;
+  if ((current.fields[index]?.step ?? 0) !== current.section) return;
   current.active = index;
   paintProblem(false);
 }
@@ -527,13 +574,18 @@ function pressKey(key) {
     if (key === "back") {
       if (current.fills[slot]) {
         current.fills[slot] = "";
-      } else if (slot > 0) {
+      } else if (slot > 0 && (current.fields[slot - 1]?.step ?? 0) === current.section) {
         current.active = slot - 1;
         current.fills[current.active] = "";
       }
     } else if (key !== "-" && key !== "−") {
-      current.fills[slot] = key;
-      if (slot + 1 < current.fills.length) current.active = slot + 1;
+      current.fills[slot] = key.slice(-1);
+      if (
+        slot + 1 < current.fills.length &&
+        (current.fields[slot + 1]?.step ?? 0) === current.section
+      ) {
+        current.active = slot + 1;
+      }
     }
     els.input.value = current.fills[current.active] ?? "";
     paintProblem(false);

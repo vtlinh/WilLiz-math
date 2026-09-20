@@ -6,6 +6,7 @@ import {
   planMultiplication,
   planSubtraction,
   worksheetFields,
+  worksheetSections,
 } from "./worksheet.js";
 
 function assert(condition, message) {
@@ -118,6 +119,19 @@ assert(divLines.some((field) => field.kind === "bring"), "bring-down is its own 
 
 const shortDiv = worksheetFields({ a: 20, b: 5, op: "div", answer: 4, difficulty: "easy" });
 assert(shortDiv.map((field) => field.answer).join(",") === "4,2,0,0", "20 ÷ 5 fills quotient, product, remainder");
+
+const divSteps = worksheetSections(divLines);
+assert(divSteps.length === 3, "13032 ÷ 24 has three working steps");
+assert(
+  divSteps[0].map((index) => divLines[index].answer).join(",") === "5,1,2,0,1,0,3",
+  "first div step is one quotient digit plus that working",
+);
+assert(divSteps[0].filter((index) => divLines[index].line === "quotient").length === 1, "one quotient digit per step");
+
+const mulSteps = worksheetSections(fourteen);
+assert(mulSteps.length === 3, "14 × 14 is ones, tens, then total");
+assert(worksheetSections(oneMul).length === 1, "single-digit mul is one section");
+assert(worksheetSections(addLine).length === 1, "addition is one section");
 
 const fourteenFills = fourteen.map((field) => String(field.answer));
 assert(fieldsReady(fourteenFills), "all mul cells filled");
