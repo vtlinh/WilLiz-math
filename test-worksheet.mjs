@@ -136,6 +136,17 @@ assert(
   twoTwentyFields.map((field) => field.answer).join(",") === "1,2,0,2,0,1,2,0,0",
   "220 ÷ 20 fills 11, then 20 / 2↓0, then 20 / 0",
 );
+assert(
+  twoTwentyFields.filter((field) => field.line === "quotient").map((field) => field.answer).join("") === "11",
+  "220 ÷ 20 quotient digits are 11",
+);
+assert(
+  fieldsMatch(
+    twoTwentyFields.map((field) => String(field.answer)),
+    twoTwentyFields,
+  ),
+  "a filled 220 ÷ 20 worksheet is correct",
+);
 
 const divSteps = worksheetSections(divLines);
 assert(divSteps.length === 3, "13032 ÷ 24 has three working steps");

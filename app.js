@@ -3,7 +3,7 @@ import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix 
 import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields, worksheetSections } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
-import { creditsAnswer } from "./scoring.js";
+import { creditsAnswer, missMessage } from "./scoring.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -404,7 +404,7 @@ function mark(correct) {
     paintProblem(true);
   } else {
     round.streak = 0;
-    els.feedback.textContent = `Not quite. ${current.prompt} = ${current.answer}`;
+    els.feedback.textContent = missMessage(current);
     els.feedback.className = "feedback is-bad";
     paintProblem(true);
   }
@@ -459,17 +459,17 @@ function submitAnswer(event) {
   const slice = sectionSlice();
   if (!fieldsReady(slice.fills)) return;
   const ok = fieldsMatch(slice.fills, slice.fields);
-  if (!isLastSection()) {
-    if (!ok) {
-      current.missed = true;
-      if (round.oneTry) {
-        afterAnswer(false);
-        return;
-      }
-      els.feedback.textContent = "Not quite. Try this step again.";
-      els.feedback.className = "feedback is-bad";
+  if (!ok) {
+    current.missed = true;
+    if (round.oneTry) {
+      afterAnswer(false);
       return;
     }
+    els.feedback.textContent = "Not quite. Try this step again.";
+    els.feedback.className = "feedback is-bad";
+    return;
+  }
+  if (!isLastSection()) {
     current.section += 1;
     current.active = current.sections[current.section][0];
     els.feedback.textContent = "";
@@ -477,7 +477,7 @@ function submitAnswer(event) {
     paintProblem(false);
     return;
   }
-  afterAnswer(ok);
+  afterAnswer(true);
 }
 
 function bestKey() {

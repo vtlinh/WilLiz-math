@@ -26,7 +26,7 @@ Answers are entered only with the on-screen keypad. Multi-step multiplication an
 
 The play equation is centered in the problem area. On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
 
-Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication. Division is written as long division with bring-down working and no times-table cheat.
+Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication. Division is written as long division with bring-down working and no times-table cheat. Worksheet misses do not rewrite the problem as `220 ÷ 20 = 11` in the feedback line.
 
 ## Non-goals
 
