@@ -15,6 +15,7 @@ node --experimental-default-type=module test-worksheet.mjs
 node --experimental-default-type=module test-celebrate.mjs
 node --experimental-default-type=module test-stars.mjs
 node --experimental-default-type=module test-scoring.mjs
+node --experimental-default-type=module test-pwa.mjs
 ```
 
 - If those pass and the change is UI-only, still merge. Full browser verification can follow when no more follow-ups are queued.

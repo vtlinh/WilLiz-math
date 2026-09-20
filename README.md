@@ -36,6 +36,7 @@ node --experimental-default-type=module test-worksheet.mjs
 node --experimental-default-type=module test-celebrate.mjs
 node --experimental-default-type=module test-stars.mjs
 node --experimental-default-type=module test-scoring.mjs
+node --experimental-default-type=module test-pwa.mjs
 ```
 
 ## GitHub Pages
@@ -51,6 +52,10 @@ One-time setup in the GitHub repo:
 If you prefer branch publishing instead of Actions, set **Source** to **Deploy from a branch**, choose `main` and `/ (root)`, and save. The root `index.html` is already the homepage.
 
 `.nojekyll` is included so GitHub Pages serves the files as a static site without Jekyll processing.
+
+## Install as an app
+
+On Chrome (phone or desktop), open the live site, then use **Install** in the address bar or the browser menu. That adds WilLiz Math as a standalone app.
 
 ## Agent context
 

@@ -10,5 +10,6 @@ description: Publish WilLiz Math on GitHub Pages
 4. If the site 404s, check repo **Settings → Pages**:
    - Preferred: **Source** = **GitHub Actions**.
    - Fallback: **Deploy from a branch**, `main`, `/ (root)`.
-5. Do not add a custom domain unless Linh provides one.
-6. Do not rewrite the workflow to build from `docs/` unless the site files move there.
+5. The site is a Chrome-installable app (`manifest.webmanifest` + `sw.js`). Keep those files at the repo root with relative URLs.
+6. Do not add a custom domain unless Linh provides one.
+7. Do not rewrite the workflow to build from `docs/` unless the site files move there.

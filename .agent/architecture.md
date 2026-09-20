@@ -18,6 +18,11 @@ test-worksheet.mjs  Node checks for worksheet layouts
 test-celebrate.mjs  Node checks for when a perfect score celebrates
 test-stars.mjs      Node checks for quiz and unlimited progress stars
 test-scoring.mjs    Node checks for first-try practice credit
+test-pwa.mjs        Node checks for the installable app manifest
+manifest.webmanifest Chrome install manifest (relative start_url)
+sw.js               caches the static shell
+icon-192.png
+icon-512.png
 .github/workflows/pages.yml
 ```
 
@@ -42,4 +47,4 @@ Keep generation in `problems.js` so `test-problems.mjs` can import it without th
 
 ## Hosting
 
-GitHub Actions on `main` uploads the repo root as a Pages artifact. Relative asset paths are required so the project site works under `/WilLiz-math/`.
+GitHub Actions on `main` uploads the repo root as a Pages artifact. Relative asset paths are required so the project site works under `/WilLiz-math/`. `manifest.webmanifest` and `sw.js` use `./` URLs for the same reason.

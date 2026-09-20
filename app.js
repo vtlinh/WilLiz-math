@@ -594,3 +594,9 @@ els.keypad.addEventListener("click", (event) => {
 });
 
 restoreSettings();
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").catch(() => {
+    // Installability still works after a later visit if registration fails once.
+  });
+}

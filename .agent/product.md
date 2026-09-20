@@ -41,3 +41,4 @@ Addition and subtraction are written as vertical column arithmetic. Multiplicati
 - A quiz earns a small star at the bottom of the play screen for each 20% of the round answered correctly, up to five.
 - Unlimited practice and sprint award a star for each all-correct set of 10 problems, counted from the first problem. After 7 stars the tray switches to `X ★`.
 - The same files work locally and at `https://vtlinh.github.io/WilLiz-math/` after Pages is enabled.
+- Chrome can install the site as an app from the address bar or the browser menu.
