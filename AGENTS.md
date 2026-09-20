@@ -11,4 +11,9 @@ Before changing behavior or deploy setup, read `.agent/README.md` and the files 
 
 Preview: `python3 -m http.server 4173`
 
-Generator checks: `node --experimental-default-type=module test-problems.mjs`
+Checks:
+
+```bash
+node --experimental-default-type=module test-problems.mjs
+node --experimental-default-type=module test-storage.mjs
+```

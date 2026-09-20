@@ -6,7 +6,8 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 
 - **Will** and **Liz** are first-class learners.
 - **Guest** is a third preset for anyone else.
-- Settings and personal bests stay in that browser via `localStorage`.
+- Each person’s last mix (operations, difficulty, mode) is remembered in `localStorage`, so switching learners does not ask them to set it up again.
+- Personal bests stay in that same browser store, keyed by person and mix.
 
 ## What a round is
 

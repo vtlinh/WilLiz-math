@@ -1,6 +1,5 @@
 import { generateProblem, parseAnswer } from "./problems.js";
-
-const STORAGE_KEY = "williz-math-v1";
+import { STORAGE_KEY, normalizeStore, personMix, writePersonMix } from "./storage.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -45,9 +44,9 @@ let awaitingAdvance = false;
 
 function loadStore() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {};
+    return normalizeStore(JSON.parse(localStorage.getItem(STORAGE_KEY)));
   } catch {
-    return {};
+    return normalizeStore(null);
   }
 }
 
@@ -59,13 +58,16 @@ function saveStore(next) {
   }
 }
 
+function applyMix(mix) {
+  settings.ops = [...mix.ops];
+  settings.difficulty = mix.difficulty;
+  settings.mode = mix.mode;
+}
+
 function restoreSettings() {
-  const saved = loadStore().settings;
-  if (!saved) return;
-  if (saved.learner) settings.learner = saved.learner;
-  if (Array.isArray(saved.ops)) settings.ops = saved.ops;
-  if (saved.difficulty) settings.difficulty = saved.difficulty;
-  if (saved.mode) settings.mode = saved.mode;
+  const store = loadStore();
+  settings.learner = store.lastLearner || "Will";
+  applyMix(personMix(store, settings.learner));
   syncSetupUi();
 }
 
@@ -90,8 +92,15 @@ function syncSetupUi() {
 
 function persistSettings() {
   const store = loadStore();
-  store.settings = { ...settings };
+  writePersonMix(store, settings.learner, settings);
   saveStore(store);
+}
+
+function selectLearner(name) {
+  settings.learner = name;
+  applyMix(personMix(loadStore(), name));
+  persistSettings();
+  syncSetupUi();
 }
 
 function showScreen(name) {
@@ -270,6 +279,7 @@ function toggleOp(op) {
   } else {
     settings.ops = [...settings.ops, op];
   }
+  persistSettings();
   syncSetupUi();
 }
 
@@ -289,8 +299,7 @@ function pressKey(key) {
 els.learnerRow.addEventListener("click", (event) => {
   const button = event.target.closest("[data-learner]");
   if (!button) return;
-  settings.learner = button.dataset.learner;
-  syncSetupUi();
+  selectLearner(button.dataset.learner);
 });
 
 els.opRow.addEventListener("click", (event) => {
@@ -303,6 +312,7 @@ els.difficultyRow.addEventListener("click", (event) => {
   const button = event.target.closest("[data-difficulty]");
   if (!button) return;
   settings.difficulty = button.dataset.difficulty;
+  persistSettings();
   syncSetupUi();
 });
 
@@ -310,6 +320,7 @@ els.modeRow.addEventListener("click", (event) => {
   const button = event.target.closest("[data-mode]");
   if (!button) return;
   settings.mode = button.dataset.mode;
+  persistSettings();
   syncSetupUi();
 });
 

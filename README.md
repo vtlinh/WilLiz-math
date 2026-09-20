@@ -17,7 +17,7 @@ After Pages is enabled, the app is served at:
 3. Choose Practice, a 10- or 20-question quiz, or a 60-second sprint.
 4. Type an answer or use the keypad, then press **Check**.
 
-Personal bests for each learner and mix are stored in the browser.
+Each learner’s last mix and personal bests are stored in the browser, so Will and Liz keep their own operations, difficulty, and mode.
 
 ## Local preview
 
@@ -31,6 +31,7 @@ Problem generation can be checked with:
 
 ```bash
 node --experimental-default-type=module test-problems.mjs
+node --experimental-default-type=module test-storage.mjs
 ```
 
 ## GitHub Pages

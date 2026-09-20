@@ -5,19 +5,22 @@ Static files at the repository root. The browser loads `index.html`, which pulls
 ```text
 index.html          screens: setup, play, results
 styles.css          layout and theme
-app.js              round state, UI, localStorage
+app.js              round state and UI
+storage.js          per-learner settings and bests
 problems.js         generateProblem, parseAnswer
 test-problems.mjs   Node checks for the generator
+test-storage.mjs    Node checks for per-learner storage
 .github/workflows/pages.yml
 ```
 
 ## Runtime flow
 
-1. `app.js` restores last settings from `localStorage` key `williz-math-v1`.
-2. Setup writes `settings` (`learner`, `ops`, `difficulty`, `mode`).
-3. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`.
-4. Submit parses the input with `parseAnswer`. Practice retries on a miss; quiz and sprint advance after one try.
-5. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves.
+1. `storage.js` reads `localStorage` key `williz-math-v1` and normalizes it to `{ lastLearner, people, bests }`.
+2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`. Switching learners restores that mix immediately.
+3. A legacy `settings` blob is migrated onto that learner once, then replaced by `people`.
+4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`.
+5. Submit parses the input with `parseAnswer`. Practice retries on a miss; quiz and sprint advance after one try.
+6. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves.
 
 ## Problem rules
 
