@@ -19,6 +19,7 @@ const els = {
   themeRow: document.getElementById("theme-row"),
   setupError: document.getElementById("setup-error"),
   startBtn: document.getElementById("start-btn"),
+  playMeta: document.getElementById("play-meta"),
   playWho: document.getElementById("play-who"),
   playProgress: document.getElementById("play-progress"),
   problem: document.getElementById("problem"),
@@ -191,6 +192,7 @@ function syncPlayChrome() {
   els.settingsBtn.setAttribute("aria-expanded", String(screen === "settings"));
   els.endBtn.hidden = practice;
   els.playActions.hidden = practice;
+  els.playMeta.hidden = practice;
   if (practice) paintPlayStat();
 }
 
@@ -356,7 +358,10 @@ function paintStars() {
 function updateProgress() {
   if (!round) return;
   paintStars();
-  if (isPracticePlay()) paintPlayStat();
+  if (isPracticePlay()) {
+    paintPlayStat();
+    return;
+  }
   if (round.timed) {
     const remaining = round.endsAt - Date.now();
     els.playProgress.textContent = formatTime(remaining);

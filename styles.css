@@ -405,6 +405,10 @@ legend {
   font-weight: 700;
 }
 
+.play-meta[hidden] {
+  display: none;
+}
+
 .problem-label {
   margin: 18px 0 0;
   text-transform: uppercase;
