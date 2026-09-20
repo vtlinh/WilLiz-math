@@ -18,7 +18,7 @@ On the home page the action bar keeps one avatar on the left, WilLiz Math immedi
 3. Appearance: Dark (default) or Light.
 4. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, a 10-minute sprint, or a 30-minute sprint.
 
-There is no Skip. Practice stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right. Quiz and sprint allow one try, then reveal and advance.
+There is no Skip. Every mode stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right.
 
 There is no End round button. During an exercise the action bar has no avatar and no settings icon. ← always asks to confirm, then shows the results screen. Practice also shows an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
 

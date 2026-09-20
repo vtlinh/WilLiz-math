@@ -248,11 +248,11 @@ function handleHistoryPop() {
 }
 
 function modeMeta(mode) {
-  if (mode === "quiz10") return { label: "Quiz", limit: 10, timed: false, oneTry: true };
-  if (mode === "quiz20") return { label: "Quiz", limit: 20, timed: false, oneTry: true };
-  if (mode === "sprint10") return { label: "Sprint · 10", limit: null, timed: true, durationMs: 10 * 60_000, oneTry: true };
-  if (mode === "sprint30") return { label: "Sprint · 30", limit: null, timed: true, durationMs: 30 * 60_000, oneTry: true };
-  return { label: "Practice", limit: null, timed: false, oneTry: false };
+  if (mode === "quiz10") return { label: "Quiz", limit: 10, timed: false };
+  if (mode === "quiz20") return { label: "Quiz", limit: 20, timed: false };
+  if (mode === "sprint10") return { label: "Sprint · 10", limit: null, timed: true, durationMs: 10 * 60_000 };
+  if (mode === "sprint30") return { label: "Sprint · 30", limit: null, timed: true, durationMs: 30 * 60_000 };
+  return { label: "Practice", limit: null, timed: false };
 }
 
 function formatTime(ms) {
@@ -447,10 +447,6 @@ function mark(correct) {
 
 function recordAttempt(correct) {
   if (round.limit) return;
-  if (round.oneTry) {
-    round.attempts.push(correct);
-    return;
-  }
   if (correct) {
     round.attempts.push(!current.missed);
     return;
@@ -471,11 +467,11 @@ function afterAnswer(correct) {
     return;
   }
 
-  if (round.oneTry || correct) {
+  if (correct) {
     awaitingAdvance = true;
     window.setTimeout(() => {
       if (round && awaitingAdvance) nextProblem();
-    }, correct ? 550 : 900);
+    }, 550);
   }
 }
 
@@ -496,10 +492,6 @@ function submitAnswer(event) {
   const ok = fieldsMatch(slice.fills, slice.fields);
   if (!ok) {
     current.missed = true;
-    if (round.oneTry) {
-      afterAnswer(false);
-      return;
-    }
     els.feedback.textContent = "Not quite. Try this step again.";
     els.feedback.className = "feedback is-bad";
     return;

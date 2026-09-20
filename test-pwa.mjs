@@ -50,6 +50,8 @@ assert(html.includes('data-mode="sprint30"'), "30 minute sprint mode");
 assert(!html.includes("60s sprint"), "60s sprint is gone");
 assert(app.includes("durationMs: 10 * 60_000"), "10 min sprint lasts 10 minutes");
 assert(app.includes("durationMs: 30 * 60_000"), "30 min sprint lasts 30 minutes");
+assert(app.includes("Try this step again."), "a miss stays on the problem");
+assert(!app.includes("afterAnswer(false)"), "a miss does not skip to the next question");
 assert(html.includes("Leave this round?"), "leave confirm is not practice-only");
 assert(html.includes("See results"), "leave confirm opens results");
 assert(html.indexOf('id="keypad"') < html.indexOf('id="submit-btn"'), "Submit sits below the keypad");
