@@ -14,7 +14,7 @@ activation: always_on
 - Division must be exact. Subtraction must not produce a negative answer.
 - `parseAnswer` accepts integers only, including a leading unicode minus (`−`).
 - The play answer field is keypad-only: `readonly`, no system keyboard, and no typing into the field.
-- Practice: wrong answers stay on the same problem so the learner can retry. Quiz and sprint: one try, then reveal and advance.
+- Practice: stay on the problem until the answer is correct, then advance. A miss scores 0 for that problem even if they later get it right (`creditsAnswer`). Quiz and sprint: one try, then reveal and advance.
 - Quiz progress stars use `progressStars(correct, limit)`: one star animates in for each 20% of the quiz answered correctly, up to five.
 - Unlimited practice and sprint use `unlimitedStars(attempts)`: one star for each all-correct set of 10 problems, counted from the first problem. A retried miss is not totally correct. After 7 stars, show `X ★` instead of more icons.
 - Do not skip uniqueness forever; avoiding the immediate previous prompt is enough.

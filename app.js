@@ -3,6 +3,7 @@ import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix 
 import { renderProblemView } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
+import { creditsAnswer } from "./scoring.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -39,6 +40,14 @@ const els = {
   settings: document.getElementById("settings-screen"),
   settingsBtn: document.getElementById("settings-btn"),
   settingsBack: document.getElementById("settings-back"),
+  actionHome: document.getElementById("action-home"),
+  sessionBack: document.getElementById("session-back"),
+  playStat: document.getElementById("play-stat"),
+  playActions: document.querySelector(".play-actions"),
+  leaveBackdrop: document.getElementById("leave-backdrop"),
+  leaveDialog: document.getElementById("leave-dialog"),
+  leaveStay: document.getElementById("leave-stay"),
+  leaveConfirm: document.getElementById("leave-confirm"),
 };
 
 const settings = {
@@ -153,16 +162,49 @@ function setSettingsOpen(open) {
   if (screen === "settings") showScreen(settingsReturn || "setup");
 }
 
+function isPracticePlay() {
+  return screen === "play" && round?.mode === "practice";
+}
+
+function paintPlayStat() {
+  if (!round) {
+    els.playStat.textContent = "0/0";
+    els.playStat.setAttribute("aria-label", "0 of 0 correct");
+    return;
+  }
+  els.playStat.textContent = `${round.correct}/${round.asked}`;
+  els.playStat.setAttribute("aria-label", `${round.correct} of ${round.asked} correct`);
+}
+
+function syncPlayChrome() {
+  const practice = isPracticePlay();
+  els.sessionBack.hidden = !practice;
+  els.actionHome.hidden = practice;
+  els.playStat.hidden = !practice;
+  els.settingsBtn.hidden = screen === "settings" || practice;
+  els.settingsBtn.classList.toggle("is-open", screen === "settings");
+  els.settingsBtn.setAttribute("aria-expanded", String(screen === "settings"));
+  els.endBtn.hidden = practice;
+  els.playActions.hidden = practice;
+  if (practice) paintPlayStat();
+}
+
+function setLeaveOpen(open) {
+  els.leaveDialog.classList.toggle("hidden", !open);
+  els.leaveBackdrop.classList.toggle("hidden", !open);
+  els.leaveDialog.hidden = !open;
+  els.leaveBackdrop.hidden = !open;
+  document.body.classList.toggle("leave-open", open);
+}
+
 function showScreen(name) {
   screen = name;
   els.setup.classList.toggle("hidden", name !== "setup");
   els.play.classList.toggle("hidden", name !== "play");
   els.results.classList.toggle("hidden", name !== "results");
   els.settings.classList.toggle("hidden", name !== "settings");
-  els.settingsBtn.classList.toggle("is-open", name === "settings");
-  els.settingsBtn.hidden = name === "settings";
-  els.settingsBtn.setAttribute("aria-expanded", String(name === "settings"));
   document.body.classList.toggle("is-settings", name === "settings");
+  syncPlayChrome();
 }
 
 function modeMeta(mode) {
@@ -301,6 +343,7 @@ function paintStars() {
 function updateProgress() {
   if (!round) return;
   paintStars();
+  if (isPracticePlay()) paintPlayStat();
   if (round.timed) {
     const remaining = round.endsAt - Date.now();
     els.playProgress.textContent = formatTime(remaining);
@@ -318,9 +361,11 @@ function updateProgress() {
 
 function mark(correct) {
   if (correct) {
-    round.correct += 1;
-    round.streak += 1;
-    round.bestStreak = Math.max(round.bestStreak, round.streak);
+    if (creditsAnswer(true, current.missed)) {
+      round.correct += 1;
+      round.streak += 1;
+      round.bestStreak = Math.max(round.bestStreak, round.streak);
+    }
     els.feedback.textContent = "Nice. That’s right.";
     els.feedback.className = "feedback is-good";
     paintProblem(true);
@@ -350,6 +395,7 @@ function afterAnswer(correct) {
   recordAttempt(correct);
   mark(correct);
   updateProgress();
+  if (isPracticePlay()) paintPlayStat();
 
   const done = round.limit && round.answered >= round.limit;
   if (done) {
@@ -381,7 +427,26 @@ function bestKey() {
   return `${learner}|${mode}|${difficulty}|${ops.slice().sort().join(",")}`;
 }
 
-function finishRound() {
+function requestLeavePractice() {
+  if (!isPracticePlay()) return;
+  const unfinished = round.asked > 0 && (!round.limit || round.answered < round.limit);
+  if (unfinished || !round.limit) {
+    setLeaveOpen(true);
+    return;
+  }
+  leavePractice();
+}
+
+function leavePractice() {
+  setLeaveOpen(false);
+  if (!round) {
+    showScreen("setup");
+    return;
+  }
+  finishRound({ to: "setup" });
+}
+
+function finishRound({ to = "results" } = {}) {
   if (!round) return;
   clearTimer();
   const elapsed = Date.now() - round.startedAt;
@@ -413,8 +478,8 @@ function finishRound() {
       ? `Personal best for this mix: ${previous}.`
       : "This mix now has a saved best.";
   round = null;
-  showScreen("results");
-  if (celebrate) playCelebration();
+  showScreen(to);
+  if (to === "results" && celebrate) playCelebration();
 }
 
 function toggleOp(op) {
@@ -487,9 +552,21 @@ els.settingsBtn.addEventListener("click", () => {
   setSettingsOpen(true);
 });
 els.settingsBack.addEventListener("click", () => setSettingsOpen(false));
+els.sessionBack.addEventListener("click", requestLeavePractice);
+els.leaveStay.addEventListener("click", () => setLeaveOpen(false));
+els.leaveConfirm.addEventListener("click", leavePractice);
+els.leaveBackdrop.addEventListener("click", () => setLeaveOpen(false));
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   setLearnerOpen(false);
+  if (!els.leaveDialog.hidden) {
+    setLeaveOpen(false);
+    return;
+  }
+  if (isPracticePlay()) {
+    requestLeavePractice();
+    return;
+  }
   setSettingsOpen(false);
 });
 

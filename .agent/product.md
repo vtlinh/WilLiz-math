@@ -18,7 +18,9 @@ The top action bar keeps one avatar on the left and WilLiz Math immediately to i
 3. Appearance: Dark (default) or Light.
 4. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, or a 60-second sprint.
 
-There is no Skip. Practice allows a retry on the same problem. Quiz and sprint allow one try, then reveal and advance.
+There is no Skip. Practice stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right. Quiz and sprint allow one try, then reveal and advance.
+
+During practice the action bar is only ← back and an X/Y score. Leaving an unfinished or unlimited session asks for confirmation.
 
 Answers are entered only with the on-screen keypad. The answer field is not editable and must not open a system keyboard.
 

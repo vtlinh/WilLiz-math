@@ -102,6 +102,20 @@ body {
   flex: 1;
 }
 
+.action-start[hidden],
+.play-stat[hidden] {
+  display: none;
+}
+
+.play-stat {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
 .app-title {
   margin: 0;
   font-family: "Fraunces", Georgia, serif;
@@ -657,6 +671,10 @@ legend {
   grid-template-columns: 1fr;
 }
 
+.play-actions[hidden] {
+  display: none;
+}
+
 .star-row {
   display: flex;
   justify-content: center;
@@ -741,6 +759,48 @@ dd {
 .best-note {
   color: var(--sage);
   font-weight: 800;
+}
+
+.leave-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(8, 12, 10, 0.55);
+}
+
+.leave-dialog {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100% - 32px));
+  padding: 22px 20px 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.leave-dialog h2 {
+  margin: 0 0 8px;
+}
+
+.leave-dialog p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.leave-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.leave-backdrop[hidden],
+.leave-dialog[hidden] {
+  display: none;
 }
 
 .celebrate-canvas {

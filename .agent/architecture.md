@@ -11,11 +11,13 @@ problems.js         generateProblem, parseAnswer
 worksheet.js        long multiplication and long division layouts
 celebrate.js        perfect-score confetti and fireworks
 stars.js            quiz 20% stars and unlimited 10-correct-set stars
+scoring.js          practice credit: first-try correct only
 test-problems.mjs   Node checks for the generator
 test-storage.mjs    Node checks for per-learner storage
 test-worksheet.mjs  Node checks for worksheet layouts
 test-celebrate.mjs  Node checks for when a perfect score celebrates
 test-stars.mjs      Node checks for quiz and unlimited progress stars
+test-scoring.mjs    Node checks for first-try practice credit
 .github/workflows/pages.yml
 ```
 
