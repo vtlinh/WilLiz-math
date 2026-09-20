@@ -35,11 +35,9 @@ const els = {
   againBtn: document.getElementById("again-btn"),
   setupBtn: document.getElementById("setup-btn"),
   mixSummary: document.getElementById("mix-summary"),
+  settings: document.getElementById("settings-screen"),
   settingsBtn: document.getElementById("settings-btn"),
-  settingsPanel: document.getElementById("settings-panel"),
-  settingsBackdrop: document.getElementById("settings-backdrop"),
-  settingsClose: document.getElementById("settings-close"),
-  settingsDone: document.getElementById("settings-done"),
+  settingsBack: document.getElementById("settings-back"),
 };
 
 const settings = {
@@ -53,6 +51,8 @@ let round = null;
 let current = null;
 let timerId = null;
 let awaitingAdvance = false;
+let screen = "setup";
+let settingsReturn = "setup";
 
 function loadStore() {
   try {
@@ -122,7 +122,6 @@ function selectLearner(name) {
 }
 
 function setLearnerOpen(open) {
-  if (open) setSettingsOpen(false);
   els.learnerPanel.classList.toggle("hidden", !open);
   els.learnerPanel.hidden = !open;
   els.learnerBtn.classList.toggle("is-open", open);
@@ -130,21 +129,25 @@ function setLearnerOpen(open) {
 }
 
 function setSettingsOpen(open) {
-  if (open) setLearnerOpen(false);
-  els.settingsPanel.classList.toggle("hidden", !open);
-  els.settingsBackdrop.classList.toggle("hidden", !open);
-  els.settingsPanel.hidden = !open;
-  els.settingsBackdrop.hidden = !open;
-  els.settingsBtn.classList.toggle("is-open", open);
-  els.settingsBtn.setAttribute("aria-expanded", String(open));
-  els.settingsBtn.setAttribute("aria-label", open ? "Close settings" : "Open settings");
-  document.body.classList.toggle("settings-open", open);
+  if (open) {
+    setLearnerOpen(false);
+    if (screen !== "settings") settingsReturn = screen;
+    showScreen("settings");
+    return;
+  }
+  if (screen === "settings") showScreen(settingsReturn || "setup");
 }
 
 function showScreen(name) {
+  screen = name;
   els.setup.classList.toggle("hidden", name !== "setup");
   els.play.classList.toggle("hidden", name !== "play");
   els.results.classList.toggle("hidden", name !== "results");
+  els.settings.classList.toggle("hidden", name !== "settings");
+  els.settingsBtn.classList.toggle("is-open", name === "settings");
+  els.settingsBtn.hidden = name === "settings";
+  els.settingsBtn.setAttribute("aria-expanded", String(name === "settings"));
+  document.body.classList.toggle("is-settings", name === "settings");
 }
 
 function modeMeta(mode) {
@@ -460,11 +463,9 @@ els.modeRow.addEventListener("click", (event) => {
 });
 
 els.settingsBtn.addEventListener("click", () => {
-  setSettingsOpen(els.settingsPanel.hidden);
+  setSettingsOpen(true);
 });
-els.settingsClose.addEventListener("click", () => setSettingsOpen(false));
-els.settingsDone.addEventListener("click", () => setSettingsOpen(false));
-els.settingsBackdrop.addEventListener("click", () => setSettingsOpen(false));
+els.settingsBack.addEventListener("click", () => setSettingsOpen(false));
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   setLearnerOpen(false);
@@ -480,7 +481,6 @@ els.endBtn.addEventListener("click", finishRound);
 els.againBtn.addEventListener("click", startRound);
 els.setupBtn.addEventListener("click", () => {
   stopCelebration();
-  showScreen("setup");
   setSettingsOpen(true);
 });
 els.keypad.addEventListener("click", (event) => {

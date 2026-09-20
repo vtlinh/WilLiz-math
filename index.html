@@ -43,7 +43,7 @@
           id="settings-btn"
           class="icon-btn"
           aria-expanded="false"
-          aria-controls="settings-panel"
+          aria-controls="settings-screen"
           aria-label="Open settings"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -55,67 +55,6 @@
         </button>
       </header>
 
-      <div id="settings-backdrop" class="settings-backdrop hidden" hidden></div>
-      <aside
-        id="settings-panel"
-        class="settings-panel hidden"
-        hidden
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="setup-title"
-      >
-        <div class="settings-head">
-          <h2 id="setup-title">Settings</h2>
-          <button type="button" id="settings-close" class="icon-btn" aria-label="Close settings">×</button>
-        </div>
-
-        <fieldset class="block">
-          <legend>Operations</legend>
-          <div class="chip-row" id="op-row" role="group" aria-label="Operations">
-            <button type="button" class="chip is-selected" data-op="add" aria-pressed="true">+</button>
-            <button type="button" class="chip is-selected" data-op="sub" aria-pressed="true">−</button>
-            <button type="button" class="chip" data-op="mul" aria-pressed="false">×</button>
-            <button type="button" class="chip" data-op="div" aria-pressed="false">÷</button>
-          </div>
-        </fieldset>
-
-        <fieldset class="block">
-          <legend>Difficulty</legend>
-          <div class="seg" id="difficulty-row" role="radiogroup" aria-label="Difficulty">
-            <button type="button" class="seg-btn is-selected" data-difficulty="easy" aria-checked="true">Easy</button>
-            <button type="button" class="seg-btn" data-difficulty="pictures" aria-checked="false">Pictures</button>
-            <button type="button" class="seg-btn" data-difficulty="medium" aria-checked="false">Medium</button>
-            <button type="button" class="seg-btn" data-difficulty="hard" aria-checked="false">Hard</button>
-            <button type="button" class="seg-btn" data-difficulty="challenge" aria-checked="false">Challenge</button>
-          </div>
-        </fieldset>
-
-        <fieldset class="block">
-          <legend>Mode</legend>
-          <div class="mode-grid" id="mode-row">
-            <button type="button" class="mode-card is-selected" data-mode="practice">
-              <strong>Practice</strong>
-              <span>Unlimited questions, retry allowed</span>
-            </button>
-            <button type="button" class="mode-card" data-mode="quiz10">
-              <strong>Quiz · 10</strong>
-              <span>One try each, then the score</span>
-            </button>
-            <button type="button" class="mode-card" data-mode="quiz20">
-              <strong>Quiz · 20</strong>
-              <span>A longer set for stamina</span>
-            </button>
-            <button type="button" class="mode-card" data-mode="sprint">
-              <strong>60s sprint</strong>
-              <span>Answer as many as you can</span>
-            </button>
-          </div>
-        </fieldset>
-
-        <p id="setup-error" class="error" hidden>Choose at least one operation to start.</p>
-        <button type="button" id="settings-done" class="primary">Done</button>
-      </aside>
-
       <header class="masthead">
         <p class="eyebrow">Practice studio</p>
         <h1>WilLiz Math</h1>
@@ -123,6 +62,58 @@
       </header>
 
       <main>
+        <section id="settings-screen" class="panel hidden" aria-labelledby="setup-title">
+          <div class="settings-head">
+            <button type="button" id="settings-back" class="icon-btn" aria-label="Back">←</button>
+            <h2 id="setup-title">Settings</h2>
+          </div>
+
+          <fieldset class="block">
+            <legend>Operations</legend>
+            <div class="chip-row" id="op-row" role="group" aria-label="Operations">
+              <button type="button" class="chip is-selected" data-op="add" aria-pressed="true">+</button>
+              <button type="button" class="chip is-selected" data-op="sub" aria-pressed="true">−</button>
+              <button type="button" class="chip" data-op="mul" aria-pressed="false">×</button>
+              <button type="button" class="chip" data-op="div" aria-pressed="false">÷</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="block">
+            <legend>Difficulty</legend>
+            <div class="seg" id="difficulty-row" role="radiogroup" aria-label="Difficulty">
+              <button type="button" class="seg-btn is-selected" data-difficulty="easy" aria-checked="true">Easy</button>
+              <button type="button" class="seg-btn" data-difficulty="pictures" aria-checked="false">Pictures</button>
+              <button type="button" class="seg-btn" data-difficulty="medium" aria-checked="false">Medium</button>
+              <button type="button" class="seg-btn" data-difficulty="hard" aria-checked="false">Hard</button>
+              <button type="button" class="seg-btn" data-difficulty="challenge" aria-checked="false">Challenge</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="block">
+            <legend>Mode</legend>
+            <div class="mode-grid" id="mode-row">
+              <button type="button" class="mode-card is-selected" data-mode="practice">
+                <strong>Practice</strong>
+                <span>Unlimited questions, retry allowed</span>
+              </button>
+              <button type="button" class="mode-card" data-mode="quiz10">
+                <strong>Quiz · 10</strong>
+                <span>One try each, then the score</span>
+              </button>
+              <button type="button" class="mode-card" data-mode="quiz20">
+                <strong>Quiz · 20</strong>
+                <span>A longer set for stamina</span>
+              </button>
+              <button type="button" class="mode-card" data-mode="sprint">
+                <strong>60s sprint</strong>
+                <span>Answer as many as you can</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <p id="setup-error" class="error" hidden>Choose at least one operation to start.</p>
+        </section>
+
         <section id="setup-screen" class="panel" aria-labelledby="home-title">
           <h2 id="home-title">Ready when you are</h2>
           <p id="mix-summary" class="mix-summary"></p>
