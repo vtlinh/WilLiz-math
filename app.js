@@ -226,9 +226,17 @@ function screenUrl(name) {
   return name === "setup" ? "./" : `./#${name}`;
 }
 
+let homeTrapSeq = 0;
+
 function lockHomeHistory() {
   if (screen !== "setup") return;
-  history.pushState({ screen: "setup", trap: true }, "", screenUrl("setup"));
+  homeTrapSeq += 1;
+  history.pushState({ screen: "setup", trap: true }, "", `./#home-${homeTrapSeq}`);
+}
+
+function armHomeHistory() {
+  lockHomeHistory();
+  lockHomeHistory();
 }
 
 function showScreen(name, { replace = false } = {}) {
@@ -237,11 +245,11 @@ function showScreen(name, { replace = false } = {}) {
   const url = screenUrl(screen);
   if (replace) {
     history.replaceState(state, "", url);
-    lockHomeHistory();
+    armHomeHistory();
     return;
   }
   if (history.state?.screen !== screen) history.pushState(state, "", url);
-  lockHomeHistory();
+  armHomeHistory();
 }
 
 function handleHistoryPop() {
@@ -253,8 +261,8 @@ function handleHistoryPop() {
   }
   paintScreen(next);
   if (screen !== "setup") return;
-  lockHomeHistory();
-  window.setTimeout(lockHomeHistory, 0);
+  armHomeHistory();
+  window.setTimeout(armHomeHistory, 0);
 }
 
 function modeMeta(mode) {
