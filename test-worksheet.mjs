@@ -1,4 +1,4 @@
-import { planAddition, planDivision, planMultiplication } from "./worksheet.js";
+import { planAddition, planDivision, planMultiplication, planSubtraction } from "./worksheet.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -56,5 +56,19 @@ assert(addCarry.carries.join(",") === "1,", "carry into tens");
 const addWide = planAddition(99, 3);
 assert(addWide.total === 102, "99 + 3");
 assert(addWide.cols === 3, "sum needs 3 columns");
+
+const subEasy = planSubtraction(42, 12);
+assert(subEasy.total === 30, "42 − 12");
+assert(subEasy.top.join("") === "42", "sub top");
+assert(subEasy.bottom.join("") === "12", "sub bottom");
+assert(subEasy.carries.every((c) => !c), "no borrow");
+
+const subBorrow = planSubtraction(42, 17);
+assert(subBorrow.total === 25, "42 − 17");
+assert(subBorrow.carries.join(",") === ",1", "borrow in ones");
+
+const subWide = planSubtraction(100, 1);
+assert(subWide.total === 99, "100 − 1");
+assert(subWide.cols === 3, "keep three columns");
 
 console.log("worksheet checks passed");

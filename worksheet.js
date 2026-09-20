@@ -268,24 +268,59 @@ export function planAddition(a, b) {
   };
 }
 
-export function renderAdditionSheet(problem, { typed = "", reveal = false } = {}) {
-  const plan = planAddition(problem.a, problem.b);
+export function planSubtraction(a, b) {
+  const total = a - b;
+  const cols = Math.max(String(a).length, String(b).length, String(Math.abs(total)).length);
+  const top = padLeft(digitList(a), cols);
+  const bottom = padLeft(digitList(b), cols);
+  const carries = Array(cols).fill("");
+  let borrow = 0;
+  for (let i = cols - 1; i >= 0; i -= 1) {
+    let topDigit = Number(top[i] || 0) - borrow;
+    const bot = Number(bottom[i] || 0);
+    if (topDigit < bot) {
+      topDigit += 10;
+      borrow = 1;
+      carries[i] = "1";
+    } else {
+      borrow = 0;
+    }
+  }
+  return {
+    cols,
+    top,
+    bottom,
+    carries,
+    total,
+    totalCells: padLeft(digitList(total), cols),
+  };
+}
+
+function renderColumnSheet(problem, plan, { typed = "", reveal = false, op, symbol }) {
   const root = document.createElement("div");
   root.className = "sheet";
-  root.dataset.op = "add";
-
+  root.dataset.op = op;
   if (reveal) root.append(row(plan.cols, plan.carries, { className: "is-carry" }));
   root.append(row(plan.cols, plan.top));
-  root.append(row(plan.cols, plan.bottom, { op: "+" }));
+  root.append(row(plan.cols, plan.bottom, { op: symbol }));
   root.append(rule(plan.cols));
   root.append(row(plan.cols, reveal ? plan.totalCells : typedCells(typed, plan.cols), { className: "is-total" }));
   return root;
+}
+
+export function renderAdditionSheet(problem, options = {}) {
+  return renderColumnSheet(problem, planAddition(problem.a, problem.b), { ...options, op: "add", symbol: "+" });
+}
+
+export function renderSubtractionSheet(problem, options = {}) {
+  return renderColumnSheet(problem, planSubtraction(problem.a, problem.b), { ...options, op: "sub", symbol: "−" });
 }
 
 export function renderProblemView(problem, options = {}) {
   if (problem.op === "mul") return renderMultiplicationSheet(problem, options);
   if (problem.op === "div") return renderDivisionSheet(problem, options);
   if (problem.op === "add") return renderAdditionSheet(problem, options);
+  if (problem.op === "sub") return renderSubtractionSheet(problem, options);
   const text = document.createElement("div");
   text.className = "problem-inline";
   text.textContent = options.reveal ? `${problem.prompt} = ${problem.answer}` : problem.prompt;

@@ -21,7 +21,7 @@ test-worksheet.mjs  Node checks for multiplication layout
 2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`. Switching learners restores that mix immediately.
 3. A legacy `settings` blob is migrated onto that learner once, then replaced by `people`.
 4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`.
-5. Addition, multiplication, and division are rendered by `worksheet.js`. Subtraction still uses the inline prompt until it gets its own sheet.
+5. Addition, subtraction, multiplication, and division are rendered by `worksheet.js`.
 6. Submit parses the input with `parseAnswer`. Practice retries on a miss; quiz and sprint advance after one try.
 7. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves.
 
