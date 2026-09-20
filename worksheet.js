@@ -53,14 +53,13 @@ function padLeft(chars, cols) {
 function timesDigitSteps(value, digit) {
   const source = String(value).split("").map(Number);
   const steps = [];
-  let carry = 0;
   for (let i = source.length - 1; i >= 0; i -= 1) {
-    const n = source[i] * digit + carry;
+    const n = source[i] * digit;
     const write = n % 10;
-    carry = Math.floor(n / 10);
-    steps.push({ sourceIndex: i, write, carryOut: carry });
+    const carryOut = Math.floor(n / 10);
+    steps.push({ sourceIndex: i, write, carryOut });
   }
-  return { steps, leftover: carry, sourceLen: source.length };
+  return { steps, leftover: steps.at(-1)?.carryOut ?? 0, sourceLen: source.length };
 }
 
 function timesDigit(value, digit) {
@@ -69,10 +68,9 @@ function timesDigit(value, digit) {
   for (const step of steps) {
     if (step.sourceIndex > 0) carries[step.sourceIndex - 1] = step.carryOut;
   }
-  const out = steps.map((step) => step.write).reverse();
-  if (leftover) out.unshift(leftover);
   return {
-    product: Number(out.join("")) || 0,
+    product: value * digit,
+    leftover,
     carries,
   };
 }
