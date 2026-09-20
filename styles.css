@@ -766,20 +766,268 @@ body.celebrate-static .results-headline {
 }
 
 @media (max-width: 640px) {
-  .chip-row,
-  .seg,
-  .mode-grid,
-  .stats {
-    grid-template-columns: 1fr 1fr;
+  html,
+  body {
+    height: 100%;
+    height: 100dvh;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   .page {
-    width: min(760px, calc(100% - 20px));
-    padding-top: 80px;
+    width: min(760px, calc(100% - 16px));
+    height: 100%;
+    min-height: 0;
+    padding: 64px 0 8px;
+    display: flex;
+    flex-direction: column;
   }
 
   .action-bar {
-    width: min(760px, calc(100% - 20px));
+    top: calc(6px + env(safe-area-inset-top));
+    width: min(760px, calc(100% - 16px));
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .icon-btn {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 12px 10px;
+    border-radius: 18px;
+  }
+
+  .panel.hidden {
+    display: none;
+  }
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 1.25rem;
+  }
+
+  .settings-head {
+    margin-bottom: 8px;
+  }
+
+  .block {
+    margin: 0 0 8px;
+  }
+
+  legend {
+    margin-bottom: 4px;
+    font-size: 0.82rem;
+  }
+
+  .chip-row,
+  .mode-grid,
+  .stats,
+  .result-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .seg {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .theme-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .chip,
+  .seg-btn {
+    padding: 7px 6px;
+    font-size: 0.82rem;
+  }
+
+  .mode-card {
+    padding: 8px 9px;
+    border-radius: 12px;
+  }
+
+  .mode-card span {
+    margin-top: 2px;
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+
+  .primary,
+  .ghost {
+    padding: 10px 12px;
+  }
+
+  #setup-screen {
+    justify-content: center;
+  }
+
+  .mix-summary {
+    margin: 0 0 12px;
+  }
+
+  #settings-screen {
+    overflow: hidden;
+  }
+
+  #play-screen {
+    gap: 6px;
+  }
+
+  .play-meta {
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+
+  .play-meta p {
+    margin: 0;
+  }
+
+  .problem-label {
+    margin: 0;
+    font-size: 0.68rem;
+  }
+
+  .problem {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+    overflow: auto;
+    font-size: clamp(2rem, 10vw, 3.2rem);
+  }
+
+  .problem-inline {
+    font-size: clamp(2rem, 10vw, 3.2rem);
+  }
+
+  .sheet-eq {
+    margin: 0 0 6px;
+    font-size: clamp(1.15rem, 4vw, 1.6rem);
+  }
+
+  .sheet-row,
+  .sheet-rule {
+    grid-template-columns: 1rem repeat(var(--cols), minmax(1rem, 1.25rem));
+  }
+
+  .sheet-cell {
+    min-height: 1.2rem;
+    font-size: clamp(1.05rem, 4vw, 1.45rem);
+  }
+
+  .sheet-div {
+    gap: 12px;
+  }
+
+  .div-table {
+    font-size: 0.85rem;
+    line-height: 1.25;
+  }
+
+  .div-divisor {
+    min-width: 1.8rem;
+    font-size: clamp(1.05rem, 4vw, 1.45rem);
+  }
+
+  .sheet-pic {
+    padding: 4px 0;
+  }
+
+  .pic-item {
+    font-size: 1.15rem;
+  }
+
+  .pic-num,
+  .pic-op,
+  .pic-answer {
+    font-size: clamp(1.2rem, 5vw, 1.8rem);
+  }
+
+  .pic-answer {
+    min-width: 2.4rem;
+    min-height: 2.4rem;
+  }
+
+  .answer-form {
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  #answer-input {
+    padding: 8px 10px;
+    font-size: 1.15rem;
+  }
+
+  .feedback {
+    min-height: 1.15em;
+    margin: 0;
+    font-size: 0.92rem;
+  }
+
+  .keypad {
+    margin-top: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 6px;
+    align-content: stretch;
+  }
+
+  .keypad button {
+    min-height: 0;
+    border-radius: 10px;
+    font-size: 1.05rem;
+  }
+
+  .play-actions,
+  .result-actions {
+    margin-top: 0;
+    flex: 0 0 auto;
+  }
+
+  .star-row {
+    min-height: 1.2rem;
+    margin-top: 0;
+    flex: 0 0 auto;
+  }
+
+  .results-headline {
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+  }
+
+  .stats div {
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  dd {
+    margin: 4px 0 0;
+    font-size: 1.25rem;
+  }
+
+  .best-note {
+    margin: 8px 0;
   }
 }
 

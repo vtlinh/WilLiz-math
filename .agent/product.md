@@ -22,6 +22,8 @@ There is no Skip. Practice allows a retry on the same problem. Quiz and sprint a
 
 Answers are entered only with the on-screen keypad. The answer field is not editable and must not open a system keyboard.
 
+On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
+
 Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication. Division is written as long division with a divisor times table and bring-down working.
 
 ## Non-goals
