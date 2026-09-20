@@ -265,6 +265,23 @@ function handleHistoryPop() {
   window.setTimeout(armHomeHistory, 0);
 }
 
+function stayOnHome() {
+  paintScreen("setup");
+  history.replaceState({ screen: "setup", trap: false }, "", screenUrl("setup"));
+  armHomeHistory();
+}
+
+function swallowHomeNavigate(event) {
+  if (event.navigationType !== "traverse" || screen !== "setup" || !event.canIntercept) return;
+  event.intercept({
+    focusReset: "manual",
+    scroll: "manual",
+    handler() {
+      stayOnHome();
+    },
+  });
+}
+
 function modeMeta(mode) {
   if (mode === "quiz10") return { label: "Quiz", limit: 10, timed: false };
   if (mode === "quiz20") return { label: "Quiz", limit: 20, timed: false };
@@ -744,6 +761,9 @@ restoreSettings();
 const launchScreen = location.hash === "#settings" ? "settings" : "setup";
 showScreen(launchScreen, { replace: true });
 window.addEventListener("popstate", handleHistoryPop);
+if (window.navigation?.addEventListener) {
+  window.navigation.addEventListener("navigate", swallowHomeNavigate);
+}
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(() => {
