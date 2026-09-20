@@ -252,7 +252,9 @@ function handleHistoryPop() {
     return;
   }
   paintScreen(next);
-  if (screen === "setup") window.setTimeout(lockHomeHistory, 0);
+  if (screen !== "setup") return;
+  lockHomeHistory();
+  window.setTimeout(lockHomeHistory, 0);
 }
 
 function modeMeta(mode) {
