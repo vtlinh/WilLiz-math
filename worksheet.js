@@ -1,4 +1,5 @@
 import { parseAnswer } from "./problems.js";
+import { pickPicture, pictureSvg } from "./pictures.js";
 
 function digitList(value) {
   return String(value).split("").map((d) => (d === "-" ? "−" : d));
@@ -428,29 +429,25 @@ export function renderSubtractionSheet(problem, options = {}) {
   return renderColumnSheet(problem, planSubtraction(problem.a, problem.b), { ...options, op: "sub", symbol: "−" });
 }
 
-const PICTURE_ICONS = ["🍐", "🍎", "🍋", "🍊", "🍇", "🍑", "⭐", "🫐"];
-
-function pictureIcon(problem) {
-  const seed = [...String(problem.key)].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
-  return PICTURE_ICONS[seed % PICTURE_ICONS.length];
+function pictureNode(picture) {
+  const item = document.createElement("span");
+  item.className = "pic-item";
+  item.setAttribute("aria-hidden", "true");
+  item.innerHTML = pictureSvg(picture.id);
+  return item;
 }
 
-function pictureCluster(count, icon) {
+function pictureCluster(count, picture) {
   const wrap = document.createElement("div");
   wrap.className = "pic-cluster";
-  for (let i = 0; i < count; i += 1) {
-    const item = document.createElement("span");
-    item.className = "pic-item";
-    item.textContent = icon;
-    wrap.append(item);
-  }
+  for (let i = 0; i < count; i += 1) wrap.append(pictureNode(picture));
   return wrap;
 }
 
-function pictureSide(count, icon, label) {
+function pictureSide(count, picture, label) {
   const side = document.createElement("div");
   side.className = "pic-side";
-  side.append(pictureCluster(count, icon));
+  side.append(pictureCluster(count, picture));
   const number = document.createElement("p");
   number.className = "pic-num";
   number.textContent = String(label);
@@ -462,7 +459,7 @@ export function renderPictureSheet(problem, { fills = [], active = 0, reveal = f
   const root = document.createElement("div");
   root.className = "sheet sheet-pic";
   root.dataset.op = problem.op;
-  const icon = pictureIcon(problem);
+  const picture = pickPicture(problem.key);
   const symbol = { add: "+", sub: "−", mul: "×", div: "÷" }[problem.op];
 
   const rowWrap = document.createElement("div");
@@ -471,7 +468,7 @@ export function renderPictureSheet(problem, { fills = [], active = 0, reveal = f
   if (problem.op === "mul") {
     const groups = document.createElement("div");
     groups.className = "pic-groups";
-    for (let i = 0; i < problem.a; i += 1) groups.append(pictureCluster(problem.b, icon));
+    for (let i = 0; i < problem.a; i += 1) groups.append(pictureCluster(problem.b, picture));
     const side = document.createElement("div");
     side.className = "pic-side";
     side.append(groups);
@@ -481,7 +478,7 @@ export function renderPictureSheet(problem, { fills = [], active = 0, reveal = f
     side.append(number);
     rowWrap.append(side);
   } else if (problem.op === "div") {
-    rowWrap.append(pictureSide(problem.a, icon, problem.a));
+    rowWrap.append(pictureSide(problem.a, picture, problem.a));
     const op = document.createElement("span");
     op.className = "pic-op";
     op.textContent = "÷";
@@ -491,15 +488,15 @@ export function renderPictureSheet(problem, { fills = [], active = 0, reveal = f
     const note = document.createElement("p");
     note.className = "pic-num";
     note.textContent = String(problem.b);
-    groups.append(pictureCluster(problem.b, icon), note);
+    groups.append(pictureCluster(problem.b, picture), note);
     rowWrap.append(groups);
   } else {
-    rowWrap.append(pictureSide(problem.a, icon, problem.a));
+    rowWrap.append(pictureSide(problem.a, picture, problem.a));
     const op = document.createElement("span");
     op.className = "pic-op";
     op.textContent = symbol;
     rowWrap.append(op);
-    rowWrap.append(pictureSide(problem.b, icon, problem.b));
+    rowWrap.append(pictureSide(problem.b, picture, problem.b));
   }
 
   const eq = document.createElement("span");

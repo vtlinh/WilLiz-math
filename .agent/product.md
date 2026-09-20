@@ -14,7 +14,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 The top action bar keeps one avatar on the left and WilLiz Math immediately to its right. Tapping the avatar opens Will, Liz, or Guest. A settings icon on the right opens the Settings page, with ← back at the top. Every mix change saves immediately; there is no Save or Done. Settings holds:
 
 1. Operations: addition, subtraction, multiplication, division (at least one).
-2. Difficulty: Easy, Pictures, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows objects to count.
+2. Difficulty: Easy, Pictures, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows kid-friendly drawings of fruit, toys, and school supplies to count.
 3. Appearance: Dark (default) or Light.
 4. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, or a 60-second sprint.
 
