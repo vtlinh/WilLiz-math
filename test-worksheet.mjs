@@ -93,8 +93,8 @@ assert(subWide.cols === 3, "keep three columns");
 const mulLines = worksheetFields({ a: 124, b: 26, op: "mul", answer: 3224, difficulty: "hard" });
 assert(
   mulLines.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:4,carry:2,digit:2,carry:1,digit:6,digit:8,digit:4,digit:2,digit:4,digit:2,digit:2,digit:3",
-  "124 × 26 fills each place product, not folded carries",
+    "digit:4,carry:2,digit:4,carry:1,digit:7,digit:8,digit:4,digit:2,digit:4,digit:2,digit:2,digit:3",
+  "124 × 26 writes each full partial: 744 and 248, then 3224",
 );
 assert(mulLines.some((field) => field.line === "partial-0"), "ones partial");
 assert(mulLines.some((field) => field.line === "partial-1"), "tens partial");
@@ -111,11 +111,18 @@ assert(
   mulLines.filter((field) => field.line === "partial-1" && field.kind === "digit").every((field) => field.col < 3),
   "tens partial 248 starts at the tens, no shift zero",
 );
+assert(
+  mulLines
+    .filter((field) => field.line === "partial-0" && field.kind === "digit")
+    .map((field) => field.answer)
+    .join("") === "447",
+  "124 × 6 is the full 744",
+);
 
 const fourteen = worksheetFields({ a: 14, b: 14, op: "mul", answer: 196, difficulty: "medium" });
 assert(
-  fourteen.map((field) => field.answer).join(",") === "6,1,4,4,1,6,9,1",
-  "14 × 14 ones, carry, tens, both partials, and total",
+  fourteen.map((field) => field.answer).join(",") === "6,1,5,4,1,6,9,1",
+  "14 × 14 ones is 56, then 14 shifted, then 196",
 );
 
 const eleven = worksheetFields({ a: 11, b: 29, op: "mul", answer: 319, difficulty: "challenge" });
@@ -128,20 +135,16 @@ assert(
 const nineByThirteen = worksheetFields({ a: 9, b: 13, op: "mul", answer: 117, difficulty: "easy" });
 assert(
   nineByThirteen.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:7,carry:2,digit:9,digit:7,digit:1,digit:1",
-  "9 × 13 is 7 with carry 2, then 9 shifted, then 117",
+    "digit:7,digit:2,digit:9,digit:7,digit:1,digit:1",
+  "9 × 13 is the full 27, then 9 shifted, then 117",
 );
 const onesPartial = nineByThirteen.filter((field) => field.line === "partial-0");
 assert(
-  onesPartial.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:7,carry:2",
-  "9 × 3 is 7 in the ones and 2 as a carry, not 27",
+  onesPartial.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:7,digit:2",
+  "9 × 3 is the full 27",
 );
-assert(onesPartial.find((field) => field.kind === "digit")?.col === 2, "7 sits in the ones result field");
-assert(onesPartial.find((field) => field.kind === "carry")?.col === 1, "2 sits above the tens field");
-assert(
-  !onesPartial.some((field) => field.kind === "digit" && field.answer === 2),
-  "leftover 2 is not a second result digit",
-);
+assert(onesPartial.find((field) => field.kind === "digit" && field.answer === 7)?.col === 2, "7 sits in the ones");
+assert(onesPartial.find((field) => field.kind === "digit" && field.answer === 2)?.col === 1, "2 sits in the tens");
 assert(
   nineByThirteen.filter((field) => field.line === "partial-1").map((field) => field.answer).join(",") === "9",
   "9 × 1 on the tens row is only 9, not 90",
@@ -154,17 +157,17 @@ assert(
 const twentySix = worksheetFields({ a: 26, b: 12, op: "mul", answer: 312, difficulty: "medium" });
 assert(
   twentySix.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:2,carry:1,digit:4,digit:6,digit:2,digit:2,digit:1,digit:3",
-  "26 × 12 ones is 40 + 12: 2, carry 1, tens 4",
+    "digit:2,carry:1,digit:5,digit:6,digit:2,digit:2,digit:1,digit:3",
+  "26 × 12 ones is the full 52",
 );
 const twentySixOnes = twentySix.filter((field) => field.line === "partial-0");
 assert(
-  twentySixOnes.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:2,carry:1,digit:4",
-  "26 × 2 writes 2 and 4 with carry 1, not 52",
+  twentySixOnes.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:2,carry:1,digit:5",
+  "26 × 2 writes 52, adding the carry into the tens",
 );
-assert(twentySixOnes.find((field) => field.kind === "digit" && field.col === 2)?.answer === 2, "ones of 12");
+assert(twentySixOnes.find((field) => field.kind === "digit" && field.col === 2)?.answer === 2, "ones of 52");
 assert(twentySixOnes.find((field) => field.kind === "carry")?.answer === 1, "tens of 12 stay a carry");
-assert(twentySixOnes.find((field) => field.kind === "digit" && field.col === 1)?.answer === 4, "20 × 2 is 4, not 5");
+assert(twentySixOnes.find((field) => field.kind === "digit" && field.col === 1)?.answer === 5, "20 × 2 plus carry 1 is 5");
 
 const seventeen = worksheetFields({ a: 17, b: 9, op: "mul", answer: 153, difficulty: "medium" });
 assert(
@@ -185,14 +188,13 @@ assert(
 const seventeenByTwentyNine = worksheetFields({ a: 17, b: 29, op: "mul", answer: 493, difficulty: "challenge" });
 const seventeenOnes = seventeenByTwentyNine.filter((field) => field.line === "partial-0");
 assert(
-  seventeenOnes.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:3,carry:6,digit:9",
-  "17 × 29 ones is 63 + 90: 3, carry 6, tens 9",
+  seventeenOnes.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:3,carry:6,digit:5,digit:1",
+  "17 × 29 ones is the full 153",
 );
-assert(seventeenOnes.length === 3, "17 × 9 has no leftover 1 from folding 6 into 9");
-assert(!seventeenOnes.some((field) => field.answer === 5 || field.answer === 1), "17 × 9 is not 153");
-assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 2)?.answer === 3, "ones of 63");
+assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 2)?.answer === 3, "ones of 153");
 assert(seventeenOnes.find((field) => field.kind === "carry")?.answer === 6, "tens of 63 stay a carry");
-assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 1)?.answer === 9, "10 × 9 is 9, not 5");
+assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 1)?.answer === 5, "10 × 9 plus carry 6 is 5");
+assert(seventeenOnes.find((field) => field.kind === "digit" && field.answer === 1)?.col === 0, "hundreds of 153");
 
 const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
 assert(oneMul.map((field) => field.answer).join(",") === "8,4", "12 × 4 ones then tens");
@@ -251,7 +253,7 @@ assert(worksheetSections(addLine).length === 1, "addition is one section");
 
 const fourteenFills = fourteen.map((field) => String(field.answer));
 assert(fieldsReady(fourteenFills), "all mul cells filled");
-assert(!fieldsReady(["6", "1", "", "4", "1", "6", "9", "1"]), "blank mul cell is not ready");
+assert(!fieldsReady(["6", "1", "", "5", "1", "6", "9", "1"]), "blank mul cell is not ready");
 assert(fieldsMatch(fourteenFills, fourteen), "matching every mul digit and carry");
 assert(!fieldsMatch(["6", "1", "5", "4", "1", "6", "9", "7"], fourteen), "final only is not enough");
 const divFills = divLines.map((field) => String(field.answer));
