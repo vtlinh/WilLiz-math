@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { generateProblem, parseAnswer } from "./problems.js";
 
 function assert(condition, message) {
@@ -5,7 +6,7 @@ function assert(condition, message) {
 }
 
 const ops = ["add", "sub", "mul", "div"];
-const levels = ["easy", "pictures", "medium", "hard", "challenge"];
+const levels = ["pictures", "easy", "medium", "hard", "challenge"];
 
 for (const op of ops) {
   for (const difficulty of levels) {
@@ -39,5 +40,10 @@ assert(parseAnswer("") === null, "empty");
 assert(parseAnswer("12") === 12, "int");
 assert(parseAnswer("−3") === -3, "unicode minus");
 assert(parseAnswer("1.5") === null, "reject decimal");
+
+const settings = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+const picturesAt = settings.indexOf('data-difficulty="pictures"');
+const easyAt = settings.indexOf('data-difficulty="easy"');
+assert(picturesAt !== -1 && picturesAt < easyAt, "pictures hardness comes before easy");
 
 console.log("problem generator checks passed");
