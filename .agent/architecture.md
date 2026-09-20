@@ -42,9 +42,9 @@ icon-512.png
 ## Problem rules
 
 - Subtraction answers are never negative.
-- Division is exact integer division by a one-digit divisor (2–9).
+- Division is exact. Easy and Medium use a one-digit divisor (2–9). Hard is a 3–5 digit dividend by 3–9. Challenge is a 4–7 digit dividend by a two-digit divisor.
 - Multiplication puts the larger factor on top.
-- Challenge multiplication uses larger factors; Easy stays in small whole numbers.
+- Hard multiplication is 2–3 digits by 3–9. Challenge is 3–5 digits by 2–3 digits. Easy stays in small whole numbers.
 
 Keep generation in `problems.js` so `test-problems.mjs` can import it without the DOM.
 

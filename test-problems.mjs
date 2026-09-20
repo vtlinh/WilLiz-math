@@ -21,12 +21,31 @@ for (const op of ops) {
       if (op === "mul") {
         assert(problem.answer === problem.a * problem.b, "mul");
         assert(problem.a >= problem.b, "larger factor on top");
+        const topDigits = String(problem.a).length;
+        const botDigits = String(problem.b).length;
+        if (difficulty === "hard") {
+          assert(topDigits >= 2 && topDigits <= 3, "hard mul is 2-3 digits on top");
+          assert(botDigits === 1 && problem.b >= 3 && problem.b <= 9, "hard mul by 3-9");
+        }
+        if (difficulty === "challenge") {
+          assert(topDigits >= 3 && topDigits <= 5, "challenge mul is 3-5 digits on top");
+          assert(botDigits >= 2 && botDigits <= 3, "challenge mul by 2-3 digits");
+        }
       }
       if (op === "div") {
         assert(problem.b !== 0, "div by zero");
-        assert(problem.b >= 2 && problem.b <= 9, "one-digit divisor");
         assert(problem.a / problem.b === problem.answer, "div exact");
         assert(Number.isInteger(problem.answer), "div integer");
+        const dividendDigits = String(problem.a).length;
+        if (difficulty === "hard") {
+          assert(dividendDigits >= 3 && dividendDigits <= 5, "hard div is 3-5 digit dividend");
+          assert(problem.b >= 3 && problem.b <= 9, "hard div by 3-9");
+        } else if (difficulty === "challenge") {
+          assert(dividendDigits >= 4 && dividendDigits <= 7, "challenge div is 4-7 digit dividend");
+          assert(problem.b >= 10 && problem.b <= 99, "challenge two-digit divisor");
+        } else {
+          assert(problem.b >= 2 && problem.b <= 9, "one-digit divisor");
+        }
       }
       assert(problem.prompt.includes(String(problem.a)), "prompt left");
       assert(problem.difficulty === difficulty, "keep difficulty");

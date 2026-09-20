@@ -244,4 +244,14 @@ const wrongQuotient = [...divFills];
 wrongQuotient[0] = "9";
 assert(!fieldsMatch(wrongQuotient, divLines), "quotient only is not enough");
 
+const hardMulSheet = worksheetFields({ a: 256, b: 7, op: "mul", answer: 1792, difficulty: "hard" });
+assert(hardMulSheet.length > 1, "hard 3-digit × 1-digit has working slots");
+const challengeMulSheet = worksheetFields({ a: 12345, b: 67, op: "mul", answer: 827115, difficulty: "challenge" });
+assert(challengeMulSheet.length > 1, "challenge 5-digit × 2-digit has working slots");
+const bigDiv = worksheetFields({ a: 1000000, b: 16, op: "div", answer: 62500, difficulty: "challenge" });
+assert(
+  bigDiv.filter((field) => field.line === "quotient").length === 5,
+  "7-digit ÷ 2-digit keeps a long-division quotient",
+);
+
 console.log("worksheet checks passed");

@@ -26,7 +26,7 @@ Answers are entered only with the on-screen keypad. Digit rows are **1–3**, th
 
 The play equation is centered in the problem area. On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
 
-Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication with the larger factor on top and no extra `a × b =` line. Division is written as long division by a one-digit divisor, with bring-down working and no times-table cheat. Worksheet misses do not rewrite the problem as `220 ÷ 20 = 11` in the feedback line.
+Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication with the larger factor on top and no extra `a × b =` line. Division is written as long division, with bring-down working and no times-table cheat. Hard division is a 3–5 digit dividend by a one-digit divisor 3–9. Challenge division is a 4–7 digit dividend by a two-digit divisor. Hard multiplication is a 2–3 digit factor by a one-digit 3–9. Challenge multiplication is a 3–5 digit factor by a 2–3 digit factor. Worksheet misses do not rewrite the problem as `220 ÷ 20 = 11` in the feedback line.
 
 ## Non-goals
 
