@@ -20,7 +20,7 @@ The top action bar keeps one avatar on the left and WilLiz Math immediately to i
 
 There is no Skip. Practice stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right. Quiz and sprint allow one try, then reveal and advance.
 
-During practice the action bar is only ← back and an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count. Leaving an unfinished or unlimited session asks for confirmation.
+There is no End round button. The action-bar ← ends the session: practice asks to confirm and returns home; quiz and sprint finish to the results screen. During practice the bar is only ← and an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
 
 Answers are entered only with the on-screen keypad, on each working line of the worksheet (partial products, long-division steps, or the column total). Pictures keep one blank. There is no separate final-only answer box, and the keypad must not open a system keyboard. Submit counts only when every line is filled and correct.
 

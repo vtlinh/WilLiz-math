@@ -27,7 +27,6 @@ const els = {
   input: document.getElementById("answer-input"),
   feedback: document.getElementById("feedback"),
   keypad: document.getElementById("keypad"),
-  endBtn: document.getElementById("end-btn"),
   starRow: document.getElementById("star-row"),
   headline: document.getElementById("results-headline"),
   statCorrect: document.getElementById("stat-correct"),
@@ -44,7 +43,6 @@ const els = {
   actionHome: document.getElementById("action-home"),
   sessionBack: document.getElementById("session-back"),
   playStat: document.getElementById("play-stat"),
-  playActions: document.querySelector(".play-actions"),
   leaveBackdrop: document.getElementById("leave-backdrop"),
   leaveDialog: document.getElementById("leave-dialog"),
   leaveStay: document.getElementById("leave-stay"),
@@ -184,14 +182,12 @@ function paintPlayStat() {
 
 function syncPlayChrome() {
   const practice = isPracticePlay();
-  els.sessionBack.hidden = !practice;
+  els.sessionBack.hidden = screen !== "play";
   els.actionHome.hidden = practice;
   els.playStat.hidden = !practice;
   els.settingsBtn.hidden = screen === "settings" || practice;
   els.settingsBtn.classList.toggle("is-open", screen === "settings");
   els.settingsBtn.setAttribute("aria-expanded", String(screen === "settings"));
-  els.endBtn.hidden = practice;
-  els.playActions.hidden = practice;
   els.playMeta.hidden = practice;
   if (practice) paintPlayStat();
 }
@@ -444,8 +440,12 @@ function bestKey() {
   return `${learner}|${mode}|${difficulty}|${ops.slice().sort().join(",")}`;
 }
 
-function requestLeavePractice() {
-  if (!isPracticePlay()) return;
+function requestLeaveSession() {
+  if (screen !== "play" || !round) return;
+  if (!isPracticePlay()) {
+    finishRound();
+    return;
+  }
   const unfinished = round.asked > 0 && (!round.limit || round.answered < round.limit);
   if (unfinished || !round.limit) {
     setLeaveOpen(true);
@@ -582,7 +582,7 @@ els.settingsBtn.addEventListener("click", () => {
   setSettingsOpen(true);
 });
 els.settingsBack.addEventListener("click", () => setSettingsOpen(false));
-els.sessionBack.addEventListener("click", requestLeavePractice);
+els.sessionBack.addEventListener("click", requestLeaveSession);
 els.leaveStay.addEventListener("click", () => setLeaveOpen(false));
 els.leaveConfirm.addEventListener("click", leavePractice);
 els.leaveBackdrop.addEventListener("click", () => setLeaveOpen(false));
@@ -593,8 +593,8 @@ document.addEventListener("keydown", (event) => {
     setLeaveOpen(false);
     return;
   }
-  if (isPracticePlay()) {
-    requestLeavePractice();
+  if (screen === "play" && round) {
+    requestLeaveSession();
     return;
   }
   setSettingsOpen(false);
@@ -611,7 +611,6 @@ els.input.addEventListener("beforeinput", (event) => {
   event.preventDefault();
 });
 els.form.addEventListener("submit", submitAnswer);
-els.endBtn.addEventListener("click", finishRound);
 els.againBtn.addEventListener("click", startRound);
 els.setupBtn.addEventListener("click", () => {
   stopCelebration();

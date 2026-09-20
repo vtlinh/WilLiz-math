@@ -276,7 +276,6 @@ legend {
 .chip-row,
 .seg,
 .mode-grid,
-.play-actions,
 .result-actions,
 .stats {
   display: grid;
@@ -716,18 +715,9 @@ legend {
   font-weight: 800;
 }
 
-.play-actions,
 .result-actions {
   margin-top: 16px;
   grid-template-columns: 1fr 1fr;
-}
-
-.play-actions {
-  grid-template-columns: 1fr;
-}
-
-.play-actions[hidden] {
-  display: none;
 }
 
 .star-row {
@@ -1115,7 +1105,6 @@ body.celebrate-static .results-headline {
     font-size: 1.05rem;
   }
 
-  .play-actions,
   .result-actions {
     margin-top: 0;
     flex: 0 0 auto;

@@ -17,6 +17,8 @@ assert(manifest.icons.every((icon) => !icon.src.startsWith("/")), "relative icon
 const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 assert(html.includes('rel="manifest"'), "manifest link");
 assert(html.includes("manifest.webmanifest"), "manifest href");
+assert(!html.includes("End round"), "no end-round button");
+assert(html.includes("session-back"), "action-bar back ends the round");
 
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert(app.includes("serviceWorker.register"), "register service worker");
