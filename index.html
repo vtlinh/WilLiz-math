@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1d4336" />
+    <meta
+      name="description"
+      content="WilLiz Math — a focused arithmetic practice studio for addition, subtraction, multiplication, and division."
+    />
+    <title>WilLiz Math</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,520;9..144,680&family=Nunito:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="masthead">
+        <p class="eyebrow">Practice studio</p>
+        <h1>WilLiz Math</h1>
+        <p class="lede">Warm up the fours, then race the clock. Pick a learner, choose a mix, and start a round.</p>
+      </header>
+
+      <main>
+        <section id="setup-screen" class="panel" aria-labelledby="setup-title">
+          <h2 id="setup-title">Set up a round</h2>
+
+          <fieldset class="block">
+            <legend>Who is practicing?</legend>
+            <div class="chip-row" id="learner-row" role="group" aria-label="Learner">
+              <button type="button" class="chip is-selected" data-learner="Will">Will</button>
+              <button type="button" class="chip" data-learner="Liz">Liz</button>
+              <button type="button" class="chip" data-learner="Guest">Guest</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="block">
+            <legend>Operations</legend>
+            <div class="chip-row" id="op-row" role="group" aria-label="Operations">
+              <button type="button" class="chip is-selected" data-op="add" aria-pressed="true">+</button>
+              <button type="button" class="chip is-selected" data-op="sub" aria-pressed="true">−</button>
+              <button type="button" class="chip" data-op="mul" aria-pressed="false">×</button>
+              <button type="button" class="chip" data-op="div" aria-pressed="false">÷</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="block">
+            <legend>Difficulty</legend>
+            <div class="seg" id="difficulty-row" role="radiogroup" aria-label="Difficulty">
+              <button type="button" class="seg-btn is-selected" data-difficulty="easy" aria-checked="true">Easy</button>
+              <button type="button" class="seg-btn" data-difficulty="medium" aria-checked="false">Medium</button>
+              <button type="button" class="seg-btn" data-difficulty="hard" aria-checked="false">Hard</button>
+              <button type="button" class="seg-btn" data-difficulty="challenge" aria-checked="false">Challenge</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="block">
+            <legend>Mode</legend>
+            <div class="mode-grid" id="mode-row">
+              <button type="button" class="mode-card is-selected" data-mode="practice">
+                <strong>Practice</strong>
+                <span>Unlimited questions, retry allowed</span>
+              </button>
+              <button type="button" class="mode-card" data-mode="quiz10">
+                <strong>Quiz · 10</strong>
+                <span>One try each, then the score</span>
+              </button>
+              <button type="button" class="mode-card" data-mode="quiz20">
+                <strong>Quiz · 20</strong>
+                <span>A longer set for stamina</span>
+              </button>
+              <button type="button" class="mode-card" data-mode="sprint">
+                <strong>60s sprint</strong>
+                <span>Answer as many as you can</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <p id="setup-error" class="error" hidden>Choose at least one operation to start.</p>
+          <button type="button" id="start-btn" class="primary">Start practicing</button>
+        </section>
+
+        <section id="play-screen" class="panel hidden" aria-labelledby="problem">
+          <div class="play-meta">
+            <p id="play-who"></p>
+            <p id="play-progress" aria-live="polite"></p>
+          </div>
+          <p class="problem-label">Solve</p>
+          <p id="problem" class="problem" aria-live="polite">8 + 5</p>
+          <form id="answer-form" class="answer-form">
+            <label class="sr-only" for="answer-input">Answer</label>
+            <input
+              id="answer-input"
+              name="answer"
+              inputmode="numeric"
+              autocomplete="off"
+              aria-describedby="feedback"
+            />
+            <button type="submit" class="primary compact">Check</button>
+          </form>
+          <p id="feedback" class="feedback" aria-live="assertive"></p>
+          <div class="keypad" id="keypad" aria-hidden="true">
+            <button type="button" data-key="7">7</button>
+            <button type="button" data-key="8">8</button>
+            <button type="button" data-key="9">9</button>
+            <button type="button" data-key="4">4</button>
+            <button type="button" data-key="5">5</button>
+            <button type="button" data-key="6">6</button>
+            <button type="button" data-key="1">1</button>
+            <button type="button" data-key="2">2</button>
+            <button type="button" data-key="3">3</button>
+            <button type="button" data-key="-">−</button>
+            <button type="button" data-key="0">0</button>
+            <button type="button" data-key="back">⌫</button>
+          </div>
+          <div class="play-actions">
+            <button type="button" id="skip-btn" class="ghost">Skip</button>
+            <button type="button" id="end-btn" class="ghost">End round</button>
+          </div>
+        </section>
+
+        <section id="results-screen" class="panel hidden" aria-labelledby="results-title">
+          <h2 id="results-title">Round complete</h2>
+          <p id="results-headline" class="results-headline"></p>
+          <dl class="stats">
+            <div>
+              <dt>Correct</dt>
+              <dd id="stat-correct">0</dd>
+            </div>
+            <div>
+              <dt>Accuracy</dt>
+              <dd id="stat-accuracy">0%</dd>
+            </div>
+            <div>
+              <dt>Best streak</dt>
+              <dd id="stat-streak">0</dd>
+            </div>
+            <div>
+              <dt>Time</dt>
+              <dd id="stat-time">0s</dd>
+            </div>
+          </dl>
+          <p id="stat-best" class="best-note"></p>
+          <div class="result-actions">
+            <button type="button" id="again-btn" class="primary">Play again</button>
+            <button type="button" id="setup-btn" class="ghost">Change setup</button>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>Hosted on GitHub Pages · Works offline in this tab after load</p>
+      </footer>
+    </div>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
