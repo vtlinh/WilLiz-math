@@ -14,7 +14,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 The top action bar keeps account picking on the left (Will, Liz, Guest) and a settings icon on the right. Settings holds:
 
 1. Operations: addition, subtraction, multiplication, division (at least one).
-2. Difficulty: Easy, Medium, Hard, Challenge.
+2. Difficulty: Easy, Pictures, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows objects to count.
 3. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, or a 60-second sprint.
 
 There is no Skip. Practice allows a retry on the same problem. Quiz and sprint allow one try, then reveal and advance.

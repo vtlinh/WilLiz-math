@@ -8,36 +8,42 @@ function pick(list) {
   return list[randInt(0, list.length - 1)];
 }
 
+export function numericDifficulty(difficulty) {
+  return difficulty === "pictures" ? "easy" : difficulty;
+}
+
 export function generateProblem(ops, difficulty, previousKey = "") {
   if (!ops.length) {
     throw new Error("At least one operation is required");
   }
 
   const chosen = pick(ops);
+  const level = numericDifficulty(difficulty);
+  const pictures = difficulty === "pictures";
   let a;
   let b;
   let answer;
 
   const make = () => {
     if (chosen === "add") {
-      const max = { easy: 10, medium: 50, hard: 99, challenge: 999 }[difficulty];
-      const min = { easy: 1, medium: 6, hard: 12, challenge: 80 }[difficulty];
+      const max = pictures ? 8 : { easy: 10, medium: 50, hard: 99, challenge: 999 }[level];
+      const min = pictures ? 1 : { easy: 1, medium: 6, hard: 12, challenge: 80 }[level];
       a = randInt(min, max);
       b = randInt(min, max);
       answer = a + b;
     } else if (chosen === "sub") {
-      const max = { easy: 10, medium: 50, hard: 99, challenge: 999 }[difficulty];
-      a = randInt(difficulty === "easy" ? 2 : 8, max);
+      const max = pictures ? 8 : { easy: 10, medium: 50, hard: 99, challenge: 999 }[level];
+      a = randInt(pictures || level === "easy" ? 2 : 8, max);
       b = randInt(1, a);
       answer = a - b;
     } else if (chosen === "mul") {
-      const max = { easy: 5, medium: 12, hard: 20, challenge: 29 }[difficulty];
-      const min = difficulty === "challenge" ? 8 : 1;
+      const max = pictures ? 4 : { easy: 5, medium: 12, hard: 20, challenge: 29 }[level];
+      const min = pictures ? 1 : level === "challenge" ? 8 : 1;
       a = randInt(min, max);
       b = randInt(min, max);
       answer = a * b;
     } else {
-      const max = { easy: 5, medium: 12, hard: 15, challenge: 20 }[difficulty];
+      const max = pictures ? 4 : { easy: 5, medium: 12, hard: 15, challenge: 20 }[level];
       b = randInt(2, max);
       answer = randInt(1, max);
       a = b * answer;
@@ -55,6 +61,7 @@ export function generateProblem(ops, difficulty, previousKey = "") {
     b,
     op: chosen,
     answer,
+    difficulty,
     prompt: `${a} ${SYMBOLS[chosen]} ${b}`,
     key: `${a}${chosen}${b}`,
   };

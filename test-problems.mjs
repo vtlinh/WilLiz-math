@@ -5,7 +5,7 @@ function assert(condition, message) {
 }
 
 const ops = ["add", "sub", "mul", "div"];
-const levels = ["easy", "medium", "hard", "challenge"];
+const levels = ["easy", "pictures", "medium", "hard", "challenge"];
 
 for (const op of ops) {
   for (const difficulty of levels) {
@@ -23,6 +23,14 @@ for (const op of ops) {
         assert(Number.isInteger(problem.answer), "div integer");
       }
       assert(problem.prompt.includes(String(problem.a)), "prompt left");
+      assert(problem.difficulty === difficulty, "keep difficulty");
+      if (difficulty === "pictures") {
+        if (op === "add" || op === "sub") {
+          assert(problem.a <= 8 && problem.b <= 8, "picture add/sub stay small");
+        } else {
+          assert(problem.a <= 16 && problem.b <= 4, "picture mul/div stay countable");
+        }
+      }
     }
   }
 }

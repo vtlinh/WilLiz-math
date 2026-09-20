@@ -316,7 +316,93 @@ export function renderSubtractionSheet(problem, options = {}) {
   return renderColumnSheet(problem, planSubtraction(problem.a, problem.b), { ...options, op: "sub", symbol: "−" });
 }
 
+const PICTURE_ICONS = ["🍐", "🍎", "🍋", "🍊", "🍇", "🍑", "⭐", "🫐"];
+
+function pictureIcon(problem) {
+  const seed = [...String(problem.key)].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  return PICTURE_ICONS[seed % PICTURE_ICONS.length];
+}
+
+function pictureCluster(count, icon) {
+  const wrap = document.createElement("div");
+  wrap.className = "pic-cluster";
+  for (let i = 0; i < count; i += 1) {
+    const item = document.createElement("span");
+    item.className = "pic-item";
+    item.textContent = icon;
+    wrap.append(item);
+  }
+  return wrap;
+}
+
+function pictureSide(count, icon, label) {
+  const side = document.createElement("div");
+  side.className = "pic-side";
+  side.append(pictureCluster(count, icon));
+  const number = document.createElement("p");
+  number.className = "pic-num";
+  number.textContent = String(label);
+  side.append(number);
+  return side;
+}
+
+export function renderPictureSheet(problem, { typed = "", reveal = false } = {}) {
+  const root = document.createElement("div");
+  root.className = "sheet sheet-pic";
+  root.dataset.op = problem.op;
+  const icon = pictureIcon(problem);
+  const symbol = { add: "+", sub: "−", mul: "×", div: "÷" }[problem.op];
+
+  const rowWrap = document.createElement("div");
+  rowWrap.className = "pic-equation";
+
+  if (problem.op === "mul") {
+    const groups = document.createElement("div");
+    groups.className = "pic-groups";
+    for (let i = 0; i < problem.a; i += 1) groups.append(pictureCluster(problem.b, icon));
+    const side = document.createElement("div");
+    side.className = "pic-side";
+    side.append(groups);
+    const number = document.createElement("p");
+    number.className = "pic-num";
+    number.textContent = `${problem.a} × ${problem.b}`;
+    side.append(number);
+    rowWrap.append(side);
+  } else if (problem.op === "div") {
+    rowWrap.append(pictureSide(problem.a, icon, problem.a));
+    const op = document.createElement("span");
+    op.className = "pic-op";
+    op.textContent = "÷";
+    rowWrap.append(op);
+    const groups = document.createElement("div");
+    groups.className = "pic-side";
+    const note = document.createElement("p");
+    note.className = "pic-num";
+    note.textContent = String(problem.b);
+    groups.append(pictureCluster(problem.b, icon), note);
+    rowWrap.append(groups);
+  } else {
+    rowWrap.append(pictureSide(problem.a, icon, problem.a));
+    const op = document.createElement("span");
+    op.className = "pic-op";
+    op.textContent = symbol;
+    rowWrap.append(op);
+    rowWrap.append(pictureSide(problem.b, icon, problem.b));
+  }
+
+  const eq = document.createElement("span");
+  eq.className = "pic-op";
+  eq.textContent = "=";
+  const answer = document.createElement("div");
+  answer.className = "pic-answer";
+  answer.textContent = reveal ? String(problem.answer) : typed && typed !== "-" ? typed : "";
+  rowWrap.append(eq, answer);
+  root.append(rowWrap);
+  return root;
+}
+
 export function renderProblemView(problem, options = {}) {
+  if (problem.difficulty === "pictures") return renderPictureSheet(problem, options);
   if (problem.op === "mul") return renderMultiplicationSheet(problem, options);
   if (problem.op === "div") return renderDivisionSheet(problem, options);
   if (problem.op === "add") return renderAdditionSheet(problem, options);
