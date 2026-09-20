@@ -5,11 +5,6 @@ function digitList(value) {
   return String(value).split("").map((d) => (d === "-" ? "−" : d));
 }
 
-function remainValue(step) {
-  if (step.bringDown === null || step.bringDown === undefined) return step.remainder;
-  return Number(`${step.remainder}${step.bringDown}`);
-}
-
 export function worksheetFields(problem) {
   if (problem.difficulty === "pictures") {
     return [{ id: "total", answer: problem.answer }];
@@ -18,13 +13,7 @@ export function worksheetFields(problem) {
     return planMultiplication(problem.a, problem.b).slots;
   }
   if (problem.op === "div") {
-    const plan = planDivision(problem.a, problem.b);
-    const fields = [{ id: "quotient", answer: plan.quotient }];
-    plan.steps.forEach((step, index) => {
-      fields.push({ id: `product-${index}`, answer: step.product });
-      fields.push({ id: `remain-${index}`, answer: remainValue(step) });
-    });
-    return fields;
+    return planDivision(problem.a, problem.b).slots;
   }
   if (problem.op === "add") {
     return [{ id: "total", answer: problem.a + problem.b }];
@@ -271,14 +260,30 @@ function emptyCols(cols) {
   return Array(cols).fill("");
 }
 
+function slotKindClass(kind) {
+  if (kind === "carry") return "is-carry-digit";
+  if (kind === "bring") return "is-bring-digit";
+  if (kind === "product") return "is-product-digit";
+  if (kind === "remain") return "is-remain-digit";
+  return "";
+}
+
+function slotLabel(kind) {
+  if (kind === "carry") return "Fill this carry";
+  if (kind === "bring") return "Fill this bring-down";
+  if (kind === "product") return "Fill this multiply digit";
+  if (kind === "remain") return "Fill this subtract digit";
+  return "Fill this digit";
+}
+
 function slotCell(field, fills, active, reveal) {
   const shown = reveal ? String(field.answer) : fills[field.index] ?? "";
-  const el = cell(shown, field.kind === "carry" ? "is-carry-digit" : "");
+  const el = cell(shown, slotKindClass(field.kind));
   markFill(el, {
     slot: field.index,
     active: active === field.index,
     reveal,
-    label: field.kind === "carry" ? "Fill this carry" : "Fill this digit",
+    label: slotLabel(field.kind),
   });
   return el;
 }
@@ -372,7 +377,7 @@ export function planDivision(dividend, divisor) {
     remainder = next;
   }
 
-  return {
+  const plan = {
     dividend,
     divisor,
     digits,
@@ -380,33 +385,72 @@ export function planDivision(dividend, divisor) {
     quotientSlots,
     steps,
   };
+  plan.slots = divisionSlots(plan);
+  return plan;
 }
 
-function placeDigits(length, text, endIndex) {
-  const cells = Array(length).fill("");
-  const digits = String(text).split("");
+function placedNumberSlots(slots, { value, endIndex, idPrefix, kind, line }) {
+  const digits = String(value).split("").map(Number);
   const start = endIndex - digits.length + 1;
   digits.forEach((digit, index) => {
-    const at = start + index;
-    if (at >= 0 && at < length) cells[at] = digit;
+    pushSlot(slots, {
+      id: `${idPrefix}-${index}`,
+      kind,
+      line,
+      col: start + index,
+      answer: digit,
+    });
   });
-  return cells;
 }
 
-function divisionRow(cols, values, { op = "", arrow = "", className = "", slot = null, active = false, reveal = false } = {}) {
+function divisionSlots(plan) {
+  const slots = [];
+  plan.steps.forEach((step, index) => {
+    pushSlot(slots, {
+      id: `q-${index}`,
+      kind: "digit",
+      line: "quotient",
+      col: step.endIndex,
+      answer: step.q,
+    });
+    placedNumberSlots(slots, {
+      value: step.product,
+      endIndex: step.endIndex,
+      idPrefix: `p-${index}`,
+      kind: "product",
+      line: `product-${index}`,
+    });
+    placedNumberSlots(slots, {
+      value: step.remainder,
+      endIndex: step.endIndex,
+      idPrefix: `r-${index}`,
+      kind: "remain",
+      line: `remain-${index}`,
+    });
+    if (step.bringDown !== null) {
+      pushSlot(slots, {
+        id: `b-${index}`,
+        kind: "bring",
+        line: `remain-${index}`,
+        col: step.endIndex + 1,
+        answer: step.bringDown,
+      });
+    }
+  });
+  return slots;
+}
+
+function divisionRow(cols, values, { op = "", arrow = "", className = "" } = {}) {
   const wrap = document.createElement("div");
   wrap.className = `div-digits ${className}`.trim();
   wrap.style.setProperty("--cols", String(cols));
   wrap.append(cell(op, "is-op"));
-  for (const value of values) wrap.append(cell(value));
+  for (const value of values) {
+    if (value instanceof HTMLElement) wrap.append(value);
+    else wrap.append(cell(value));
+  }
   wrap.append(cell(arrow, "is-arrow"));
-  markFill(wrap, { slot, active, reveal });
   return wrap;
-}
-
-function placedFill(cols, typed, endIndex) {
-  if (!typed || typed === "-" || typed === "−") return Array(cols).fill("");
-  return placeDigits(cols, typed.replace("-", "−"), endIndex);
 }
 
 export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = false } = {}) {
@@ -429,45 +473,23 @@ export function renderDivisionSheet(problem, { fills = [], active = 0, reveal = 
     return wrap;
   };
 
-  const topSlots = reveal
-    ? plan.quotientSlots
-    : padLeft(fills[0] && fills[0] !== "-" && fills[0] !== "−" ? digitList(String(fills[0]).replace("-", "−")) : [], cols);
+  const lineSlots = (name) => plan.slots.filter((field) => field.line === name);
   work.append(
-    line(topSlots, { className: "is-quotient", slot: 0, active: active === 0, reveal }),
+    line(cellsFromSlots(cols, lineSlots("quotient"), fills, active, reveal), { className: "is-quotient" }),
   );
   work.append(line(plan.digits, { className: "is-dividend", divisor: true }));
 
-  let nextSlot = 1;
-  for (const step of plan.steps) {
-    const productSlot = nextSlot;
-    nextSlot += 1;
-    const productCells = reveal
-      ? placeDigits(cols, step.product, step.endIndex)
-      : placedFill(cols, fills[productSlot], step.endIndex);
+  for (const [index, step] of plan.steps.entries()) {
     work.append(
-      line(productCells, {
+      line(cellsFromSlots(cols, lineSlots(`product-${index}`), fills, active, reveal), {
         op: "−",
         arrow: step.bringDown !== null ? "↓" : "",
         className: "is-sub",
-        slot: productSlot,
-        active: active === productSlot,
-        reveal,
       }),
     );
-
-    const remainSlot = nextSlot;
-    nextSlot += 1;
-    const remainEnd = step.bringDown !== null ? step.endIndex + 1 : step.endIndex;
-    const remCells = reveal
-      ? placeDigits(cols, step.remainder, step.endIndex)
-      : placedFill(cols, fills[remainSlot], remainEnd);
-    if (reveal && step.bringDown !== null) remCells[step.endIndex + 1] = String(step.bringDown);
     work.append(
-      line(remCells, {
+      line(cellsFromSlots(cols, lineSlots(`remain-${index}`), fills, active, reveal), {
         className: "is-remain",
-        slot: remainSlot,
-        active: active === remainSlot,
-        reveal,
       }),
     );
   }

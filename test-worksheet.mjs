@@ -109,15 +109,27 @@ assert(subLine.length === 1 && subLine[0].answer === 25, "subtraction total");
 
 const divLines = worksheetFields({ a: 13032, b: 24, op: "div", answer: 543, difficulty: "hard" });
 assert(
-  divLines.map((field) => field.answer).join(",") === "543,120,103,96,72,72,0",
-  "quotient plus each subtract and bring-down",
+  divLines.map((field) => `${field.kind}:${field.answer}`).join(",") ===
+    "digit:5,product:1,product:2,product:0,remain:1,remain:0,bring:3,digit:4,product:9,product:6,remain:7,bring:2,digit:3,product:7,product:2,remain:0",
+  "each quotient, multiply, subtract, and bring-down digit",
 );
+assert(divLines.every((field) => field.unit === "cell"), "div slots are single digits");
+assert(divLines.some((field) => field.kind === "bring"), "bring-down is its own box");
+
+const shortDiv = worksheetFields({ a: 20, b: 5, op: "div", answer: 4, difficulty: "easy" });
+assert(shortDiv.map((field) => field.answer).join(",") === "4,2,0,0", "20 ÷ 5 fills quotient, product, remainder");
 
 const fourteenFills = fourteen.map((field) => String(field.answer));
 assert(fieldsReady(fourteenFills), "all mul cells filled");
 assert(!fieldsReady(["6", "1", "", "0", "4", "1", "6", "9", "1"]), "blank mul cell is not ready");
 assert(fieldsMatch(fourteenFills, fourteen), "matching every mul digit and carry");
 assert(!fieldsMatch(["6", "1", "5", "0", "4", "1", "6", "9", "7"], fourteen), "final only is not enough");
-assert(fieldsMatch(["543", "120", "103", "96", "72", "72", "0"], divLines), "matching every div line");
+const divFills = divLines.map((field) => String(field.answer));
+assert(fieldsReady(divFills), "all div cells filled");
+assert(!fieldsReady(divFills.map((value, index) => (index === 0 ? "" : value))), "blank quotient is not ready");
+assert(fieldsMatch(divFills, divLines), "matching every div digit");
+const wrongQuotient = [...divFills];
+wrongQuotient[0] = "9";
+assert(!fieldsMatch(wrongQuotient, divLines), "quotient only is not enough");
 
 console.log("worksheet checks passed");

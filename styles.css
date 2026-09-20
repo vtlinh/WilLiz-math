@@ -577,6 +577,18 @@ legend {
   margin-left: 0;
 }
 
+.sheet-cell.is-product-digit.is-fill {
+  border-bottom-color: color-mix(in srgb, var(--sage) 55%, var(--ink) 20%);
+}
+
+.sheet-cell.is-remain-digit.is-fill {
+  border-bottom-color: color-mix(in srgb, #8a6ad4 55%, var(--ink) 20%);
+}
+
+.sheet-cell.is-bring-digit.is-fill {
+  border-bottom-color: color-mix(in srgb, #e07a9a 70%, var(--ink) 15%);
+}
+
 .sheet-cell.is-arrow {
   color: var(--ink);
   font-size: 1.1rem;
