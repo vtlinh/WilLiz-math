@@ -162,7 +162,12 @@ function setSettingsOpen(open) {
     showScreen("settings");
     return;
   }
-  if (screen === "settings") showScreen("setup");
+  if (screen !== "settings") return;
+  if (history.state?.screen === "settings") {
+    history.back();
+    return;
+  }
+  showScreen("setup", { replace: true });
 }
 
 function isPracticePlay() {
@@ -183,7 +188,10 @@ function syncPlayChrome() {
   const play = screen === "play";
   const settingsPage = screen === "settings";
   const practice = isPracticePlay();
-  els.sessionBack.hidden = !play && !settingsPage;
+  const showBack = play || settingsPage;
+  els.sessionBack.hidden = !showBack;
+  els.sessionBack.classList.toggle("is-hidden", !showBack);
+  els.sessionBack.tabIndex = showBack ? 0 : -1;
   els.sessionBack.setAttribute("aria-label", settingsPage ? "Back to home" : "Back");
   els.setupTitle.hidden = !settingsPage;
   els.actionHome.hidden = play || settingsPage;
@@ -204,14 +212,39 @@ function setLeaveOpen(open) {
   document.body.classList.toggle("leave-open", open);
 }
 
-function showScreen(name) {
-  screen = name;
-  els.setup.classList.toggle("hidden", name !== "setup");
-  els.play.classList.toggle("hidden", name !== "play");
-  els.results.classList.toggle("hidden", name !== "results");
-  els.settings.classList.toggle("hidden", name !== "settings");
-  document.body.classList.toggle("is-settings", name === "settings");
+function paintScreen(name) {
+  screen = name === "play" || name === "settings" || name === "results" ? name : "setup";
+  els.setup.classList.toggle("hidden", screen !== "setup");
+  els.play.classList.toggle("hidden", screen !== "play");
+  els.results.classList.toggle("hidden", screen !== "results");
+  els.settings.classList.toggle("hidden", screen !== "settings");
+  document.body.classList.toggle("is-settings", screen === "settings");
   syncPlayChrome();
+}
+
+function screenUrl(name) {
+  return name === "setup" ? "./" : `./#${name}`;
+}
+
+function showScreen(name, { replace = false } = {}) {
+  paintScreen(name);
+  const state = { screen };
+  const url = screenUrl(screen);
+  if (replace) {
+    history.replaceState(state, "", url);
+    return;
+  }
+  if (history.state?.screen !== screen) history.pushState(state, "", url);
+}
+
+function handleHistoryPop() {
+  const next = history.state?.screen === "play" && !round ? "setup" : history.state?.screen || "setup";
+  if (screen === "play" && round && next !== "play") {
+    showScreen("play");
+    requestLeaveSession();
+    return;
+  }
+  paintScreen(next);
 }
 
 function modeMeta(mode) {
@@ -645,6 +678,7 @@ els.settingsBtn.addEventListener("click", () => {
   setSettingsOpen(true);
 });
 els.sessionBack.addEventListener("click", () => {
+  if (screen === "setup" || screen === "results") return;
   if (screen === "settings") {
     setSettingsOpen(false);
     return;
@@ -696,6 +730,9 @@ els.keypad.addEventListener("click", (event) => {
 });
 
 restoreSettings();
+const launchScreen = location.hash === "#settings" ? "settings" : "setup";
+showScreen(launchScreen, { replace: true });
+window.addEventListener("popstate", handleHistoryPop);
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(() => {

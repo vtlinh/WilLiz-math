@@ -32,9 +32,12 @@ const mulRender = worksheet.slice(
 assert(!mulRender.includes("sheet-eq"), "multiplication has no horizontal a × b = line");
 assert(!mulRender.includes(" × "), "multiplication does not repeat the equation above the stack");
 
+const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert(app.includes("serviceWorker.register"), "register service worker");
-assert(app.includes('if (screen === "settings") showScreen("setup")'), "settings back returns to home");
+assert(app.includes("history.back()"), "settings back uses browser history so home back is not swallowed");
+assert(app.includes("handleHistoryPop"), "system back is wired to in-app screens");
+assert(css.includes(".icon-btn.is-hidden"), "home hides the session back control");
 assert(app.includes("function leavePractice"), "practice back has a leave path");
 assert(!app.includes('finishRound({ to: "setup" })'), "practice back shows results, not home");
 const leaveFn = app.slice(app.indexOf("function requestLeaveSession"), app.indexOf("function leavePractice"));

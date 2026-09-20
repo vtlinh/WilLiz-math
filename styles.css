@@ -77,15 +77,17 @@ body {
 
 .action-bar {
   position: fixed;
-  top: 10px;
-  left: 50%;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: max(16px, env(safe-area-inset-left, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
   z-index: 60;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  width: min(760px, calc(100% - 32px));
-  transform: translateX(-50%);
+  width: auto;
+  max-width: 760px;
+  margin-inline: auto;
   padding: 8px;
   background: var(--bar);
   border: 1px solid var(--line);
@@ -188,8 +190,10 @@ body {
   border-color: var(--sage-deep);
 }
 
-.icon-btn[hidden] {
-  display: none;
+.icon-btn[hidden],
+.icon-btn.is-hidden {
+  display: none !important;
+  pointer-events: none;
 }
 
 .icon-btn {
@@ -874,15 +878,19 @@ body.celebrate-static .results-headline {
 }
 
 @media (max-width: 640px) {
-  html,
+  html {
+    height: 100%;
+    height: 100dvh;
+    height: 100svh;
+    overflow: auto;
+  }
+
   body {
     height: 100%;
     height: 100dvh;
     height: 100svh;
     overflow: hidden;
-  }
-
-  body {
+    overscroll-behavior: none;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
@@ -896,8 +904,10 @@ body.celebrate-static .results-headline {
   }
 
   .action-bar {
-    top: calc(6px + env(safe-area-inset-top));
-    width: min(760px, calc(100% - 16px));
+    top: calc(6px + env(safe-area-inset-top, 0px));
+    left: max(8px, env(safe-area-inset-left, 0px));
+    right: max(8px, env(safe-area-inset-right, 0px));
+    width: auto;
     padding: 6px;
     border-radius: 16px;
   }
