@@ -1,4 +1,4 @@
-const CACHE = "williz-math-shell-v21";
+const CACHE = "williz-math-shell-v22";
 const SHELL = [
   "./",
   "./index.html",

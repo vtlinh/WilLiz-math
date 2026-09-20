@@ -35,7 +35,8 @@ assert(!mulRender.includes(" × "), "multiplication does not repeat the equation
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert(app.includes("serviceWorker.register"), "register service worker");
-assert(app.includes("history.back()"), "settings back uses browser history so home back is not swallowed");
+assert(app.includes("history.back()"), "settings back uses browser history");
+assert(app.includes("function lockHomeHistory"), "home back is swallowed so the app does not quit");
 assert(app.includes("handleHistoryPop"), "system back is wired to in-app screens");
 assert(css.includes(".icon-btn.is-hidden"), "home hides the session back control");
 assert(css.includes("#difficulty-row"), "difficulty row can wrap so Challenge is not clipped");

@@ -226,15 +226,23 @@ function screenUrl(name) {
   return name === "setup" ? "./" : `./#${name}`;
 }
 
+function lockHomeHistory() {
+  if (screen !== "setup") return;
+  if (history.state?.screen === "setup" && history.state?.trap) return;
+  history.pushState({ screen: "setup", trap: true }, "", screenUrl("setup"));
+}
+
 function showScreen(name, { replace = false } = {}) {
   paintScreen(name);
-  const state = { screen };
+  const state = { screen, trap: false };
   const url = screenUrl(screen);
   if (replace) {
     history.replaceState(state, "", url);
+    lockHomeHistory();
     return;
   }
   if (history.state?.screen !== screen) history.pushState(state, "", url);
+  lockHomeHistory();
 }
 
 function handleHistoryPop() {
@@ -245,6 +253,7 @@ function handleHistoryPop() {
     return;
   }
   paintScreen(next);
+  lockHomeHistory();
 }
 
 function modeMeta(mode) {
