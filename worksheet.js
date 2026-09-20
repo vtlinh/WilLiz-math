@@ -88,16 +88,6 @@ function pushSlot(slots, field) {
 
 function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0 }) {
   const { steps, leftover, sourceLen } = timesDigitSteps(a, digit);
-  for (let s = 0; s < shift; s += 1) {
-    pushSlot(slots, {
-      id: `${line}-shift-${s}`,
-      kind: "digit",
-      line,
-      step,
-      col: cols - 1 - s,
-      answer: 0,
-    });
-  }
   for (let i = 0; i < steps.length; i += 1) {
     const item = steps[i];
     const col = cols - sourceLen + item.sourceIndex - shift;

@@ -93,17 +93,28 @@ assert(subWide.cols === 3, "keep three columns");
 const mulLines = worksheetFields({ a: 124, b: 26, op: "mul", answer: 3224, difficulty: "hard" });
 assert(
   mulLines.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:4,carry:2,digit:4,carry:1,digit:7,digit:0,digit:8,digit:4,digit:2,digit:4,digit:2,carry:1,digit:2,carry:1,digit:3",
+    "digit:4,carry:2,digit:4,carry:1,digit:7,digit:8,digit:4,digit:2,digit:4,digit:2,carry:1,digit:2,carry:1,digit:3",
   "124 × 26 fills digits and carries RTL",
 );
 assert(mulLines.some((field) => field.line === "partial-0"), "ones partial");
 assert(mulLines.some((field) => field.line === "partial-1"), "tens partial");
 assert(mulLines.some((field) => field.line === "total"), "product total");
+assert(
+  mulLines.filter((field) => field.line === "partial-1" && field.kind === "digit").every((field) => field.col < 3),
+  "tens partial 248 starts at the tens, no shift zero",
+);
 
 const fourteen = worksheetFields({ a: 14, b: 14, op: "mul", answer: 196, difficulty: "medium" });
 assert(
-  fourteen.map((field) => field.answer).join(",") === "6,1,5,0,4,1,6,9,1",
+  fourteen.map((field) => field.answer).join(",") === "6,1,5,4,1,6,9,1",
   "14 × 14 ones, carry, tens, both partials, and total",
+);
+
+const eleven = worksheetFields({ a: 11, b: 29, op: "mul", answer: 319, difficulty: "challenge" });
+assert(eleven.map((field) => field.answer).join(",") === "9,9,2,2,9,1,1,3", "11 × 29 is 99, then 22 shifted, then 319");
+assert(
+  eleven.filter((field) => field.line === "partial-1").map((field) => field.answer).join(",") === "2,2",
+  "tens of 11 × 29 is 22 shifted left, not 220",
 );
 
 const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
@@ -163,9 +174,9 @@ assert(worksheetSections(addLine).length === 1, "addition is one section");
 
 const fourteenFills = fourteen.map((field) => String(field.answer));
 assert(fieldsReady(fourteenFills), "all mul cells filled");
-assert(!fieldsReady(["6", "1", "", "0", "4", "1", "6", "9", "1"]), "blank mul cell is not ready");
+assert(!fieldsReady(["6", "1", "", "4", "1", "6", "9", "1"]), "blank mul cell is not ready");
 assert(fieldsMatch(fourteenFills, fourteen), "matching every mul digit and carry");
-assert(!fieldsMatch(["6", "1", "5", "0", "4", "1", "6", "9", "7"], fourteen), "final only is not enough");
+assert(!fieldsMatch(["6", "1", "5", "4", "1", "6", "9", "7"], fourteen), "final only is not enough");
 const divFills = divLines.map((field) => String(field.answer));
 assert(fieldsReady(divFills), "all div cells filled");
 assert(!fieldsReady(divFills.map((value, index) => (index === 0 ? "" : value))), "blank quotient is not ready");
