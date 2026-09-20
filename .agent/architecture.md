@@ -3,7 +3,7 @@
 Static files at the repository root. The browser loads `index.html`, which pulls `styles.css` and `app.js` as an ES module.
 
 ```text
-index.html          screens: setup, play, results
+index.html          action bar, settings sheet, home / play / results
 styles.css          layout and theme
 app.js              round state and UI
 storage.js          per-learner settings and bests

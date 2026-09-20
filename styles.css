@@ -25,6 +25,10 @@ body {
   min-height: 100%;
 }
 
+body.settings-open {
+  overflow: hidden;
+}
+
 body {
   font-family: "Nunito", "Segoe UI", sans-serif;
   color: var(--ink);
@@ -37,11 +41,108 @@ body {
 .page {
   width: min(760px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 32px 0 48px;
+  padding: 86px 0 48px;
+}
+
+.action-bar {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(760px, calc(100% - 32px));
+  transform: translateX(-50%);
+  padding: 8px 8px 8px 10px;
+  background: rgba(255, 248, 235, 0.94);
+  border: 1px solid rgba(80, 52, 22, 0.08);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.account-row {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+}
+
+.account-row .chip {
+  flex: 1;
+}
+
+.icon-btn {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--sage-deep);
+  display: grid;
+  place-items: center;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.icon-btn.is-open,
+.icon-btn:hover {
+  background: var(--sage-deep);
+  color: #fff8eb;
+  border-color: var(--sage-deep);
+}
+
+.settings-backdrop {
+  position: fixed;
+  inset: 72px 0 0;
+  z-index: 40;
+  background: rgba(28, 23, 17, 0.35);
+}
+
+.settings-panel {
+  position: fixed;
+  top: 72px;
+  right: 0;
+  z-index: 50;
+  width: min(420px, 100%);
+  height: calc(100% - 72px);
+  overflow: auto;
+  padding: 22px 20px 28px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.settings-head h2 {
+  margin: 0;
 }
 
 .masthead {
   margin-bottom: 22px;
+}
+
+.mix-summary {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-weight: 700;
 }
 
 .eyebrow {
@@ -128,8 +229,9 @@ legend {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-#learner-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.account-row.chip-row {
+  display: flex;
+  grid-template-columns: none;
 }
 
 .chip,
@@ -370,7 +472,15 @@ footer {
 
   .page {
     width: min(760px, calc(100% - 20px));
-    padding-top: 20px;
+    padding-top: 80px;
+  }
+
+  .action-bar {
+    width: min(760px, calc(100% - 20px));
+  }
+
+  .account-row .chip {
+    padding: 10px 8px;
   }
 }
 

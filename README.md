@@ -12,9 +12,9 @@ After Pages is enabled, the app is served at:
 
 ## Use it
 
-1. Pick who is practicing.
-2. Toggle the operations and a difficulty.
-3. Choose Practice, a 10- or 20-question quiz, or a 60-second sprint.
+1. Pick who is practicing in the top-left action bar.
+2. Open the settings icon on the right to choose operations, difficulty, and mode.
+3. Start a practice, quiz, or 60-second sprint.
 4. Type an answer or use the keypad, then press **Check**.
 
 Each learner’s last mix and personal bests are stored in the browser, so Will and Liz keep their own operations, difficulty, and mode.

@@ -28,6 +28,12 @@ const els = {
   statBest: document.getElementById("stat-best"),
   againBtn: document.getElementById("again-btn"),
   setupBtn: document.getElementById("setup-btn"),
+  mixSummary: document.getElementById("mix-summary"),
+  settingsBtn: document.getElementById("settings-btn"),
+  settingsPanel: document.getElementById("settings-panel"),
+  settingsBackdrop: document.getElementById("settings-backdrop"),
+  settingsClose: document.getElementById("settings-close"),
+  settingsDone: document.getElementById("settings-done"),
 };
 
 const settings = {
@@ -88,6 +94,10 @@ function syncSetupUi() {
   for (const button of els.modeRow.querySelectorAll("[data-mode]")) {
     button.classList.toggle("is-selected", button.dataset.mode === settings.mode);
   }
+  const symbols = { add: "+", sub: "−", mul: "×", div: "÷" };
+  const ops = settings.ops.map((op) => symbols[op]).join(" ") || "no operations";
+  els.mixSummary.textContent = `${settings.learner} · ${modeMeta(settings.mode).label} · ${settings.difficulty} · ${ops}`;
+  if (settings.ops.length) els.setupError.hidden = true;
 }
 
 function persistSettings() {
@@ -101,6 +111,17 @@ function selectLearner(name) {
   applyMix(personMix(loadStore(), name));
   persistSettings();
   syncSetupUi();
+}
+
+function setSettingsOpen(open) {
+  els.settingsPanel.classList.toggle("hidden", !open);
+  els.settingsBackdrop.classList.toggle("hidden", !open);
+  els.settingsPanel.hidden = !open;
+  els.settingsBackdrop.hidden = !open;
+  els.settingsBtn.classList.toggle("is-open", open);
+  els.settingsBtn.setAttribute("aria-expanded", String(open));
+  els.settingsBtn.setAttribute("aria-label", open ? "Close settings" : "Open settings");
+  document.body.classList.toggle("settings-open", open);
 }
 
 function showScreen(name) {
@@ -133,15 +154,21 @@ function clearTimer() {
 function startRound() {
   if (!settings.ops.length) {
     els.setupError.hidden = false;
+    setSettingsOpen(true);
     return;
   }
   els.setupError.hidden = true;
   persistSettings();
   clearTimer();
+  setSettingsOpen(false);
 
   const meta = modeMeta(settings.mode);
   round = {
     ...meta,
+    learner: settings.learner,
+    ops: [...settings.ops],
+    difficulty: settings.difficulty,
+    mode: settings.mode,
     startedAt: Date.now(),
     endsAt: meta.timed ? Date.now() + 60_000 : null,
     asked: 0,
@@ -152,7 +179,7 @@ function startRound() {
     lastKey: "",
   };
 
-  els.playWho.textContent = `${settings.learner} · ${meta.label} · ${settings.difficulty}`;
+  els.playWho.textContent = `${round.learner} · ${meta.label} · ${round.difficulty}`;
   els.skipBtn.hidden = meta.oneTry;
   showScreen("play");
   nextProblem();
@@ -164,7 +191,7 @@ function startRound() {
 
 function nextProblem() {
   awaitingAdvance = false;
-  current = generateProblem(settings.ops, settings.difficulty, round.lastKey);
+  current = generateProblem(round.ops, round.difficulty, round.lastKey);
   round.lastKey = current.key;
   round.asked += 1;
   els.problem.textContent = current.prompt;
@@ -240,7 +267,11 @@ function skipProblem() {
 }
 
 function bestKey() {
-  return `${settings.learner}|${settings.mode}|${settings.difficulty}|${settings.ops.slice().sort().join(",")}`;
+  const learner = round?.learner ?? settings.learner;
+  const mode = round?.mode ?? settings.mode;
+  const difficulty = round?.difficulty ?? settings.difficulty;
+  const ops = round?.ops ?? settings.ops;
+  return `${learner}|${mode}|${difficulty}|${ops.slice().sort().join(",")}`;
 }
 
 function finishRound() {
@@ -256,7 +287,7 @@ function finishRound() {
   if (improved) store.bests[key] = round.correct;
   saveStore(store);
 
-  const name = settings.learner;
+  const name = round.learner;
   els.headline.textContent = round.correct
     ? `${name} banked ${round.correct} correct answer${round.correct === 1 ? "" : "s"}.`
     : `${name} is warmed up. Try one more pass.`;
@@ -324,15 +355,24 @@ els.modeRow.addEventListener("click", (event) => {
   syncSetupUi();
 });
 
+els.settingsBtn.addEventListener("click", () => {
+  setSettingsOpen(els.settingsPanel.hidden);
+});
+els.settingsClose.addEventListener("click", () => setSettingsOpen(false));
+els.settingsDone.addEventListener("click", () => setSettingsOpen(false));
+els.settingsBackdrop.addEventListener("click", () => setSettingsOpen(false));
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") setSettingsOpen(false);
+});
+
 els.startBtn.addEventListener("click", startRound);
 els.form.addEventListener("submit", submitAnswer);
 els.skipBtn.addEventListener("click", skipProblem);
 els.endBtn.addEventListener("click", finishRound);
 els.againBtn.addEventListener("click", startRound);
 els.setupBtn.addEventListener("click", () => {
-  clearTimer();
-  round = null;
   showScreen("setup");
+  setSettingsOpen(true);
 });
 els.keypad.addEventListener("click", (event) => {
   const button = event.target.closest("[data-key]");

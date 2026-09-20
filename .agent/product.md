@@ -11,7 +11,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 
 ## What a round is
 
-A learner picks:
+The top action bar keeps account picking on the left (Will, Liz, Guest) and a settings icon on the right. Settings holds:
 
 1. Operations: addition, subtraction, multiplication, division (at least one).
 2. Difficulty: Easy, Medium, Hard, Challenge.
