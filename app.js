@@ -250,7 +250,8 @@ function handleHistoryPop() {
 function modeMeta(mode) {
   if (mode === "quiz10") return { label: "Quiz", limit: 10, timed: false, oneTry: true };
   if (mode === "quiz20") return { label: "Quiz", limit: 20, timed: false, oneTry: true };
-  if (mode === "sprint") return { label: "Sprint", limit: null, timed: true, oneTry: true };
+  if (mode === "sprint10") return { label: "Sprint · 10", limit: null, timed: true, durationMs: 10 * 60_000, oneTry: true };
+  if (mode === "sprint30") return { label: "Sprint · 30", limit: null, timed: true, durationMs: 30 * 60_000, oneTry: true };
   return { label: "Practice", limit: null, timed: false, oneTry: false };
 }
 
@@ -290,7 +291,7 @@ function startRound() {
     difficulty: settings.difficulty,
     mode: settings.mode,
     startedAt: Date.now(),
-    endsAt: meta.timed ? Date.now() + 60_000 : null,
+    endsAt: meta.timed ? Date.now() + meta.durationMs : null,
     asked: 0,
     correct: 0,
     answered: 0,
@@ -561,7 +562,7 @@ function finishRound({ to = "results" } = {}) {
   els.statCorrect.textContent = String(round.correct);
   els.statAccuracy.textContent = `${accuracy}%`;
   els.statStreak.textContent = String(round.bestStreak);
-  els.statTime.textContent = round.timed ? "60s" : formatTime(elapsed);
+  els.statTime.textContent = round.timed ? formatTime(round.durationMs) : formatTime(elapsed);
   els.statBest.textContent = improved
     ? "New personal best for this mix."
     : previous

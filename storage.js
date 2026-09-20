@@ -11,6 +11,14 @@ export function normalizeTheme(theme) {
   return theme === "light" ? "light" : "dark";
 }
 
+export function normalizeMode(mode) {
+  if (mode === "sprint") return "sprint10";
+  if (mode === "quiz10" || mode === "quiz20" || mode === "sprint10" || mode === "sprint30" || mode === "practice") {
+    return mode;
+  }
+  return DEFAULT_MIX.mode;
+}
+
 export function defaultMix() {
   return {
     ops: [...DEFAULT_MIX.ops],
@@ -25,7 +33,7 @@ function copyMix(mix) {
   return {
     ops: Array.isArray(source.ops) ? [...source.ops] : [...DEFAULT_MIX.ops],
     difficulty: source.difficulty || DEFAULT_MIX.difficulty,
-    mode: source.mode || DEFAULT_MIX.mode,
+    mode: normalizeMode(source.mode),
     theme: normalizeTheme(source.theme),
   };
 }

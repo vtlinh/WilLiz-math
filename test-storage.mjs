@@ -1,4 +1,4 @@
-import { defaultMix, normalizeStore, personMix, writePersonMix } from "./storage.js";
+import { defaultMix, normalizeMode, normalizeStore, personMix, writePersonMix } from "./storage.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -19,15 +19,17 @@ assert(personMix(fresh, "Guest").ops.join(",") === defaultMix().ops.join(","), "
 assert(personMix(fresh, "Guest").theme === "dark", "default theme is dark");
 assert(migrated.people.Liz.theme === "dark", "legacy mix gets dark");
 
+assert(normalizeMode("sprint") === "sprint10", "legacy 60s sprint becomes 10 min");
 writePersonMix(fresh, "Will", { ops: ["add", "div"], difficulty: "medium", mode: "sprint", theme: "light" });
 writePersonMix(fresh, "Liz", { ops: ["sub"], difficulty: "challenge", mode: "practice" });
-assert(personMix(fresh, "Will").mode === "sprint", "will mix stays");
+assert(personMix(fresh, "Will").mode === "sprint10", "will mix stays as 10 min sprint");
 assert(personMix(fresh, "Will").theme === "light", "will light theme");
 assert(personMix(fresh, "Liz").ops.join(",") === "sub", "liz mix stays");
 assert(personMix(fresh, "Liz").theme === "dark", "liz keeps default dark");
 assert(fresh.lastLearner === "Liz", "last writer is current learner");
 
 const reloaded = normalizeStore(JSON.parse(JSON.stringify(fresh)));
+assert(personMix(reloaded, "Will").mode === "sprint10", "round-trip will sprint");
 assert(personMix(reloaded, "Will").difficulty === "medium", "round-trip will");
 assert(personMix(reloaded, "Will").theme === "light", "round-trip will theme");
 assert(personMix(reloaded, "Liz").difficulty === "challenge", "round-trip liz");

@@ -45,6 +45,11 @@ assert(!app.includes('finishRound({ to: "setup" })'), "practice back shows resul
 const leaveFn = app.slice(app.indexOf("function requestLeaveSession"), app.indexOf("function leavePractice"));
 assert(leaveFn.includes("setLeaveOpen(true)"), "play back always opens a confirm dialog");
 assert(!leaveFn.includes("finishRound"), "play back does not skip the confirm dialog");
+assert(html.includes('data-mode="sprint10"'), "10 minute sprint mode");
+assert(html.includes('data-mode="sprint30"'), "30 minute sprint mode");
+assert(!html.includes("60s sprint"), "60s sprint is gone");
+assert(app.includes("durationMs: 10 * 60_000"), "10 min sprint lasts 10 minutes");
+assert(app.includes("durationMs: 30 * 60_000"), "30 min sprint lasts 30 minutes");
 assert(html.includes("Leave this round?"), "leave confirm is not practice-only");
 assert(html.includes("See results"), "leave confirm opens results");
 assert(html.indexOf('id="keypad"') < html.indexOf('id="submit-btn"'), "Submit sits below the keypad");

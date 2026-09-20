@@ -16,7 +16,7 @@ On the home page the action bar keeps one avatar on the left, WilLiz Math immedi
 1. Operations: addition, subtraction, multiplication, division (at least one).
 2. Difficulty: Pictures, Easy, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows kid-friendly drawings of fruit, toys, and school supplies to count. Pictures has no division.
 3. Appearance: Dark (default) or Light.
-4. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, or a 60-second sprint.
+4. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, a 10-minute sprint, or a 30-minute sprint.
 
 There is no Skip. Practice stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right. Quiz and sprint allow one try, then reveal and advance.
 
