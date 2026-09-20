@@ -164,6 +164,18 @@ assert(
   "17 × 9 is 63 + 90: 3, carry 6, tens 9",
 );
 
+const seventeenByTwentyNine = worksheetFields({ a: 17, b: 29, op: "mul", answer: 493, difficulty: "challenge" });
+const seventeenOnes = seventeenByTwentyNine.filter((field) => field.line === "partial-0");
+assert(
+  seventeenOnes.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:3,carry:6,digit:9",
+  "17 × 29 ones is 63 + 90: 3, carry 6, tens 9",
+);
+assert(seventeenOnes.length === 3, "17 × 9 has no leftover 1 from folding 6 into 9");
+assert(!seventeenOnes.some((field) => field.answer === 5 || field.answer === 1), "17 × 9 is not 153");
+assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 2)?.answer === 3, "ones of 63");
+assert(seventeenOnes.find((field) => field.kind === "carry")?.answer === 6, "tens of 63 stay a carry");
+assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 1)?.answer === 9, "10 × 9 is 9, not 5");
+
 const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
 assert(oneMul.map((field) => field.answer).join(",") === "8,4", "12 × 4 ones then tens");
 assert(oneMul.every((field) => field.unit === "cell"), "mul slots are single digits");
