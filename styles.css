@@ -663,6 +663,7 @@ legend {
 .answer-form {
   display: flex;
   gap: 10px;
+  margin-top: 12px;
 }
 
 .answer-form.is-sheet-fill #answer-input,
@@ -708,7 +709,7 @@ legend {
 }
 
 .keypad {
-  margin-top: 12px;
+  margin-top: 8px;
   grid-template-columns: repeat(3, 1fr);
   display: grid;
 }
@@ -1077,6 +1078,7 @@ body.celebrate-static .results-headline {
 
   .answer-form {
     gap: 8px;
+    margin-top: 6px;
     flex: 0 0 auto;
   }
 
