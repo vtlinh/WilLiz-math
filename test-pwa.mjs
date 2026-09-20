@@ -34,6 +34,7 @@ assert(!mulRender.includes(" × "), "multiplication does not repeat the equation
 
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert(app.includes("serviceWorker.register"), "register service worker");
+assert(app.includes('if (screen === "settings") showScreen("setup")'), "settings back returns to home");
 assert(app.includes("function leavePractice"), "practice back has a leave path");
 assert(!app.includes('finishRound({ to: "setup" })'), "practice back shows results, not home");
 assert(html.includes("See results"), "leave confirm opens results");

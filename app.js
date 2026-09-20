@@ -63,7 +63,6 @@ let current = null;
 let timerId = null;
 let awaitingAdvance = false;
 let screen = "setup";
-let settingsReturn = "setup";
 
 function loadStore() {
   try {
@@ -160,11 +159,10 @@ function setLearnerOpen(open) {
 function setSettingsOpen(open) {
   if (open) {
     setLearnerOpen(false);
-    if (screen !== "settings") settingsReturn = screen;
     showScreen("settings");
     return;
   }
-  if (screen === "settings") showScreen(settingsReturn || "setup");
+  if (screen === "settings") showScreen("setup");
 }
 
 function isPracticePlay() {
@@ -186,6 +184,7 @@ function syncPlayChrome() {
   const settingsPage = screen === "settings";
   const practice = isPracticePlay();
   els.sessionBack.hidden = !play && !settingsPage;
+  els.sessionBack.setAttribute("aria-label", settingsPage ? "Back to home" : "Back");
   els.setupTitle.hidden = !settingsPage;
   els.actionHome.hidden = play || settingsPage;
   els.playStat.hidden = !practice;
