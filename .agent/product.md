@@ -24,7 +24,7 @@ There is no End round button. During an exercise the action bar has no avatar an
 
 Answers are entered only with the on-screen keypad, on each working line of the worksheet (partial products, long-division steps, or the column total). Pictures keep one blank. There is no separate final-only answer box, and the keypad must not open a system keyboard. Submit counts only when every line is filled and correct.
 
-On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
+The play equation is centered in the problem area. On a phone, home, settings, play, and results all fit on one screen. The page does not scroll.
 
 Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication. Division is written as long division with bring-down working and no times-table cheat.
 
