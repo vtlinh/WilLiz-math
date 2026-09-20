@@ -763,7 +763,7 @@ const launchScreen = location.hash === "#settings" ? "settings" : "setup";
 showScreen(launchScreen, { replace: true });
 window.addEventListener("popstate", handleHistoryPop);
 if (window.navigation?.addEventListener) {
-  window.navigation.addEventListener("navigate", swallowHomeNavigate);
+  window.navigation.addEventListener("navigate", swallowHomeNavigate, { capture: true });
 }
 
 if ("serviceWorker" in navigator) {
