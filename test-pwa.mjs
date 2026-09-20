@@ -19,6 +19,10 @@ assert(html.includes('rel="manifest"'), "manifest link");
 assert(html.includes("manifest.webmanifest"), "manifest href");
 assert(!html.includes("End round"), "no end-round button");
 assert(html.includes("session-back"), "action-bar back ends the round");
+const actionBar = html.slice(html.indexOf('class="action-bar"'), html.indexOf("</header>"));
+assert(actionBar.includes('id="setup-title"'), "Settings title lives in the action bar");
+assert(!html.includes("settings-head"), "no second settings status bar");
+assert(!html.includes("settings-back"), "settings uses the global back button");
 
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert(app.includes("serviceWorker.register"), "register service worker");

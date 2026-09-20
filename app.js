@@ -40,7 +40,7 @@ const els = {
   mixSummary: document.getElementById("mix-summary"),
   settings: document.getElementById("settings-screen"),
   settingsBtn: document.getElementById("settings-btn"),
-  settingsBack: document.getElementById("settings-back"),
+  setupTitle: document.getElementById("setup-title"),
   actionHome: document.getElementById("action-home"),
   sessionBack: document.getElementById("session-back"),
   playStat: document.getElementById("play-stat"),
@@ -183,15 +183,17 @@ function paintPlayStat() {
 
 function syncPlayChrome() {
   const play = screen === "play";
+  const settingsPage = screen === "settings";
   const practice = isPracticePlay();
-  els.sessionBack.hidden = !play;
-  els.actionHome.hidden = play;
+  els.sessionBack.hidden = !play && !settingsPage;
+  els.setupTitle.hidden = !settingsPage;
+  els.actionHome.hidden = play || settingsPage;
   els.playStat.hidden = !practice;
-  els.settingsBtn.hidden = play || screen === "settings";
-  els.settingsBtn.classList.toggle("is-open", screen === "settings");
-  els.settingsBtn.setAttribute("aria-expanded", String(screen === "settings"));
+  els.settingsBtn.hidden = play || settingsPage;
+  els.settingsBtn.classList.toggle("is-open", settingsPage);
+  els.settingsBtn.setAttribute("aria-expanded", String(settingsPage));
   els.playMeta.hidden = practice;
-  if (play) setLearnerOpen(false);
+  if (play || settingsPage) setLearnerOpen(false);
   if (practice) paintPlayStat();
 }
 
@@ -652,8 +654,13 @@ els.themeRow.addEventListener("click", (event) => {
 els.settingsBtn.addEventListener("click", () => {
   setSettingsOpen(true);
 });
-els.settingsBack.addEventListener("click", () => setSettingsOpen(false));
-els.sessionBack.addEventListener("click", requestLeaveSession);
+els.sessionBack.addEventListener("click", () => {
+  if (screen === "settings") {
+    setSettingsOpen(false);
+    return;
+  }
+  requestLeaveSession();
+});
 els.leaveStay.addEventListener("click", () => setLeaveOpen(false));
 els.leaveConfirm.addEventListener("click", leavePractice);
 els.leaveBackdrop.addEventListener("click", () => setLeaveOpen(false));

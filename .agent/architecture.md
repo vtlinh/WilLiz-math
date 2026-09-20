@@ -31,7 +31,7 @@ icon-512.png
 ## Runtime flow
 
 1. `storage.js` reads `localStorage` key `williz-math-v1` and normalizes it to `{ lastLearner, people, bests }`.
-2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`, `theme`. Theme defaults to `dark`. Switching learners restores that mix immediately. The avatar and settings button are hidden during a round. The settings page saves each tap inline and returns with ←.
+2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`, `theme`. Theme defaults to `dark`. Switching learners restores that mix immediately. The avatar and settings button are hidden during a round. The settings page saves each tap inline; ← in the action bar returns.
 3. A legacy `settings` blob is migrated onto that learner once, then replaced by `people`.
 4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`. Pictures rounds use `playOps` so division is never in the mix.
 5. Addition, subtraction, multiplication, and division are rendered by `worksheet.js`. Pictures difficulty uses the counting-object sheet with drawings from `pictures.js` (fruit, toys, pencils/pens/erasers). `worksheetFields(problem)` lists every fillable working line.

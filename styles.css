@@ -116,13 +116,23 @@ body {
   line-height: 1;
 }
 
-.app-title {
+.app-title,
+.action-title {
   margin: 0;
   font-family: "Fraunces", Georgia, serif;
   font-size: clamp(1.15rem, 4vw, 1.45rem);
   font-weight: 680;
   line-height: 1;
   white-space: nowrap;
+}
+
+.action-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-title[hidden] {
+  display: none;
 }
 
 .learner-menu {
@@ -209,17 +219,6 @@ body {
   background: var(--sage-deep);
   color: var(--on-accent);
   border-color: var(--sage-deep);
-}
-
-.settings-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.settings-head h2 {
-  margin: 0;
 }
 
 .mix-summary {
@@ -941,8 +940,9 @@ body.celebrate-static .results-headline {
     font-size: 1.25rem;
   }
 
-  .settings-head {
-    margin-bottom: 8px;
+  .action-title {
+    margin: 0;
+    font-size: 1.15rem;
   }
 
   .block {
