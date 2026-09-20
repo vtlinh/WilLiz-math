@@ -15,14 +15,7 @@ export function worksheetFields(problem) {
     return [{ id: "total", answer: problem.answer }];
   }
   if (problem.op === "mul") {
-    const plan = planMultiplication(problem.a, problem.b);
-    if (plan.partials.length > 1) {
-      return [
-        ...plan.partials.map((row, index) => ({ id: `partial-${index}`, answer: row.value })),
-        { id: "total", answer: plan.total },
-      ];
-    }
-    return [{ id: "total", answer: plan.total }];
+    return planMultiplication(problem.a, problem.b).slots;
   }
   if (problem.op === "div") {
     const plan = planDivision(problem.a, problem.b);
@@ -57,22 +50,110 @@ function padLeft(chars, cols) {
   return Array.from({ length: cols - list.length }, () => "").concat(list);
 }
 
-function timesDigit(value, digit) {
+function timesDigitSteps(value, digit) {
   const source = String(value).split("").map(Number);
-  const carries = Array(source.length).fill(0);
-  const out = [];
+  const steps = [];
   let carry = 0;
   for (let i = source.length - 1; i >= 0; i -= 1) {
     const n = source[i] * digit + carry;
-    out.unshift(n % 10);
+    const write = n % 10;
     carry = Math.floor(n / 10);
-    if (i > 0) carries[i - 1] = carry;
+    steps.push({ sourceIndex: i, write, carryOut: carry });
   }
-  if (carry) out.unshift(carry);
+  return { steps, leftover: carry, sourceLen: source.length };
+}
+
+function timesDigit(value, digit) {
+  const { steps, leftover, sourceLen } = timesDigitSteps(value, digit);
+  const carries = Array(sourceLen).fill(0);
+  for (const step of steps) {
+    if (step.sourceIndex > 0) carries[step.sourceIndex - 1] = step.carryOut;
+  }
+  const out = steps.map((step) => step.write).reverse();
+  if (leftover) out.unshift(leftover);
   return {
     product: Number(out.join("")) || 0,
     carries,
   };
+}
+
+function pushSlot(slots, field) {
+  slots.push({
+    ...field,
+    unit: "cell",
+    index: slots.length,
+    answer: field.answer,
+  });
+}
+
+function appendProductSlots(slots, { a, digit, shift, cols, line }) {
+  const { steps, leftover, sourceLen } = timesDigitSteps(a, digit);
+  for (let s = 0; s < shift; s += 1) {
+    pushSlot(slots, {
+      id: `${line}-shift-${s}`,
+      kind: "digit",
+      line,
+      col: cols - 1 - s,
+      answer: 0,
+    });
+  }
+  for (let i = 0; i < steps.length; i += 1) {
+    const step = steps[i];
+    const col = cols - sourceLen + step.sourceIndex - shift;
+    pushSlot(slots, {
+      id: `${line}-d${step.sourceIndex}`,
+      kind: "digit",
+      line,
+      col,
+      answer: step.write,
+    });
+    if (step.carryOut && i < steps.length - 1) {
+      pushSlot(slots, {
+        id: `${line}-c${step.sourceIndex}`,
+        kind: "carry",
+        line,
+        col: col - 1,
+        answer: step.carryOut,
+      });
+    }
+  }
+  if (leftover) {
+    const last = steps.at(-1);
+    pushSlot(slots, {
+      id: `${line}-lead`,
+      kind: "digit",
+      line,
+      col: cols - sourceLen + last.sourceIndex - shift - 1,
+      answer: leftover,
+    });
+  }
+}
+
+function appendAdditionSlots(slots, values, cols, line) {
+  const rows = values.map((value) => padLeft(digitList(value), cols).map((d) => (d === "" || d === "−" ? 0 : Number(d))));
+  let carry = 0;
+  for (let col = cols - 1; col >= 0; col -= 1) {
+    const sum = rows.reduce((total, row) => total + row[col], 0) + carry;
+    const write = sum % 10;
+    const next = Math.floor(sum / 10);
+    pushSlot(slots, {
+      id: `${line}-d${col}`,
+      kind: "digit",
+      line,
+      col,
+      answer: write,
+    });
+    if (next && col > 0) {
+      pushSlot(slots, {
+        id: `${line}-c${col}`,
+        kind: "carry",
+        line,
+        col: col - 1,
+        answer: next,
+      });
+    }
+    carry = next;
+  }
 }
 
 export function planMultiplication(a, b) {
@@ -111,7 +192,38 @@ export function planMultiplication(a, b) {
     })),
     total,
     totalCells: padLeft(digitList(total), cols),
+    slots: multiplicationSlots(a, b, cols, partials, total),
   };
+}
+
+function multiplicationSlots(a, b, cols, partials, total) {
+  const slots = [];
+  if (partials.length > 1) {
+    for (const [index, partial] of partials.entries()) {
+      appendProductSlots(slots, {
+        a,
+        digit: partial.digit,
+        shift: partial.shift,
+        cols,
+        line: `partial-${index}`,
+      });
+    }
+    appendAdditionSlots(
+      slots,
+      partials.map((row) => row.value),
+      cols,
+      "total",
+    );
+  } else {
+    appendProductSlots(slots, {
+      a,
+      digit: Number(b),
+      shift: 0,
+      cols,
+      line: "total",
+    });
+  }
+  return slots;
 }
 
 function cell(text, className = "") {
@@ -121,13 +233,13 @@ function cell(text, className = "") {
   return span;
 }
 
-function markFill(el, { slot = null, active = false, reveal = false } = {}) {
+function markFill(el, { slot = null, active = false, reveal = false, label = "Fill this line" } = {}) {
   if (reveal || slot == null) return;
   el.classList.add("is-fill");
   if (active) el.classList.add("is-active");
   el.dataset.slot = String(slot);
   el.setAttribute("role", "button");
-  el.setAttribute("aria-label", "Fill this line");
+  el.setAttribute("aria-label", label);
 }
 
 function row(cols, cells, { op = "", className = "", slot = null, active = false, reveal = false } = {}) {
@@ -155,6 +267,44 @@ function typedCells(value, cols) {
   return padLeft(digitList(value.replace("-", "−")), cols);
 }
 
+function emptyCols(cols) {
+  return Array(cols).fill("");
+}
+
+function slotCell(field, fills, active, reveal) {
+  const shown = reveal ? String(field.answer) : fills[field.index] ?? "";
+  const el = cell(shown, field.kind === "carry" ? "is-carry-digit" : "");
+  markFill(el, {
+    slot: field.index,
+    active: active === field.index,
+    reveal,
+    label: field.kind === "carry" ? "Fill this carry" : "Fill this digit",
+  });
+  return el;
+}
+
+function cellsFromSlots(cols, fields, fills, active, reveal) {
+  const byCol = new Map(fields.map((field) => [field.col, field]));
+  return emptyCols(cols).map((_, col) => {
+    const field = byCol.get(col);
+    return field ? slotCell(field, fills, active, reveal) : "";
+  });
+}
+
+function appendFillLine(root, cols, slots, { line, op = "", className = "", fills, active, reveal }) {
+  const carries = slots.filter((field) => field.line === line && field.kind === "carry");
+  const digits = slots.filter((field) => field.line === line && field.kind === "digit");
+  if (carries.length) {
+    root.append(row(cols, cellsFromSlots(cols, carries, fills, active, reveal), { className: "is-carry" }));
+  }
+  root.append(
+    row(cols, cellsFromSlots(cols, digits, fills, active, reveal), {
+      op,
+      className,
+    }),
+  );
+}
+
 export function renderMultiplicationSheet(problem, { fills = [], active = 0, reveal = false } = {}) {
   const plan = planMultiplication(problem.a, problem.b);
   const root = document.createElement("div");
@@ -166,43 +316,31 @@ export function renderMultiplicationSheet(problem, { fills = [], active = 0, rev
   eq.textContent = reveal ? `${problem.a} × ${problem.b} = ${plan.total}` : `${problem.a} × ${problem.b} =`;
   root.append(eq);
 
-  if (reveal) {
-    root.append(row(plan.cols, plan.mulCarries, { className: "is-carry" }));
-  }
-
   root.append(row(plan.cols, plan.top));
   root.append(row(plan.cols, plan.mul, { op: "×" }));
   root.append(rule(plan.cols));
 
-  let nextSlot = 0;
   if (plan.partials.length > 1) {
-    for (const partial of plan.partials) {
-      const slot = nextSlot;
-      nextSlot += 1;
-      const cells = reveal ? partial.cells : typedCells(fills[slot], plan.cols);
-      root.append(
-        row(plan.cols, cells, {
-          op: partial.plus ? "+" : "",
-          className: "is-partial",
-          slot,
-          active: active === slot,
-          reveal,
-        }),
-      );
+    for (const [index, partial] of plan.partials.entries()) {
+      appendFillLine(root, plan.cols, plan.slots, {
+        line: `partial-${index}`,
+        op: partial.plus ? "+" : "",
+        className: "is-partial",
+        fills,
+        active,
+        reveal,
+      });
     }
     root.append(rule(plan.cols));
   }
 
-  const totalSlot = nextSlot;
-  const total = reveal ? plan.totalCells : typedCells(fills[totalSlot], plan.cols);
-  root.append(
-    row(plan.cols, total, {
-      className: "is-total",
-      slot: totalSlot,
-      active: active === totalSlot,
-      reveal,
-    }),
-  );
+  appendFillLine(root, plan.cols, plan.slots, {
+    line: "total",
+    className: "is-total",
+    fills,
+    active,
+    reveal,
+  });
   return root;
 }
 

@@ -79,13 +79,24 @@ assert(subWide.total === 99, "100 − 1");
 assert(subWide.cols === 3, "keep three columns");
 
 const mulLines = worksheetFields({ a: 124, b: 26, op: "mul", answer: 3224, difficulty: "hard" });
-assert(mulLines.map((field) => field.answer).join(",") === "744,2480,3224", "fill each mul line");
+assert(
+  mulLines.map((field) => `${field.kind}:${field.answer}`).join(",") ===
+    "digit:4,carry:2,digit:4,carry:1,digit:7,digit:0,digit:8,digit:4,digit:2,digit:4,digit:2,carry:1,digit:2,carry:1,digit:3",
+  "124 × 26 fills digits and carries RTL",
+);
+assert(mulLines.some((field) => field.line === "partial-0"), "ones partial");
+assert(mulLines.some((field) => field.line === "partial-1"), "tens partial");
+assert(mulLines.some((field) => field.line === "total"), "product total");
 
 const fourteen = worksheetFields({ a: 14, b: 14, op: "mul", answer: 196, difficulty: "medium" });
-assert(fourteen.map((field) => field.answer).join(",") === "56,140,196", "14 × 14 working lines");
+assert(
+  fourteen.map((field) => field.answer).join(",") === "6,1,5,0,4,1,6,9,1",
+  "14 × 14 ones, carry, tens, both partials, and total",
+);
 
 const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
-assert(oneMul.length === 1 && oneMul[0].answer === 48, "single-digit mul is one total");
+assert(oneMul.map((field) => field.answer).join(",") === "8,4", "12 × 4 ones then tens");
+assert(oneMul.every((field) => field.unit === "cell"), "mul slots are single digits");
 
 const pic = worksheetFields({ a: 2, b: 3, op: "mul", answer: 6, difficulty: "pictures" });
 assert(pic.length === 1 && pic[0].answer === 6, "pictures stay one blank");
@@ -102,10 +113,11 @@ assert(
   "quotient plus each subtract and bring-down",
 );
 
-assert(fieldsReady(["56", "140", "196"]), "all lines filled");
-assert(!fieldsReady(["56", "", "196"]), "blank line is not ready");
-assert(fieldsMatch(["744", "2480", "3224"], mulLines), "matching every mul line");
-assert(!fieldsMatch(["744", "2480", "77"], mulLines), "final only is not enough");
+const fourteenFills = fourteen.map((field) => String(field.answer));
+assert(fieldsReady(fourteenFills), "all mul cells filled");
+assert(!fieldsReady(["6", "1", "", "0", "4", "1", "6", "9", "1"]), "blank mul cell is not ready");
+assert(fieldsMatch(fourteenFills, fourteen), "matching every mul digit and carry");
+assert(!fieldsMatch(["6", "1", "5", "0", "4", "1", "6", "9", "7"], fourteen), "final only is not enough");
 assert(fieldsMatch(["543", "120", "103", "96", "72", "72", "0"], divLines), "matching every div line");
 
 console.log("worksheet checks passed");

@@ -522,6 +522,23 @@ function setActiveSlot(index) {
 function pressKey(key) {
   if (!current || awaitingAdvance) return;
   const slot = current.active ?? 0;
+  const field = current.fields[slot];
+  if (field?.unit === "cell") {
+    if (key === "back") {
+      if (current.fills[slot]) {
+        current.fills[slot] = "";
+      } else if (slot > 0) {
+        current.active = slot - 1;
+        current.fills[current.active] = "";
+      }
+    } else if (key !== "-" && key !== "−") {
+      current.fills[slot] = key;
+      if (slot + 1 < current.fills.length) current.active = slot + 1;
+    }
+    els.input.value = current.fills[current.active] ?? "";
+    paintProblem(false);
+    return;
+  }
   let value = current.fills[slot] ?? "";
   if (key === "back") {
     value = value.slice(0, -1);

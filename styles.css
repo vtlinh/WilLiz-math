@@ -495,12 +495,14 @@ legend {
 
 .sheet-row.is-fill,
 .div-digits.is-fill,
-.pic-answer.is-fill {
+.pic-answer.is-fill,
+.sheet-cell.is-fill {
   cursor: pointer;
 }
 
 .sheet-row.is-fill .sheet-cell:not(.is-op),
-.div-digits.is-fill .sheet-cell:not(.is-op):not(.is-arrow) {
+.div-digits.is-fill .sheet-cell:not(.is-op):not(.is-arrow),
+.sheet-cell.is-fill {
   border-bottom: 2px solid color-mix(in srgb, var(--ink) 28%, transparent);
 }
 
@@ -511,8 +513,14 @@ legend {
 }
 
 .sheet-row.is-active .sheet-cell:not(.is-op),
-.div-digits.is-active .sheet-cell:not(.is-op):not(.is-arrow) {
+.div-digits.is-active .sheet-cell:not(.is-op):not(.is-arrow),
+.sheet-cell.is-active {
   border-bottom-color: var(--sage);
+}
+
+.sheet-cell.is-active {
+  background: color-mix(in srgb, var(--sage) 16%, transparent);
+  border-radius: 6px;
 }
 
 .pic-answer.is-active {
