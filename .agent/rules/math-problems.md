@@ -13,6 +13,7 @@ activation: always_on
 - Division is shown as long division: a 1–9 times table for the divisor on the left, and the bracket, quotient, subtract-and-bring-down working on the right. Do not show `a ÷ b` as a single inline equation only.
 - Division must be exact. Subtraction must not produce a negative answer.
 - `parseAnswer` accepts integers only, including a leading unicode minus (`−`).
+- The play answer field is keypad-only: `readonly`, no system keyboard, and no typing into the field.
 - Practice: wrong answers stay on the same problem so the learner can retry. Quiz and sprint: one try, then reveal and advance.
 - Quiz progress stars use `progressStars(correct, limit)`: one star animates in for each 20% of the quiz answered correctly, up to five.
 - Unlimited practice and sprint use `unlimitedStars(attempts)`: one star for each all-correct set of 10 problems, counted from the first problem. A retried miss is not totally correct. After 7 stars, show `X ★` instead of more icons.

@@ -242,7 +242,6 @@ function nextProblem() {
   els.feedback.textContent = "";
   els.feedback.className = "feedback";
   paintProblem(false);
-  els.input.focus();
   updateProgress();
 }
 
@@ -437,7 +436,6 @@ function pressKey(key) {
     els.input.value += key;
   }
   paintProblem(false);
-  els.input.focus();
 }
 
 els.learnerBtn.addEventListener("click", (event) => {
@@ -496,8 +494,14 @@ document.addEventListener("keydown", (event) => {
 });
 
 els.startBtn.addEventListener("click", startRound);
-els.input.addEventListener("input", () => {
-  if (current && !awaitingAdvance) paintProblem(false);
+els.input.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+});
+els.input.addEventListener("focus", () => {
+  els.input.blur();
+});
+els.input.addEventListener("beforeinput", (event) => {
+  event.preventDefault();
 });
 els.form.addEventListener("submit", submitAnswer);
 els.endBtn.addEventListener("click", finishRound);

@@ -626,11 +626,13 @@ legend {
   font-weight: 800;
   background: var(--lift);
   color: var(--ink);
+  caret-color: transparent;
+  cursor: default;
+  user-select: none;
 }
 
 #answer-input:focus {
-  outline: 3px solid var(--gold);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .feedback {

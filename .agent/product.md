@@ -20,6 +20,8 @@ The top action bar keeps one avatar on the left. Tapping it opens Will, Liz, or 
 
 There is no Skip. Practice allows a retry on the same problem. Quiz and sprint allow one try, then reveal and advance.
 
+Answers are entered only with the on-screen keypad. The answer field is not editable and must not open a system keyboard.
+
 Addition and subtraction are written as vertical column arithmetic. Multiplication is written as long multiplication. Division is written as long division with a divisor times table and bring-down working.
 
 ## Non-goals

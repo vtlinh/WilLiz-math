@@ -150,8 +150,11 @@
             <input
               id="answer-input"
               name="answer"
-              inputmode="numeric"
+              readonly
+              tabindex="-1"
+              inputmode="none"
               autocomplete="off"
+              aria-readonly="true"
               aria-describedby="feedback"
             />
             <button type="submit" class="primary compact">Check</button>
