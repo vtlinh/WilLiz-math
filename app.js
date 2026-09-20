@@ -508,7 +508,7 @@ function leavePractice() {
     showScreen("setup");
     return;
   }
-  finishRound({ to: "setup" });
+  finishRound();
 }
 
 function finishRound({ to = "results" } = {}) {

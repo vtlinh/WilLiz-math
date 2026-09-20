@@ -22,5 +22,8 @@ assert(html.includes("session-back"), "action-bar back ends the round");
 
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 assert(app.includes("serviceWorker.register"), "register service worker");
+assert(app.includes("function leavePractice"), "practice back has a leave path");
+assert(!app.includes('finishRound({ to: "setup" })'), "practice back shows results, not home");
+assert(html.includes("See results"), "leave confirm opens results");
 
 console.log("pwa install checks passed");

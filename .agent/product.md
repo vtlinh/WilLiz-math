@@ -20,7 +20,7 @@ On the home page the action bar keeps one avatar on the left, WilLiz Math immedi
 
 There is no Skip. Practice stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right. Quiz and sprint allow one try, then reveal and advance.
 
-There is no End round button. During an exercise the action bar has no avatar and no settings icon. ← ends the session: practice asks to confirm and returns home; quiz and sprint finish to the results screen. Practice also shows an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
+There is no End round button. During an exercise the action bar has no avatar and no settings icon. ← ends the session: practice asks to confirm, then always shows the results screen; quiz and sprint finish to results as well. Practice also shows an X/Y score. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
 
 Answers are entered only with the on-screen keypad. Multi-step multiplication and division use **Next** to move to the next working section; the last section uses **Submit**. Multiplication is filled one digit at a time from right to left, including carries. Long division fills one quotient digit at a time, then that step’s multiply, subtract, and bring-down boxes. Column totals are filled by line. Pictures keep one blank. There is no separate final-only answer box, and the keypad must not open a system keyboard.
 
