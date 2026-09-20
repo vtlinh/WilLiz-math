@@ -123,10 +123,16 @@ assert(
     "digit:7,carry:2,digit:9,digit:7,digit:1,carry:1,digit:1",
   "9 × 13 is 7 with carry 2, then 9 shifted, then 117",
 );
+const onesPartial = nineByThirteen.filter((field) => field.line === "partial-0");
 assert(
-  nineByThirteen.filter((field) => field.line === "partial-0").map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:7,carry:2",
+  onesPartial.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:7,carry:2",
   "9 × 3 is 7 in the ones and 2 as a carry, not 27",
+);
+assert(onesPartial.find((field) => field.kind === "digit")?.col === 2, "7 sits in the ones result field");
+assert(onesPartial.find((field) => field.kind === "carry")?.col === 1, "2 sits above the tens field");
+assert(
+  !onesPartial.some((field) => field.kind === "digit" && field.answer === 2),
+  "leftover 2 is not a second result digit",
 );
 assert(
   nineByThirteen.filter((field) => field.line === "partial-1").map((field) => field.answer).join(",") === "9",
