@@ -208,10 +208,6 @@ body {
   margin: 0;
 }
 
-body.is-settings footer {
-  display: none;
-}
-
 .mix-summary {
   margin: 0 0 18px;
   color: var(--muted);
@@ -228,10 +224,6 @@ h2,
 h2 {
   margin: 0 0 18px;
   font-size: 1.7rem;
-}
-
-footer p {
-  color: var(--muted);
 }
 
 .panel {
@@ -749,11 +741,6 @@ dd {
 .best-note {
   color: var(--sage);
   font-weight: 800;
-}
-
-footer {
-  margin-top: 22px;
-  text-align: center;
 }
 
 .celebrate-canvas {
