@@ -50,16 +50,18 @@ function padLeft(chars, cols) {
   return Array.from({ length: cols - list.length }, () => "").concat(list);
 }
 
-function timesDigitSteps(value, digit) {
+function timesDigitSteps(value, digit, { addCarry = false } = {}) {
   const source = String(value).split("").map(Number);
   const steps = [];
+  let incoming = 0;
   for (let i = source.length - 1; i >= 0; i -= 1) {
-    const n = source[i] * digit;
+    const n = source[i] * digit + (addCarry ? incoming : 0);
     const write = n % 10;
     const carryOut = Math.floor(n / 10);
     steps.push({ sourceIndex: i, write, carryOut });
+    incoming = carryOut;
   }
-  return { steps, leftover: steps.at(-1)?.carryOut ?? 0, sourceLen: source.length };
+  return { steps, leftover: incoming, sourceLen: source.length };
 }
 
 function timesDigit(value, digit) {
@@ -84,8 +86,8 @@ function pushSlot(slots, field) {
   });
 }
 
-function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0, leftoverAs = "digit" }) {
-  const { steps, leftover, sourceLen } = timesDigitSteps(a, digit);
+function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0, leftoverAs = "digit", addCarry = leftoverAs === "digit" }) {
+  const { steps, leftover, sourceLen } = timesDigitSteps(a, digit, { addCarry });
   for (let i = 0; i < steps.length; i += 1) {
     const item = steps[i];
     const col = cols - sourceLen + item.sourceIndex - shift;

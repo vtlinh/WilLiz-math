@@ -168,8 +168,18 @@ assert(twentySixOnes.find((field) => field.kind === "digit" && field.col === 1)?
 
 const seventeen = worksheetFields({ a: 17, b: 9, op: "mul", answer: 153, difficulty: "medium" });
 assert(
-  seventeen.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:3,carry:6,digit:9",
-  "17 × 9 is 63 + 90: 3, carry 6, tens 9",
+  seventeen.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:3,carry:6,digit:5,digit:1",
+  "17 × 9 final product adds the 6 carry: 153",
+);
+
+const twentyFour = worksheetFields({ a: 24, b: 8, op: "mul", answer: 192, difficulty: "hard" });
+assert(
+  twentyFour.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:2,carry:3,digit:9,digit:1",
+  "24 × 8 is 192, not 162: ones 2, carry 3, tens 9, hundreds 1",
+);
+assert(
+  twentyFour.filter((field) => field.kind === "digit").map((field) => field.answer).join("") === "291",
+  "24 × 8 result digits are 2, 9, 1",
 );
 
 const seventeenByTwentyNine = worksheetFields({ a: 17, b: 29, op: "mul", answer: 493, difficulty: "challenge" });
