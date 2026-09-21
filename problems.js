@@ -36,9 +36,16 @@ export function playOps(ops, difficulty) {
   return difficulty === "pictures" ? list.filter((op) => op !== "div") : [...list];
 }
 
+function repeatedDivisorDividend(dividend, divisor) {
+  const digits = String(dividend);
+  const mark = String(divisor);
+  return mark.length === 1 && digits.length > 1 && [...digits].every((digit) => digit === mark);
+}
+
 export function operandsAllowed(op, a, b) {
   if (a < 2 || b < 2) return false;
-  if (op === "div" && (b === 0 || b === 1)) return false;
+  if (op === "sub" && a === b) return false;
+  if (op === "div" && (a === b || repeatedDivisorDividend(a, b))) return false;
   return true;
 }
 
@@ -65,21 +72,18 @@ export function generateProblem(ops, difficulty, previousKey = "") {
     } else if (chosen === "sub") {
       const max = pictures ? 8 : { easy: 10, medium: 99, hard: 999 }[level];
       a = randInt(pictures || level === "easy" ? 4 : 8, max);
-      b = randInt(2, a);
+      b = randInt(2, a - 1);
       answer = a - b;
     } else if (chosen === "mul") {
-      if (pictures) {
-        a = randInt(2, 4);
-        b = randInt(2, 4);
+      if (pictures || level === "easy") {
+        a = randInt(2, 9);
+        b = randInt(2, 9);
       } else if (level === "medium") {
         a = randDigits(2, 3);
         b = randInt(3, 9);
       } else if (level === "hard") {
         a = randDigits(3, 5);
         b = randDigits(2, 3);
-      } else {
-        a = randInt(2, 5);
-        b = randInt(2, 5);
       }
       if (b > a) [a, b] = [b, a];
       answer = a * b;
@@ -96,9 +100,17 @@ export function generateProblem(ops, difficulty, previousKey = "") {
       answer = exactDividend(b, 4, 7);
       a = b * answer;
     } else {
-      b = randInt(2, 5);
-      answer = randInt(2, 5);
-      a = b * answer;
+      a = 15;
+      b = 3;
+      answer = 5;
+      for (let n = 0; n < 30; n += 1) {
+        b = randInt(2, 9);
+        const minQ = Math.max(2, Math.ceil(10 / b));
+        const maxQ = Math.floor(99 / b);
+        answer = randInt(minQ, maxQ);
+        a = b * answer;
+        if (a >= 10 && a <= 99 && operandsAllowed("div", a, b)) break;
+      }
     }
   };
 

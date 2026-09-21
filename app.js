@@ -392,7 +392,7 @@ function paintProblem(reveal = false) {
       section: current.section ?? 0,
     }),
   );
-  els.problem.classList.toggle("is-sheet", Boolean(current.op));
+  els.problem.classList.toggle("is-sheet", current.difficulty !== "easy");
   els.form.classList.add("is-sheet-fill");
   els.input.hidden = true;
   syncSubmitLabel();
@@ -699,7 +699,9 @@ function pressKey(key) {
   } else if (key === "-" || key === "−") {
     value = value.startsWith("-") ? value.slice(1) : `-${value}`;
   } else {
-    value += key;
+    const width = String(Math.abs(Number(field?.answer))).length;
+    const digits = value.replace(/[-−]/g, "").length;
+    if (!width || digits < width) value += key;
   }
   current.fills[slot] = value;
   els.input.value = value;

@@ -34,8 +34,8 @@ icon-512.png
 2. Each person (Will, Liz, Guest) has their own mix: `ops`, `difficulty`, `mode`, `theme`. Theme defaults to `dark`. Switching learners restores that mix immediately. The avatar and settings button are hidden during a round. The settings page saves each tap inline; ← in the action bar returns to the home page. During play, ← asks to confirm before showing results once `round.answered` is at least 1. With no finished exercise, ← drops the round and returns home. Opening that confirm pushes `#play/leave` so Android back pops the dialog only and stays on the exercise, instead of walking back to `./` and quitting. Screen changes use `history.pushState`. Home is `#home`, never the launch `./`. A `#home/stay` trap sits above it and is re-armed after each home pop. Chrome’s Navigation API also intercepts home Back so Android does not treat the page as leaving.
 3. A legacy `settings` blob is migrated onto that learner once, then replaced by `people`.
 4. Start creates a `round` and calls `generateProblem(ops, difficulty, lastKey)`. Pictures rounds use `playOps` so division is never in the mix.
-5. Addition, subtraction, multiplication, and division are rendered by `worksheet.js`. Pictures difficulty uses the counting-object sheet with drawings from `pictures.js` (fruit, toys, pencils/pens/erasers). `worksheetFields(problem)` lists every fillable working line.
-6. The keypad writes `current.fills[current.active]`. Multi-step worksheets use `worksheetSections` and **Next** until the last section, then **Submit**. Multiplication slots are one digit (or carry) and stay in the current section. Each partial row is the full product of the top number times that bottom digit, with the carry added into the next place (`26 × 2` → `52`). Carry rows stack above the top factor, newest on top, and the final sum also has carry boxes. Shifted rows do not write placeholder zeros. Division shows one quotient digit per section. A miss stays on the problem so they can fix it; that problem still scores 0.
+5. Addition, subtraction, multiplication, and division are rendered by `worksheet.js`. Easy renders a flat equation. Pictures difficulty uses the counting-object sheet with drawings from `pictures.js` (fruit, toys, pencils/pens/erasers). `worksheetFields(problem)` lists every fillable working line.
+6. The keypad writes `current.fills[current.active]`. Multi-step worksheets use `worksheetSections` and **Next** until the last section, then **Submit**. Multiplication slots are one digit (or carry) and stay in the current section. Each partial row is the full product of the top number times that bottom digit, with the carry added into the next place (`26 × 2` → `52`). Carry rows stack above the top factor, newest on top, and the final sum also has carry boxes. Vertical addition and subtraction fill from the ones place toward the left and include a carry or borrow box when that column needs one. Every carry is two type sizes smaller than a working digit and cursive. Shifted rows do not write placeholder zeros. Division shows one quotient digit per section. A miss stays on the problem so they can fix it; that problem still scores 0.
 7. Quiz rounds paint a bottom star tray with `progressStars(correct, limit)` so a star animates in at each 20% correct. Unlimited rounds use `unlimitedStars(attempts)` for each all-correct set of 10 from the first problem, then `X ★` after 7 icons.
 8. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves. Results Correct is `formatCorrectCount(correct, answered)` (`10 / 11`). Accuracy uses the same pair.
 9. `holdScreenAwake` requests a screen Wake Lock while the page is visible and re-acquires it after a hide or `pageshow`, so the device does not sleep during practice.
@@ -43,11 +43,12 @@ icon-512.png
 
 ## Problem rules
 
-- Subtraction answers are never negative.
-- Division is exact. Easy uses a one-digit divisor (2–9). Medium is a 3–5 digit dividend by 3–9. Hard is a 4–7 digit dividend by a two-digit divisor.
-- Multiplication puts the larger factor on top.
-- Medium multiplication is 2–3 digits by 3–9. Hard is 3–5 digits by 2–3 digits. Easy stays in small whole numbers.
-- Addition, subtraction, multiplication, and division never use 0 or 1 as an operand.
+- Subtraction answers are never negative, and subtraction is never `X − X`, `X − 1`, or `X − 0`.
+- Division is exact and never `X ÷ X`. Easy is a flat `[10–99] ÷ [2–9]` equation and also skips a dividend made only of the divisor digit (`22 ÷ 2`). Medium is a 3–5 digit dividend by 3–9. Hard is a 4–7 digit dividend by a two-digit divisor.
+- Multiplication puts the larger factor on top. Easy and picture multiplication are `[2–9] × [2–9]`.
+- Medium multiplication is 2–3 digits by 3–9. Hard is 3–5 digits by 2–3 digits.
+- Easy problems are one flat equation. Medium and hard addition and subtraction are vertical, filled from right to left, with a cursive carry or borrow box two type sizes smaller whenever a column needs one.
+- Addition never uses `+ 0` or `+ 1`. No operation uses 0 or 1 as an operand.
 
 Keep generation in `problems.js` so `test-problems.mjs` can import it without the DOM.
 

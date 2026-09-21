@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import {
   fieldsMatch,
   fieldsReady,
@@ -141,7 +142,7 @@ assert(
   "tens of 11 × 29 is 22 shifted left, not 220",
 );
 
-const nineByThirteen = worksheetFields({ a: 9, b: 13, op: "mul", answer: 117, difficulty: "easy" });
+const nineByThirteen = worksheetFields({ a: 9, b: 13, op: "mul", answer: 117, difficulty: "hard" });
 assert(
   nineByThirteen.map((field) => `${field.kind}:${field.answer}`).join(",") ===
     "digit:7,digit:2,digit:9,digit:7,digit:1,carry:1,digit:1",
@@ -245,7 +246,7 @@ assert(
   "39 × 2 carry stays above the 3 of 39, not shifted with the result",
 );
 
-const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
+const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "medium" });
 assert(oneMul.map((field) => field.answer).join(",") === "8,4", "12 × 4 ones then tens");
 assert(oneMul.every((field) => field.unit === "cell"), "mul slots are single digits");
 
@@ -253,10 +254,54 @@ const pic = worksheetFields({ a: 2, b: 3, op: "mul", answer: 6, difficulty: "pic
 assert(pic.length === 1 && pic[0].answer === 6, "pictures stay one blank");
 
 const addLine = worksheetFields({ a: 12, b: 42, op: "add", answer: 54, difficulty: "easy" });
-assert(addLine.length === 1 && addLine[0].answer === 54, "addition total");
+assert(addLine.length === 1 && addLine[0].answer === 54, "easy addition is one flat answer");
 
 const subLine = worksheetFields({ a: 42, b: 17, op: "sub", answer: 25, difficulty: "easy" });
-assert(subLine.length === 1 && subLine[0].answer === 25, "subtraction total");
+assert(subLine.length === 1 && subLine[0].answer === 25, "easy subtraction is one flat answer");
+
+const easyMulBlank = worksheetFields({ a: 5, b: 3, op: "mul", answer: 15, difficulty: "easy" });
+assert(easyMulBlank.length === 1 && easyMulBlank[0].answer === 15, "easy multiplication is one flat answer");
+
+const addCarryFields = worksheetFields({ a: 25, b: 17, op: "add", answer: 42, difficulty: "medium" });
+assert(
+  addCarryFields.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:2,carry:1,digit:4",
+  "25 + 17 writes the ones, then the carry, then the tens",
+);
+assert(
+  addCarryFields.filter((field) => field.kind === "digit").map((field) => field.col).join(",") === "1,0",
+  "addition digits go from right to left",
+);
+
+const addPlain = worksheetFields({ a: 12, b: 42, op: "add", answer: 54, difficulty: "medium" });
+assert(
+  addPlain.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:4,digit:5",
+  "12 + 42 has no carry and still fills ones then tens",
+);
+
+const addWideFields = worksheetFields({ a: 99, b: 3, op: "add", answer: 102, difficulty: "hard" });
+assert(
+  addWideFields.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:2,carry:1,digit:0,carry:1,digit:1",
+  "99 + 3 carries into the tens and the hundreds",
+);
+
+const subBorrowFields = worksheetFields({ a: 42, b: 17, op: "sub", answer: 25, difficulty: "medium" });
+assert(
+  subBorrowFields.map((field) => `${field.kind}:${field.answer}`).join(",") === "carry:1,digit:5,digit:2",
+  "42 − 17 marks the borrow, then the ones, then the tens",
+);
+assert(
+  subBorrowFields.filter((field) => field.kind === "digit").map((field) => field.col).join(",") === "1,0",
+  "subtraction digits go from right to left",
+);
+
+const subPlain = worksheetFields({ a: 42, b: 12, op: "sub", answer: 30, difficulty: "hard" });
+assert(subPlain.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:0,digit:3", "42 − 12 fills ones then tens");
+
+const wideBorrow = worksheetFields({ a: 200, b: 17, op: "sub", answer: 183, difficulty: "hard" });
+assert(
+  wideBorrow.map((field) => `${field.kind}:${field.answer}:${field.col}`).join(",") === "carry:1:2,digit:3:2,carry:1:1,digit:8:1,digit:1:0",
+  "200 − 17 borrows from right to left",
+);
 
 const divLines = worksheetFields({ a: 13032, b: 24, op: "div", answer: 543, difficulty: "hard" });
 assert(
@@ -267,8 +312,11 @@ assert(
 assert(divLines.every((field) => field.unit === "cell"), "div slots are single digits");
 assert(divLines.some((field) => field.kind === "bring"), "bring-down is its own box");
 
-const shortDiv = worksheetFields({ a: 20, b: 5, op: "div", answer: 4, difficulty: "easy" });
+const shortDiv = worksheetFields({ a: 20, b: 5, op: "div", answer: 4, difficulty: "medium" });
 assert(shortDiv.map((field) => field.answer).join(",") === "4,2,0,0", "20 ÷ 5 fills quotient, product, remainder");
+
+const easyDiv = worksheetFields({ a: 15, b: 3, op: "div", answer: 5, difficulty: "easy" });
+assert(easyDiv.length === 1 && easyDiv[0].answer === 5, "easy division is one flat answer");
 
 const twoTwentyFields = worksheetFields({ a: 220, b: 20, op: "div", answer: 11, difficulty: "hard" });
 assert(
@@ -298,7 +346,9 @@ assert(divSteps[0].filter((index) => divLines[index].line === "quotient").length
 const mulSteps = worksheetSections(fourteen);
 assert(mulSteps.length === 3, "14 × 14 is ones, tens, then total");
 assert(worksheetSections(oneMul).length === 1, "single-digit mul is one section");
-assert(worksheetSections(addLine).length === 1, "addition is one section");
+assert(worksheetSections(addLine).length === 1, "easy addition is one section");
+assert(worksheetSections(addCarryFields).length === 1, "vertical addition stays one right-to-left section");
+assert(worksheetSections(subBorrowFields).length === 1, "vertical subtraction stays one right-to-left section");
 
 const fourteenFills = fourteen.map((field) => String(field.answer));
 assert(fieldsReady(fourteenFills), "all mul cells filled");
@@ -322,5 +372,9 @@ assert(
   bigDiv.filter((field) => field.line === "quotient").length === 5,
   "7-digit ÷ 2-digit keeps a long-division quotient",
 );
+
+const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+assert(css.includes('font-family: "Caveat", "Segoe Script", "Apple Chancery", cursive'), "carry digits are cursive");
+assert(css.includes("calc(var(--sheet-digit) / 1.5625)"), "carry digits are two sizes smaller");
 
 console.log("worksheet checks passed");

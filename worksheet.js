@@ -1,4 +1,4 @@
-import { parseAnswer } from "./problems.js";
+import { SYMBOLS, parseAnswer } from "./problems.js";
 import { pickPicture, pictureSvg } from "./pictures.js";
 
 function digitList(value) {
@@ -6,7 +6,7 @@ function digitList(value) {
 }
 
 export function worksheetFields(problem) {
-  if (problem.difficulty === "pictures") {
+  if (problem.difficulty === "pictures" || problem.difficulty === "easy") {
     return [{ id: "total", answer: problem.answer }];
   }
   if (problem.op === "mul") {
@@ -16,10 +16,10 @@ export function worksheetFields(problem) {
     return planDivision(problem.a, problem.b).slots;
   }
   if (problem.op === "add") {
-    return [{ id: "total", answer: problem.a + problem.b }];
+    return planAddition(problem.a, problem.b).slots;
   }
   if (problem.op === "sub") {
-    return [{ id: "total", answer: problem.a - problem.b }];
+    return planSubtraction(problem.a, problem.b).slots;
   }
   return [{ id: "total", answer: problem.answer }];
 }
@@ -266,11 +266,6 @@ function rule(cols) {
   line.className = "sheet-rule";
   line.style.setProperty("--cols", String(cols));
   return line;
-}
-
-function typedCells(value, cols) {
-  if (!value || value === "-" || value === "−") return padLeft([], cols);
-  return padLeft(digitList(value.replace("-", "−")), cols);
 }
 
 function emptyCols(cols) {
@@ -563,6 +558,8 @@ export function planAddition(a, b) {
     carry = Math.floor(n / 10);
     if (i > 0 && carry) carries[i - 1] = String(carry);
   }
+  const slots = [];
+  appendAdditionSlots(slots, [a, b], cols, "total");
   return {
     cols,
     top,
@@ -570,6 +567,7 @@ export function planAddition(a, b) {
     carries,
     total,
     totalCells: padLeft(digitList(total), cols),
+    slots,
   };
 }
 
@@ -591,7 +589,7 @@ export function planSubtraction(a, b) {
       borrow = 0;
     }
   }
-  return {
+  const plan = {
     cols,
     top,
     bottom,
@@ -599,24 +597,61 @@ export function planSubtraction(a, b) {
     total,
     totalCells: padLeft(digitList(total), cols),
   };
+  plan.slots = subtractionSlots(plan);
+  return plan;
 }
 
-function renderColumnSheet(problem, plan, { fills = [], active = 0, reveal = false, op, symbol }) {
+function subtractionSlots(plan) {
+  const slots = [];
+  for (let col = plan.cols - 1; col >= 0; col -= 1) {
+    if (plan.carries[col]) {
+      pushSlot(slots, {
+        id: `total-c${col}`,
+        kind: "carry",
+        line: "total",
+        step: 0,
+        col,
+        answer: Number(plan.carries[col]),
+      });
+    }
+    const digit = plan.totalCells[col];
+    if (digit !== "" && digit != null) {
+      pushSlot(slots, {
+        id: `total-d${col}`,
+        kind: "digit",
+        line: "total",
+        step: 0,
+        col,
+        answer: Number(digit),
+      });
+    }
+  }
+  return slots;
+}
+
+function renderColumnSheet(problem, plan, { fills = [], active = 0, reveal = false, section = Infinity, op, symbol }) {
   const root = document.createElement("div");
   root.className = "sheet";
   root.dataset.op = op;
-  if (reveal) root.append(row(plan.cols, plan.carries, { className: "is-carry" }));
+  const maxSection = reveal ? Infinity : section;
+  appendCarryLine(root, plan.cols, plan.slots, {
+    line: "total",
+    fills,
+    active,
+    reveal,
+    section: maxSection,
+  });
   root.append(row(plan.cols, plan.top));
   root.append(row(plan.cols, plan.bottom, { op: symbol }));
   root.append(rule(plan.cols));
-  root.append(
-    row(plan.cols, reveal ? plan.totalCells : typedCells(fills[0], plan.cols), {
-      className: "is-total",
-      slot: 0,
-      active: active === 0,
-      reveal,
-    }),
-  );
+  appendDigitLine(root, plan.cols, plan.slots, {
+    line: "total",
+    className: "is-total",
+    fills,
+    active,
+    reveal,
+    section: maxSection,
+  });
   return root;
 }
 
@@ -658,6 +693,9 @@ export function renderPictureSheet(problem, { fills = [], active = 0, reveal = f
   const root = document.createElement("div");
   root.className = "sheet sheet-pic";
   root.dataset.op = problem.op;
+  const pictured = problem.op === "mul" ? problem.a * problem.b : problem.op === "add" ? problem.a + problem.b : problem.a;
+  if (pictured > 36) root.dataset.picDensity = "tight";
+  else if (pictured > 16) root.dataset.picDensity = "compact";
   const picture = pickPicture(problem.key);
   const symbol = { add: "+", sub: "−", mul: "×", div: "÷" }[problem.op];
 
@@ -711,8 +749,34 @@ export function renderPictureSheet(problem, { fills = [], active = 0, reveal = f
   return root;
 }
 
+function renderInlineProblem(problem, { fills = [], active = 0, reveal = false } = {}) {
+  const root = document.createElement("div");
+  root.className = "problem-inline";
+  const symbol = SYMBOLS[problem.op] ?? "";
+  const width = String(Math.abs(problem.answer)).length;
+  const typed = fills[0] ?? "";
+  const blank = document.createElement("span");
+  blank.className = "inline-blank";
+  blank.style.minWidth = `${Math.max(width, 1)}ch`;
+  if (reveal) {
+    blank.textContent = String(problem.answer);
+  } else if (typed && typed !== "-" && typed !== "−") {
+    blank.textContent = typed;
+  } else {
+    blank.textContent = "_".repeat(Math.max(width, 1));
+    blank.classList.add("is-placeholder");
+  }
+  markFill(blank, { slot: 0, active: active === 0, reveal, label: "Fill the answer" });
+  root.append(
+    document.createTextNode(`${problem.a} ${symbol} ${problem.b} = `),
+    blank,
+  );
+  return root;
+}
+
 export function renderProblemView(problem, options = {}) {
   if (problem.difficulty === "pictures") return renderPictureSheet(problem, options);
+  if (problem.difficulty === "easy") return renderInlineProblem(problem, options);
   if (problem.op === "mul") return renderMultiplicationSheet(problem, options);
   if (problem.op === "div") return renderDivisionSheet(problem, options);
   if (problem.op === "add") return renderAdditionSheet(problem, options);
