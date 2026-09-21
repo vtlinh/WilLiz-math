@@ -70,8 +70,14 @@ assert(app.includes("function isLeaveOpen"), "leave dialog open state is shared"
 assert(app.includes("function leavePractice"), "practice back has a leave path");
 assert(!app.includes('finishRound({ to: "setup" })'), "practice back shows results, not home");
 const leaveFn = app.slice(app.indexOf("function requestLeaveSession"), app.indexOf("function leavePractice"));
-assert(leaveFn.includes("setLeaveOpen(true)"), "play back always opens a confirm dialog");
+assert(leaveFn.includes("setLeaveOpen(true)"), "a started round still asks before leaving");
+assert(leaveFn.includes("roundHasWork()"), "an untouched round skips the leave dialog");
 assert(!leaveFn.includes("finishRound"), "play back does not skip the confirm dialog");
+assert(html.includes(">Start</button>"), "the home action is Start");
+assert(!html.includes("Start practicing"), "Start practicing is renamed");
+assert(!html.includes("Play again"), "results no longer say Play again");
+assert(!html.includes("Change setup"), "results no longer offer Change setup");
+assert(html.includes('id="again-btn" class="primary">Start</button>'), "results use one Start button");
 assert(html.includes('data-mode="sprint10"'), "10 minute sprint mode");
 assert(html.includes('data-mode="sprint30"'), "30 minute sprint mode");
 assert(!html.includes("60s sprint"), "60s sprint is gone");

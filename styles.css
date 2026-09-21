@@ -749,7 +749,7 @@ legend {
 
 .result-actions {
   margin-top: 16px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 
 .star-row {
@@ -990,8 +990,7 @@ body.celebrate-static .results-headline {
 
   .chip-row,
   .mode-grid,
-  .stats,
-  .result-actions {
+  .stats {
     grid-template-columns: 1fr 1fr;
     gap: 6px;
   }

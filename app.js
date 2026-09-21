@@ -36,7 +36,6 @@ const els = {
   statTime: document.getElementById("stat-time"),
   statBest: document.getElementById("stat-best"),
   againBtn: document.getElementById("again-btn"),
-  setupBtn: document.getElementById("setup-btn"),
   mixSummary: document.getElementById("mix-summary"),
   settings: document.getElementById("settings-screen"),
   settingsBtn: document.getElementById("settings-btn"),
@@ -279,6 +278,12 @@ function handleHistoryPop() {
   }
   const next = history.state?.screen === "play" && !round ? "setup" : history.state?.screen || "setup";
   if (screen === "play" && round && next !== "play") {
+    if (!roundHasWork()) {
+      clearUnstartedRound();
+      paintScreen(next);
+      if (screen === "setup") lockHomeHistory();
+      return;
+    }
     showScreen("play");
     requestLeaveSession();
     return;
@@ -577,8 +582,25 @@ function bestKey() {
   return `${learner}|${mode}|${difficulty}|${ops.slice().sort().join(",")}`;
 }
 
+function roundHasWork() {
+  return (round?.answered || 0) > 0;
+}
+
+function clearUnstartedRound() {
+  clearTimer();
+  stopCelebration();
+  round = null;
+  current = null;
+}
+
 function requestLeaveSession() {
   if (screen !== "play" || !round) return;
+  if (!roundHasWork()) {
+    clearUnstartedRound();
+    if (history.state?.screen === "play") history.back();
+    else showScreen("setup");
+    return;
+  }
   setLeaveOpen(true);
 }
 
@@ -772,10 +794,9 @@ els.input.addEventListener("beforeinput", (event) => {
   event.preventDefault();
 });
 els.form.addEventListener("submit", submitAnswer);
-els.againBtn.addEventListener("click", startRound);
-els.setupBtn.addEventListener("click", () => {
+els.againBtn.addEventListener("click", () => {
   stopCelebration();
-  setSettingsOpen(true);
+  startRound();
 });
 els.problem.addEventListener("click", (event) => {
   const slot = event.target.closest("[data-slot]");
