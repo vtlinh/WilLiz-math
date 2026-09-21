@@ -53,7 +53,9 @@ assert(!popHandler.includes("setTimeout"), "home does not stack extra trap entri
 assert(!app.includes("function armHomeHistory"), "home does not stack multiple trap entries");
 assert(!app.includes("#home-"), "home trap hashes stay stable");
 assert(css.includes(".icon-btn.is-hidden"), "home hides the session back control");
-assert(css.includes("#difficulty-row"), "difficulty row can wrap so Challenge is not clipped");
+assert(css.includes("#difficulty-row"), "difficulty row can wrap so Hard is not clipped");
+assert(!html.includes('data-difficulty="challenge"'), "challenge difficulty is gone");
+assert(html.includes('data-difficulty="medium"'), "medium difficulty remains");
 assert(!css.includes("repeat(5, minmax(0, 1fr))"), "difficulty is not forced into five clipped columns");
 assert(app.includes("function isLeaveOpen"), "leave dialog open state is shared");
 assert(app.includes("function leavePractice"), "practice back has a leave path");

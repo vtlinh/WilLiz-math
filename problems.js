@@ -9,7 +9,7 @@ function pick(list) {
 }
 
 function digitsMin(count) {
-  return count <= 1 ? 1 : 10 ** (count - 1);
+  return count <= 1 ? 2 : 10 ** (count - 1);
 }
 
 function digitsMax(count) {
@@ -22,7 +22,7 @@ function randDigits(minDigits, maxDigits) {
 }
 
 function exactDividend(divisor, minDigits, maxDigits) {
-  const minQ = Math.ceil(digitsMin(minDigits) / divisor);
+  const minQ = Math.max(2, Math.ceil(digitsMin(minDigits) / divisor));
   const maxQ = Math.floor(digitsMax(maxDigits) / divisor);
   return randInt(minQ, maxQ);
 }
@@ -34,6 +34,12 @@ export function numericDifficulty(difficulty) {
 export function playOps(ops, difficulty) {
   const list = Array.isArray(ops) ? ops : [];
   return difficulty === "pictures" ? list.filter((op) => op !== "div") : [...list];
+}
+
+export function operandsAllowed(op, a, b) {
+  if (a < 2 || b < 2) return false;
+  if (op === "div" && (b === 0 || b === 1)) return false;
+  return true;
 }
 
 export function generateProblem(ops, difficulty, previousKey = "") {
@@ -51,57 +57,55 @@ export function generateProblem(ops, difficulty, previousKey = "") {
 
   const make = () => {
     if (chosen === "add") {
-      const max = pictures ? 8 : { easy: 10, medium: 50, hard: 99, challenge: 999 }[level];
-      const min = pictures ? 1 : { easy: 1, medium: 6, hard: 12, challenge: 80 }[level];
+      const max = pictures ? 8 : { easy: 10, medium: 99, hard: 999 }[level];
+      const min = pictures ? 2 : { easy: 2, medium: 12, hard: 80 }[level];
       a = randInt(min, max);
       b = randInt(min, max);
       answer = a + b;
     } else if (chosen === "sub") {
-      const max = pictures ? 8 : { easy: 10, medium: 50, hard: 99, challenge: 999 }[level];
-      a = randInt(pictures || level === "easy" ? 2 : 8, max);
-      b = randInt(1, a);
+      const max = pictures ? 8 : { easy: 10, medium: 99, hard: 999 }[level];
+      a = randInt(pictures || level === "easy" ? 4 : 8, max);
+      b = randInt(2, a);
       answer = a - b;
     } else if (chosen === "mul") {
       if (pictures) {
-        a = randInt(1, 4);
-        b = randInt(1, 4);
-      } else if (level === "hard") {
+        a = randInt(2, 4);
+        b = randInt(2, 4);
+      } else if (level === "medium") {
         a = randDigits(2, 3);
         b = randInt(3, 9);
-      } else if (level === "challenge") {
+      } else if (level === "hard") {
         a = randDigits(3, 5);
         b = randDigits(2, 3);
       } else {
-        const max = { easy: 5, medium: 12 }[level];
-        a = randInt(1, max);
-        b = randInt(1, max);
+        a = randInt(2, 5);
+        b = randInt(2, 5);
       }
       if (b > a) [a, b] = [b, a];
       answer = a * b;
     } else if (pictures) {
       b = randInt(2, 4);
-      answer = randInt(1, 4);
+      answer = randInt(2, 4);
       a = b * answer;
-    } else if (level === "hard") {
+    } else if (level === "medium") {
       b = randInt(3, 9);
       answer = exactDividend(b, 3, 5);
       a = b * answer;
-    } else if (level === "challenge") {
+    } else if (level === "hard") {
       b = randInt(10, 99);
       answer = exactDividend(b, 4, 7);
       a = b * answer;
     } else {
-      const max = { easy: 5, medium: 12 }[level];
-      b = randInt(2, Math.min(max, 9));
-      answer = randInt(1, max);
+      b = randInt(2, 5);
+      answer = randInt(2, 5);
       a = b * answer;
     }
   };
 
-  for (let i = 0; i < 8; i += 1) {
+  for (let i = 0; i < 16; i += 1) {
     make();
     const key = `${a}${chosen}${b}`;
-    if (key !== previousKey) break;
+    if (operandsAllowed(chosen, a, b) && key !== previousKey) break;
   }
 
   return {

@@ -1,4 +1,4 @@
-export const CELEBRATE_DIFFICULTIES = ["pictures", "hard", "challenge"];
+export const CELEBRATE_DIFFICULTIES = ["pictures", "medium", "hard"];
 
 export function shouldCelebrate({ answered = 0, correct = 0, difficulty = "" } = {}) {
   return answered > 0 && correct === answered && CELEBRATE_DIFFICULTIES.includes(difficulty);

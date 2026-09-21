@@ -65,11 +65,15 @@ let awaitingAdvance = false;
 let screen = "setup";
 
 function loadStore() {
+  let raw = null;
   try {
-    return normalizeStore(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+    raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
   } catch {
-    return normalizeStore(null);
+    raw = null;
   }
+  const store = normalizeStore(raw);
+  if ((Number(raw?.storeVersion) || 1) < 2) saveStore(store);
+  return store;
 }
 
 function saveStore(next) {

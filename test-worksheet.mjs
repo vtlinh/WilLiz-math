@@ -134,7 +134,7 @@ assert(
   "14 × 14 ones is 56, then 14 shifted, then 196",
 );
 
-const eleven = worksheetFields({ a: 11, b: 29, op: "mul", answer: 319, difficulty: "challenge" });
+const eleven = worksheetFields({ a: 11, b: 29, op: "mul", answer: 319, difficulty: "hard" });
 assert(eleven.map((field) => field.answer).join(",") === "9,9,2,2,9,1,1,3", "11 × 29 is 99, then 22 shifted, then 319 with a sum carry");
 assert(
   eleven.filter((field) => field.line === "partial-1").map((field) => field.answer).join(",") === "2,2",
@@ -194,7 +194,7 @@ assert(
   "24 × 8 result digits are 2, 9, 1",
 );
 
-const seventeenByTwentyNine = worksheetFields({ a: 17, b: 29, op: "mul", answer: 493, difficulty: "challenge" });
+const seventeenByTwentyNine = worksheetFields({ a: 17, b: 29, op: "mul", answer: 493, difficulty: "hard" });
 const seventeenOnes = seventeenByTwentyNine.filter((field) => field.line === "partial-0");
 assert(
   seventeenOnes.map((field) => `${field.kind}:${field.answer}`).join(",") === "digit:3,carry:6,digit:5,digit:1",
@@ -205,7 +205,7 @@ assert(seventeenOnes.find((field) => field.kind === "carry")?.answer === 6, "ten
 assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 1)?.answer === 5, "10 × 9 plus carry 6 is 5");
 assert(seventeenOnes.find((field) => field.kind === "digit" && field.answer === 1)?.col === 0, "hundreds of 153");
 
-const challengeLong = worksheetFields({ a: 324, b: 187, op: "mul", answer: 60588, difficulty: "challenge" });
+const challengeLong = worksheetFields({ a: 324, b: 187, op: "mul", answer: 60588, difficulty: "hard" });
 const challengeOnes = challengeLong.filter((field) => field.line === "partial-0");
 assert(
   challengeOnes
@@ -238,7 +238,7 @@ assert(
   "summation carries sit above the earlier carry rows",
 );
 
-const shiftedCarry = worksheetFields({ a: 39, b: 26, op: "mul", answer: 1014, difficulty: "challenge" });
+const shiftedCarry = worksheetFields({ a: 39, b: 26, op: "mul", answer: 1014, difficulty: "hard" });
 const topThreeCol = planMultiplication(39, 26).top.indexOf("3");
 assert(
   shiftedCarry.find((field) => field.line === "partial-1" && field.kind === "carry")?.col === topThreeCol,
@@ -270,7 +270,7 @@ assert(divLines.some((field) => field.kind === "bring"), "bring-down is its own 
 const shortDiv = worksheetFields({ a: 20, b: 5, op: "div", answer: 4, difficulty: "easy" });
 assert(shortDiv.map((field) => field.answer).join(",") === "4,2,0,0", "20 ÷ 5 fills quotient, product, remainder");
 
-const twoTwentyFields = worksheetFields({ a: 220, b: 20, op: "div", answer: 11, difficulty: "challenge" });
+const twoTwentyFields = worksheetFields({ a: 220, b: 20, op: "div", answer: 11, difficulty: "hard" });
 assert(
   twoTwentyFields.map((field) => field.answer).join(",") === "1,2,0,2,0,1,2,0,0",
   "220 ÷ 20 fills 11, then 20 / 2↓0, then 20 / 0",
@@ -313,11 +313,11 @@ const wrongQuotient = [...divFills];
 wrongQuotient[0] = "9";
 assert(!fieldsMatch(wrongQuotient, divLines), "quotient only is not enough");
 
-const hardMulSheet = worksheetFields({ a: 256, b: 7, op: "mul", answer: 1792, difficulty: "hard" });
-assert(hardMulSheet.length > 1, "hard 3-digit × 1-digit has working slots");
-const challengeMulSheet = worksheetFields({ a: 12345, b: 67, op: "mul", answer: 827115, difficulty: "challenge" });
-assert(challengeMulSheet.length > 1, "challenge 5-digit × 2-digit has working slots");
-const bigDiv = worksheetFields({ a: 1000000, b: 16, op: "div", answer: 62500, difficulty: "challenge" });
+const hardMulSheet = worksheetFields({ a: 256, b: 7, op: "mul", answer: 1792, difficulty: "medium" });
+assert(hardMulSheet.length > 1, "medium 3-digit × 1-digit has working slots");
+const challengeMulSheet = worksheetFields({ a: 12345, b: 67, op: "mul", answer: 827115, difficulty: "hard" });
+assert(challengeMulSheet.length > 1, "hard 5-digit × 2-digit has working slots");
+const bigDiv = worksheetFields({ a: 1000000, b: 16, op: "div", answer: 62500, difficulty: "hard" });
 assert(
   bigDiv.filter((field) => field.line === "quotient").length === 5,
   "7-digit ÷ 2-digit keeps a long-division quotient",
