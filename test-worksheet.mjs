@@ -1,6 +1,7 @@
 import {
   fieldsMatch,
   fieldsReady,
+  multiplicationCarryStack,
   planAddition,
   planDivision,
   planMultiplication,
@@ -93,19 +94,27 @@ assert(subWide.cols === 3, "keep three columns");
 const mulLines = worksheetFields({ a: 124, b: 26, op: "mul", answer: 3224, difficulty: "hard" });
 assert(
   mulLines.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:4,carry:2,digit:4,carry:1,digit:7,digit:8,digit:4,digit:2,digit:4,digit:2,digit:2,digit:3",
-  "124 × 26 writes each full partial: 744 and 248, then 3224",
+    "digit:4,carry:2,digit:4,carry:1,digit:7,digit:8,digit:4,digit:2,digit:4,digit:2,carry:1,digit:2,carry:1,digit:3",
+  "124 × 26 writes each full partial: 744 and 248, then 3224 with sum carries",
 );
 assert(mulLines.some((field) => field.line === "partial-0"), "ones partial");
 assert(mulLines.some((field) => field.line === "partial-1"), "tens partial");
 assert(mulLines.some((field) => field.line === "total"), "product total");
 assert(
-  mulLines.filter((field) => field.line === "total").every((field) => field.kind === "digit"),
-  "final product has no carry boxes",
+  mulLines.some((field) => field.line === "total" && field.kind === "carry"),
+  "final sum keeps carry boxes",
 );
 assert(
   mulLines.some((field) => field.line.startsWith("partial-") && field.kind === "carry"),
   "partials still keep carry boxes",
+);
+assert(
+  multiplicationCarryStack(mulLines, 0).join(",") === "partial-0",
+  "first carries sit above the top number",
+);
+assert(
+  multiplicationCarryStack(mulLines).join(",") === "total,partial-0",
+  "later carries stack above the first carry row",
 );
 assert(
   mulLines.filter((field) => field.line === "partial-1" && field.kind === "digit").every((field) => field.col < 3),
@@ -126,7 +135,7 @@ assert(
 );
 
 const eleven = worksheetFields({ a: 11, b: 29, op: "mul", answer: 319, difficulty: "challenge" });
-assert(eleven.map((field) => field.answer).join(",") === "9,9,2,2,9,1,3", "11 × 29 is 99, then 22 shifted, then 319");
+assert(eleven.map((field) => field.answer).join(",") === "9,9,2,2,9,1,1,3", "11 × 29 is 99, then 22 shifted, then 319 with a sum carry");
 assert(
   eleven.filter((field) => field.line === "partial-1").map((field) => field.answer).join(",") === "2,2",
   "tens of 11 × 29 is 22 shifted left, not 220",
@@ -135,8 +144,8 @@ assert(
 const nineByThirteen = worksheetFields({ a: 9, b: 13, op: "mul", answer: 117, difficulty: "easy" });
 assert(
   nineByThirteen.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:7,digit:2,digit:9,digit:7,digit:1,digit:1",
-  "9 × 13 is the full 27, then 9 shifted, then 117",
+    "digit:7,digit:2,digit:9,digit:7,digit:1,carry:1,digit:1",
+  "9 × 13 is the full 27, then 9 shifted, then 117 with a sum carry",
 );
 const onesPartial = nineByThirteen.filter((field) => field.line === "partial-0");
 assert(
@@ -157,8 +166,8 @@ assert(
 const twentySix = worksheetFields({ a: 26, b: 12, op: "mul", answer: 312, difficulty: "medium" });
 assert(
   twentySix.map((field) => `${field.kind}:${field.answer}`).join(",") ===
-    "digit:2,carry:1,digit:5,digit:6,digit:2,digit:2,digit:1,digit:3",
-  "26 × 12 ones is the full 52",
+    "digit:2,carry:1,digit:5,digit:6,digit:2,digit:2,digit:1,carry:1,digit:3",
+  "26 × 12 ones is the full 52, then 26 shifted, then 312 with a sum carry",
 );
 const twentySixOnes = twentySix.filter((field) => field.line === "partial-0");
 assert(
@@ -195,6 +204,46 @@ assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 2)?
 assert(seventeenOnes.find((field) => field.kind === "carry")?.answer === 6, "tens of 63 stay a carry");
 assert(seventeenOnes.find((field) => field.kind === "digit" && field.col === 1)?.answer === 5, "10 × 9 plus carry 6 is 5");
 assert(seventeenOnes.find((field) => field.kind === "digit" && field.answer === 1)?.col === 0, "hundreds of 153");
+
+const challengeLong = worksheetFields({ a: 324, b: 187, op: "mul", answer: 60588, difficulty: "challenge" });
+const challengeOnes = challengeLong.filter((field) => field.line === "partial-0");
+assert(
+  challengeOnes
+    .filter((field) => field.kind === "digit")
+    .sort((left, right) => left.col - right.col)
+    .map((field) => field.answer)
+    .join("") === "2268",
+  "324 × 7 is the full 2268",
+);
+assert(
+  challengeLong
+    .filter((field) => field.line === "partial-1" && field.kind === "digit")
+    .every((field) => field.col < 4),
+  "324 × 8 is 2592 shifted left, no trailing zero",
+);
+assert(
+  challengeLong.some((field) => field.line === "total" && field.kind === "carry"),
+  "324 × 187 summation has carries",
+);
+assert(
+  multiplicationCarryStack(challengeLong, 0).join(",") === "partial-0",
+  "324 × 7 carries sit above the top number",
+);
+assert(
+  multiplicationCarryStack(challengeLong, 1).join(",") === "partial-1,partial-0",
+  "324 × 8 carries stack above the first carry row",
+);
+assert(
+  multiplicationCarryStack(challengeLong).join(",") === "total,partial-1,partial-0",
+  "summation carries sit above the earlier carry rows",
+);
+
+const shiftedCarry = worksheetFields({ a: 39, b: 26, op: "mul", answer: 1014, difficulty: "challenge" });
+const topThreeCol = planMultiplication(39, 26).top.indexOf("3");
+assert(
+  shiftedCarry.find((field) => field.line === "partial-1" && field.kind === "carry")?.col === topThreeCol,
+  "39 × 2 carry stays above the 3 of 39, not shifted with the result",
+);
 
 const oneMul = worksheetFields({ a: 12, b: 4, op: "mul", answer: 48, difficulty: "easy" });
 assert(oneMul.map((field) => field.answer).join(",") === "8,4", "12 × 4 ones then tens");

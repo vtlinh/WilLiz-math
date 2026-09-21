@@ -473,11 +473,36 @@ legend {
   font-size: clamp(1.2rem, 4vw, 1.7rem);
 }
 
+.sheet-row.is-carry {
+  align-items: center;
+}
+
 .sheet-row.is-carry .sheet-cell {
-  min-height: 1rem;
-  font-size: 0.85rem;
+  min-height: 1.2rem;
+  font-size: clamp(0.95rem, 3.2vw, 1.35rem);
   color: var(--muted);
-  align-items: end;
+}
+
+.sheet-cell.is-carry-digit {
+  width: 1.2em;
+  height: 1.2em;
+  min-width: 1.2em;
+  min-height: 1.2em;
+  justify-self: center;
+  font-size: clamp(0.95rem, 3.2vw, 1.35rem);
+  color: var(--muted);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 42%, transparent);
+  border-radius: 50%;
+}
+
+.sheet-cell.is-carry-digit.is-fill,
+.sheet-row.is-active .sheet-cell.is-carry-digit,
+.sheet-cell.is-carry-digit.is-active {
+  border: 1.5px solid color-mix(in srgb, var(--ink) 42%, transparent);
+}
+
+.sheet-cell.is-carry-digit.is-active {
+  border-color: var(--sage);
 }
 
 .sheet-rule {

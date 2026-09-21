@@ -90,13 +90,14 @@ function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0 }) {
   const { steps, leftover, sourceLen } = timesDigitSteps(a, digit);
   for (let i = 0; i < steps.length; i += 1) {
     const item = steps[i];
-    const col = cols - sourceLen + item.sourceIndex - shift;
+    const resultCol = cols - sourceLen + item.sourceIndex - shift;
+    const carryCol = cols - sourceLen + item.sourceIndex - 1;
     pushSlot(slots, {
       id: `${line}-d${item.sourceIndex}`,
       kind: "digit",
       line,
       step,
-      col,
+      col: resultCol,
       answer: item.write,
     });
     if (item.carryOut && i < steps.length - 1) {
@@ -105,7 +106,7 @@ function appendProductSlots(slots, { a, digit, shift, cols, line, step = 0 }) {
         kind: "carry",
         line,
         step,
-        col: col - 1,
+        col: carryCol,
         answer: item.carryOut,
       });
     }
@@ -211,7 +212,6 @@ function multiplicationSlots(a, b, cols, partials, total) {
       cols,
       "total",
       partials.length,
-      { includeCarries: false },
     );
   } else {
     appendProductSlots(slots, {
@@ -315,14 +315,28 @@ function cellsFromSlots(cols, fields, fills, active, reveal, { section = Infinit
   });
 }
 
-function appendFillLine(root, cols, slots, { line, op = "", className = "", fills, active, reveal, section = Infinity }) {
-  const carries = slots.filter((field) => field.line === line && field.kind === "carry");
-  const digits = slots.filter((field) => field.line === line && field.kind === "digit");
-  if (carries.length) {
-    root.append(
-      row(cols, cellsFromSlots(cols, carries, fills, active, reveal, { section }), { className: "is-carry" }),
-    );
+export function multiplicationCarryStack(slots, section = Infinity) {
+  const lines = [];
+  const seen = new Set();
+  for (const field of slots) {
+    if (field.kind !== "carry" || (field.step ?? 0) > section) continue;
+    if (seen.has(field.line)) continue;
+    seen.add(field.line);
+    lines.push(field.line);
   }
+  return lines.reverse();
+}
+
+function appendCarryLine(root, cols, slots, { line, fills, active, reveal, section = Infinity }) {
+  const carries = slots.filter((field) => field.line === line && field.kind === "carry");
+  if (!carries.length) return;
+  root.append(
+    row(cols, cellsFromSlots(cols, carries, fills, active, reveal, { section }), { className: "is-carry" }),
+  );
+}
+
+function appendDigitLine(root, cols, slots, { line, op = "", className = "", fills, active, reveal, section = Infinity }) {
+  const digits = slots.filter((field) => field.line === line && field.kind === "digit");
   root.append(
     row(cols, cellsFromSlots(cols, digits, fills, active, reveal, { section }), {
       op,
@@ -336,7 +350,17 @@ export function renderMultiplicationSheet(problem, { fills = [], active = 0, rev
   const root = document.createElement("div");
   root.className = "sheet";
   root.dataset.op = "mul";
+  const maxSection = reveal ? Infinity : section;
 
+  for (const line of multiplicationCarryStack(plan.slots, maxSection)) {
+    appendCarryLine(root, plan.cols, plan.slots, {
+      line,
+      fills,
+      active,
+      reveal,
+      section: maxSection,
+    });
+  }
   root.append(row(plan.cols, plan.top));
   root.append(row(plan.cols, plan.mul, { op: "×" }));
   root.append(rule(plan.cols));
@@ -344,7 +368,7 @@ export function renderMultiplicationSheet(problem, { fills = [], active = 0, rev
   if (plan.partials.length > 1) {
     for (const [index, partial] of plan.partials.entries()) {
       if (!reveal && index > section) continue;
-      appendFillLine(root, plan.cols, plan.slots, {
+      appendDigitLine(root, plan.cols, plan.slots, {
         line: `partial-${index}`,
         op: partial.plus ? "+" : "",
         className: "is-partial",
@@ -358,7 +382,7 @@ export function renderMultiplicationSheet(problem, { fills = [], active = 0, rev
   }
 
   if (reveal || plan.partials.length <= 1 || section >= plan.partials.length) {
-    appendFillLine(root, plan.cols, plan.slots, {
+    appendDigitLine(root, plan.cols, plan.slots, {
       line: "total",
       className: "is-total",
       fills,
