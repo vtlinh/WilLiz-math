@@ -809,11 +809,36 @@ async function holdScreenAwake() {
   }
 }
 
+function runningAsInstalledApp() {
+  return (
+    window.matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function hideSystemNavigation() {
+  const phone = window.matchMedia("(pointer: coarse)").matches;
+  const alreadyCovered =
+    window.matchMedia("(display-mode: fullscreen)").matches || document.fullscreenElement;
+  if (!runningAsInstalledApp() || !phone || alreadyCovered) return;
+  const root = document.documentElement;
+  if (!root.requestFullscreen) return;
+  root.requestFullscreen({ navigationUI: "hide" }).catch(() => {
+    // A browser tab, or a phone that blocks fullscreen until the next tap.
+  });
+}
+
 function watchScreenWake() {
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") holdScreenAwake();
+    if (document.visibilityState === "visible") {
+      holdScreenAwake();
+      hideSystemNavigation();
+    }
   });
-  document.addEventListener("pointerdown", holdScreenAwake);
+  document.addEventListener("pointerdown", () => {
+    holdScreenAwake();
+    hideSystemNavigation();
+  });
 }
 
 restoreSettings();
@@ -821,10 +846,12 @@ const launchScreen = location.hash === "#settings" ? "settings" : "setup";
 showScreen(launchScreen, { replace: true });
 watchScreenWake();
 holdScreenAwake();
+hideSystemNavigation();
 window.addEventListener("popstate", handleHistoryPop);
 window.addEventListener("pageshow", () => {
   if (screen === "setup") lockHomeHistory();
   holdScreenAwake();
+  hideSystemNavigation();
 });
 if (window.navigation?.addEventListener) {
   window.navigation.addEventListener("navigate", swallowHomeNavigate, { capture: true });

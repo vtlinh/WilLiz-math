@@ -42,4 +42,5 @@ Addition and subtraction are written as vertical column arithmetic. Multiplicati
 - Unlimited practice and sprint award a star for each all-correct set of 10 problems, counted from the first problem. After 7 stars the tray switches to `X ★`.
 - The same files work locally and at `https://vtlinh.github.io/WilLiz-math/` after Pages is enabled.
 - Chrome can install the site as an app from the address bar or the browser menu.
+- The installed phone app covers the screen and hides the system navigation buttons. A browser tab keeps the browser’s own controls. iOS still shows the home indicator.
 - The screen stays awake while the app is in front so a quiz or sprint does not dim out.

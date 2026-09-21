@@ -39,6 +39,7 @@ icon-512.png
 7. Quiz rounds paint a bottom star tray with `progressStars(correct, limit)` so a star animates in at each 20% correct. Unlimited rounds use `unlimitedStars(attempts)` for each all-correct set of 10 from the first problem, then `X ★` after 7 icons.
 8. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves. Results Correct is `formatCorrectCount(correct, answered)` (`10 / 11`). Accuracy uses the same pair.
 9. `holdScreenAwake` requests a screen Wake Lock while the page is visible and re-acquires it after a hide or `pageshow`, so the device does not sleep during practice.
+10. The install manifest prefers `fullscreen`, then `standalone`. On a phone, `hideSystemNavigation` asks for fullscreen with the system navigation hidden when the installed app is not already covering the screen. A normal browser tab does not.
 
 ## Problem rules
 

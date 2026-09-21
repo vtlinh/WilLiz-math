@@ -56,7 +56,7 @@ If you prefer branch publishing instead of Actions, set **Source** to **Deploy f
 
 ## Install as an app
 
-On Chrome (phone or desktop), open the live site, then use **Install** in the address bar or the browser menu. That adds WilLiz Math as a standalone app.
+On Chrome (phone or desktop), open the live site, then use **Install** in the address bar or the browser menu. That adds WilLiz Math as an app. On a phone the installed app covers the screen and hides the system navigation buttons. A browser tab keeps the browser controls.
 
 ## Agent context
 
