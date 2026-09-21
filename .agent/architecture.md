@@ -38,6 +38,7 @@ icon-512.png
 6. The keypad writes `current.fills[current.active]`. Multi-step worksheets use `worksheetSections` and **Next** until the last section, then **Submit**. Multiplication slots are one digit (or carry) and stay in the current section. Each partial row is the full product of the top number times that bottom digit, with the carry added into the next place (`26 × 2` → `52`). Carry rows stack above the top factor, newest on top, and the final sum also has carry boxes. Shifted rows do not write placeholder zeros. Division shows one quotient digit per section. A miss stays on the problem so they can fix it; that problem still scores 0.
 7. Quiz rounds paint a bottom star tray with `progressStars(correct, limit)` so a star animates in at each 20% correct. Unlimited rounds use `unlimitedStars(attempts)` for each all-correct set of 10 from the first problem, then `X ★` after 7 icons.
 8. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves. Results Correct is `formatCorrectCount(correct, answered)` (`10 / 11`). Accuracy uses the same pair.
+9. `holdScreenAwake` requests a screen Wake Lock while the page is visible and re-acquires it after a hide or `pageshow`, so the device does not sleep during practice.
 
 ## Problem rules
 

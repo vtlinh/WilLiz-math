@@ -330,6 +330,7 @@ function clearTimer() {
 }
 
 function startRound() {
+  holdScreenAwake();
   const ops = playOps(settings.ops, settings.difficulty);
   if (!ops.length) {
     els.setupError.hidden = false;
@@ -787,12 +788,43 @@ els.keypad.addEventListener("click", (event) => {
   pressKey(button.dataset.key);
 });
 
+let screenWake = null;
+
+function screenWakeHeld() {
+  return Boolean(screenWake && !screenWake.released);
+}
+
+async function holdScreenAwake() {
+  if (document.visibilityState !== "visible") return;
+  if (!navigator.wakeLock?.request) return;
+  if (screenWakeHeld()) return;
+  try {
+    const sentinel = await navigator.wakeLock.request("screen");
+    screenWake = sentinel;
+    sentinel.addEventListener("release", () => {
+      if (screenWake === sentinel) screenWake = null;
+    });
+  } catch {
+    // Denied until a tap, or the OS blocked it.
+  }
+}
+
+function watchScreenWake() {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") holdScreenAwake();
+  });
+  document.addEventListener("pointerdown", holdScreenAwake);
+}
+
 restoreSettings();
 const launchScreen = location.hash === "#settings" ? "settings" : "setup";
 showScreen(launchScreen, { replace: true });
+watchScreenWake();
+holdScreenAwake();
 window.addEventListener("popstate", handleHistoryPop);
 window.addEventListener("pageshow", () => {
   if (screen === "setup") lockHomeHistory();
+  holdScreenAwake();
 });
 if (window.navigation?.addEventListener) {
   window.navigation.addEventListener("navigate", swallowHomeNavigate, { capture: true });
