@@ -1,9 +1,12 @@
-import { creditsAnswer, missMessage } from "./scoring.js";
+import { creditsAnswer, formatCorrectCount, missMessage } from "./scoring.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+assert(formatCorrectCount(10, 11) === "10 / 11", "results correct is correct / answered");
+assert(formatCorrectCount(10, 10) === "10 / 10", "perfect round is 10 / 10");
+assert(formatCorrectCount(0, 0) === "0 / 0", "empty round is 0 / 0");
 assert(creditsAnswer(true, false) === true, "first-try correct scores");
 assert(creditsAnswer(true, true) === false, "correct after a miss scores 0");
 assert(creditsAnswer(false, true) === false, "a miss scores 0");

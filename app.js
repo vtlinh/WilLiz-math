@@ -3,7 +3,7 @@ import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix 
 import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields, worksheetSections } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
-import { creditsAnswer, missMessage } from "./scoring.js";
+import { creditsAnswer, formatCorrectCount, missMessage } from "./scoring.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -567,7 +567,8 @@ function finishRound({ to = "results" } = {}) {
   els.headline.textContent = round.correct
     ? `${name} banked ${round.correct} correct answer${round.correct === 1 ? "" : "s"}.`
     : `${name} is warmed up. Try one more pass.`;
-  els.statCorrect.textContent = String(round.correct);
+  els.statCorrect.textContent = formatCorrectCount(round.correct, round.answered);
+  els.statCorrect.setAttribute("aria-label", `${round.correct} of ${round.answered} correct`);
   els.statAccuracy.textContent = `${accuracy}%`;
   els.statStreak.textContent = String(round.bestStreak);
   els.statTime.textContent = round.timed ? formatTime(round.durationMs) : formatTime(elapsed);

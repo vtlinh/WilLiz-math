@@ -12,14 +12,14 @@ pictures.js         kid-friendly fruit, toy, and school-supply drawings
 worksheet.js        long multiplication and long division layouts
 celebrate.js        perfect-score confetti and fireworks
 stars.js            quiz 20% stars and unlimited 10-correct-set stars
-scoring.js          practice credit: first-try correct only
+scoring.js          first-try credit and results Correct as `correct / answered`
 test-problems.mjs   Node checks for the generator
 test-storage.mjs    Node checks for per-learner storage
 test-worksheet.mjs  Node checks for worksheet layouts
 test-pictures.mjs   Node checks for the Pictures object set
 test-celebrate.mjs  Node checks for when a perfect score celebrates
 test-stars.mjs      Node checks for quiz and unlimited progress stars
-test-scoring.mjs    Node checks for first-try practice credit
+test-scoring.mjs    Node checks for first-try credit and the results Correct ratio
 test-pwa.mjs        Node checks for the installable app manifest
 manifest.webmanifest Chrome install manifest (relative start_url)
 sw.js               caches the static shell
@@ -37,7 +37,7 @@ icon-512.png
 5. Addition, subtraction, multiplication, and division are rendered by `worksheet.js`. Pictures difficulty uses the counting-object sheet with drawings from `pictures.js` (fruit, toys, pencils/pens/erasers). `worksheetFields(problem)` lists every fillable working line.
 6. The keypad writes `current.fills[current.active]`. Multi-step worksheets use `worksheetSections` and **Next** until the last section, then **Submit**. Multiplication slots are one digit (or carry) and stay in the current section. Each partial row is the full product of the top number times that bottom digit, with the carry added into the next place (`26 × 2` → `52`). Shifted rows do not write placeholder zeros. Division shows one quotient digit per section. A miss stays on the problem so they can fix it; that problem still scores 0.
 7. Quiz rounds paint a bottom star tray with `progressStars(correct, limit)` so a star animates in at each 20% correct. Unlimited rounds use `unlimitedStars(attempts)` for each all-correct set of 10 from the first problem, then `X ★` after 7 icons.
-8. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves.
+8. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves. Results Correct is `formatCorrectCount(correct, answered)` (`10 / 11`). Accuracy uses the same pair.
 
 ## Problem rules
 

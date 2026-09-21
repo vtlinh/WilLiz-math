@@ -34,6 +34,7 @@ assert(!mulRender.includes(" × "), "multiplication does not repeat the equation
 
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const app = readFileSync(new URL("./app.js", import.meta.url), "utf8");
+assert(app.includes("formatCorrectCount(round.correct, round.answered)"), "results Correct is correct / answered");
 assert(app.includes("serviceWorker.register"), "register service worker");
 assert(app.includes("history.back()"), "settings back uses browser history");
 assert(app.includes("function lockHomeHistory"), "home back is swallowed so the app does not quit");

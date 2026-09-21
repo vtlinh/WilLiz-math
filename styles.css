@@ -808,6 +808,10 @@ dd {
   font-size: 1.6rem;
 }
 
+#stat-correct {
+  white-space: nowrap;
+}
+
 .best-note {
   color: var(--sage);
   font-weight: 800;
