@@ -11,7 +11,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 
 ## What a round is
 
-On the home page the action bar keeps one avatar on the left, WilLiz Math immediately to its right, and a settings icon on the right. Tapping the avatar opens Will, Liz, or Guest. Settings replaces that chrome with ← and Settings in the same action bar. ← returns to the home page. The device or browser back button does the same from Settings or play. On the home page, back is swallowed so the app does not quit. Every mix change saves immediately; there is no Save or Done. The avatar and settings button do not appear during an exercise. Settings holds:
+On the home page the action bar keeps one avatar on the left, WilLiz Math immediately to its right, and a settings icon on the right. Tapping the avatar opens Will, Liz, or Guest. Settings replaces that chrome with ← and Settings in the same action bar. ← returns to the home page. The device or browser back button does the same from Settings or play. On the home page, back stays on home — it does not quit the installed app. Every mix change saves immediately; there is no Save or Done. The avatar and settings button do not appear during an exercise. Settings holds:
 
 1. Operations: addition, subtraction, multiplication, division (at least one).
 2. Difficulty: Pictures, Easy, Medium, Hard, Challenge. Pictures uses only easy, countable numbers and shows kid-friendly drawings of fruit, toys, and school supplies to count. Pictures has no division.

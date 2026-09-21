@@ -204,12 +204,25 @@ function syncPlayChrome() {
   if (practice) paintPlayStat();
 }
 
-function setLeaveOpen(open) {
+function leaveUrl() {
+  return "./#play/leave";
+}
+
+function setLeaveOpen(open, { fromHistory = false } = {}) {
+  const wasOpen = isLeaveOpen();
   els.leaveDialog.classList.toggle("hidden", !open);
   els.leaveBackdrop.classList.toggle("hidden", !open);
   els.leaveDialog.hidden = !open;
   els.leaveBackdrop.hidden = !open;
   document.body.classList.toggle("leave-open", open);
+  if (fromHistory || wasOpen === open) return;
+  if (open && !history.state?.leave) {
+    history.pushState({ screen: "play", leave: true }, "", leaveUrl());
+    return;
+  }
+  if (!open && history.state?.leave) {
+    history.replaceState({ screen: "play", trap: false }, "", screenUrl("play"));
+  }
 }
 
 function isLeaveOpen() {
@@ -227,12 +240,17 @@ function paintScreen(name) {
 }
 
 function screenUrl(name) {
-  return name === "setup" ? "./" : `./#${name}`;
+  return name === "setup" ? "./#home" : `./#${name}`;
+}
+
+function homeTrapUrl() {
+  return "./#home/stay";
 }
 
 function lockHomeHistory() {
   if (screen !== "setup") return;
-  history.pushState({ screen: "setup", trap: true }, "", screenUrl("setup"));
+  if (history.state?.trap) return;
+  history.pushState({ screen: "setup", trap: true }, "", homeTrapUrl());
 }
 
 function showScreen(name, { replace = false } = {}) {
@@ -249,18 +267,40 @@ function showScreen(name, { replace = false } = {}) {
 }
 
 function handleHistoryPop() {
+  if (isLeaveOpen()) {
+    setLeaveOpen(false, { fromHistory: true });
+    if (round) {
+      if (history.state?.screen !== "play") showScreen("play");
+      else paintScreen("play");
+    }
+    return;
+  }
   const next = history.state?.screen === "play" && !round ? "setup" : history.state?.screen || "setup";
   if (screen === "play" && round && next !== "play") {
     showScreen("play");
-    if (isLeaveOpen()) {
-      setLeaveOpen(false);
-      return;
-    }
     requestLeaveSession();
     return;
   }
   paintScreen(next);
   if (screen === "setup") lockHomeHistory();
+}
+
+function swallowHomeNavigate(event) {
+  if (event.navigationType !== "traverse" || screen !== "setup" || !event.canIntercept) return;
+  const destIndex = event.destination?.index;
+  const here = window.navigation?.currentEntry?.index;
+  if (typeof destIndex === "number" && typeof here === "number" && destIndex >= here) return;
+  try {
+    event.intercept({
+      focusReset: "manual",
+      scroll: "manual",
+      handler() {
+        lockHomeHistory();
+      },
+    });
+  } catch {
+    lockHomeHistory();
+  }
 }
 
 function modeMeta(mode) {
@@ -747,6 +787,12 @@ restoreSettings();
 const launchScreen = location.hash === "#settings" ? "settings" : "setup";
 showScreen(launchScreen, { replace: true });
 window.addEventListener("popstate", handleHistoryPop);
+window.addEventListener("pageshow", () => {
+  if (screen === "setup") lockHomeHistory();
+});
+if (window.navigation?.addEventListener) {
+  window.navigation.addEventListener("navigate", swallowHomeNavigate, { capture: true });
+}
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(() => {
