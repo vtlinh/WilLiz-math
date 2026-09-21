@@ -3,7 +3,7 @@ import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix 
 import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields, worksheetSections } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
-import { creditsAnswer, formatCorrectCount, missMessage } from "./scoring.js";
+import { bestNote, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -224,9 +224,7 @@ function setLeaveOpen(open, { fromHistory = false } = {}) {
     history.pushState({ screen: "play", leave: true }, "", leaveUrl());
     return;
   }
-  if (!open && history.state?.leave) {
-    history.replaceState({ screen: "play", trap: false }, "", screenUrl("play"));
-  }
+  if (!open && history.state?.leave) history.back();
 }
 
 function isLeaveOpen() {
@@ -494,6 +492,8 @@ function mark(correct) {
       round.correct += 1;
       round.streak += 1;
       round.bestStreak = Math.max(round.bestStreak, round.streak);
+    } else {
+      round.streak = 0;
     }
     els.feedback.textContent = "Nice. That’s right.";
     els.feedback.className = "feedback is-good";
@@ -553,6 +553,7 @@ function submitAnswer(event) {
   const ok = fieldsMatch(slice.fills, slice.fields);
   if (!ok) {
     current.missed = true;
+    round.streak = 0;
     els.feedback.textContent = "Not quite. Try this step again.";
     els.feedback.className = "feedback is-bad";
     return;
@@ -582,6 +583,9 @@ function requestLeaveSession() {
 }
 
 function leavePractice() {
+  if (history.state?.leave) {
+    history.replaceState({ screen: "play", trap: false }, "", screenUrl("play"));
+  }
   setLeaveOpen(false);
   if (!round) {
     showScreen("setup");
@@ -593,7 +597,7 @@ function leavePractice() {
 function finishRound({ to = "results" } = {}) {
   if (!round) return;
   clearTimer();
-  const elapsed = Date.now() - round.startedAt;
+  const elapsed = resultsTimeMs(round, Date.now() - round.startedAt);
   const accuracy = round.answered ? Math.round((round.correct / round.answered) * 100) : 0;
   const celebrate = shouldCelebrate({
     answered: round.answered,
@@ -616,12 +620,8 @@ function finishRound({ to = "results" } = {}) {
   els.statCorrect.setAttribute("aria-label", `${round.correct} of ${round.answered} correct`);
   els.statAccuracy.textContent = `${accuracy}%`;
   els.statStreak.textContent = String(round.bestStreak);
-  els.statTime.textContent = round.timed ? formatTime(round.durationMs) : formatTime(elapsed);
-  els.statBest.textContent = improved
-    ? "New personal best for this mix."
-    : previous
-      ? `Personal best for this mix: ${previous}.`
-      : "This mix now has a saved best.";
+  els.statTime.textContent = formatTime(elapsed);
+  els.statBest.textContent = bestNote(improved, previous);
   round = null;
   showScreen(to);
   if (to === "results" && celebrate) playCelebration();

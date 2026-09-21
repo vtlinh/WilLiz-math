@@ -1,4 +1,4 @@
-const CACHE = "williz-math-shell-v32";
+const CACHE = "williz-math-shell-v33";
 const SHELL = [
   "./",
   "./index.html",
@@ -35,8 +35,10 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((hit) => {
       if (hit) return hit;
       return fetch(event.request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+        }
         return response;
       });
     }),

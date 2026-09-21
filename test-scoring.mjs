@@ -1,4 +1,4 @@
-import { creditsAnswer, formatCorrectCount, missMessage } from "./scoring.js";
+import { bestNote, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -20,5 +20,14 @@ assert(
     "Not quite. 2 × 3 = 6",
   "pictures still say the counted total",
 );
+
+assert(bestNote(true, 0) === "New personal best for this mix.", "a higher score is a new best");
+assert(bestNote(false, 4) === "Personal best for this mix: 4.", "an unbeaten best stays visible");
+assert(bestNote(false, 0) === "No personal best yet.", "a zero round does not claim a saved best");
+
+const tenMinutes = 10 * 60_000;
+assert(resultsTimeMs({ timed: false }, 12_400) === 12_400, "practice time is elapsed");
+assert(resultsTimeMs({ timed: true, durationMs: tenMinutes }, 90_000) === 90_000, "leaving a sprint early shows time spent");
+assert(resultsTimeMs({ timed: true, durationMs: tenMinutes }, tenMinutes + 800) === tenMinutes, "a finished sprint does not run past its length");
 
 console.log("practice scoring checks passed");
