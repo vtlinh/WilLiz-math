@@ -80,6 +80,8 @@ for (const op of ops) {
   }
 }
 
+assert(playOps(["add", "mul", "div"], "table").join(",") === "mul", "table uses multiplication only");
+assert(playOps(["add", "sub"], "table").length === 0, "table needs the × operation");
 assert(playOps(["add", "div"], "pictures").join(",") === "add", "drop division in pictures");
 assert(playOps(["div"], "pictures").length === 0, "pictures cannot be division-only");
 assert(operandsAllowed("div", 22, 2) === false, "22 ÷ 2 is an obvious divide");

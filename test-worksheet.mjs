@@ -8,6 +8,7 @@ import {
   planMultiplication,
   planSubtraction,
   displayDigit,
+  tableFields,
   worksheetFields,
   worksheetSections,
 } from "./worksheet.js";
@@ -372,6 +373,15 @@ assert(
   bigDiv.filter((field) => field.line === "quotient").length === 5,
   "7-digit ÷ 2-digit keeps a long-division quotient",
 );
+
+const table = tableFields();
+assert(table.length === 36, "2–9 table fills the diagonal and the products above it");
+assert(table.every((field) => field.col >= field.row && field.row >= 2 && field.col <= 9), "rows and columns stay in 2–9");
+assert(table.find((field) => field.row === 2 && field.col === 2)?.answer === 4, "2 × 2 is 4");
+assert(table.find((field) => field.row === 2 && field.col === 9)?.answer === 18, "2 × 9 is 18");
+assert(table.find((field) => field.row === 9 && field.col === 9)?.answer === 81, "9 × 9 is 81");
+assert(!table.some((field) => field.row > field.col), "products below the diagonal are left blank");
+assert(worksheetFields({ difficulty: "table", answer: 0 }).length === 36, "table difficulty uses the grid");
 
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 assert(css.includes('font-family: "Caveat", "Segoe Script", "Apple Chancery", cursive'), "carry digits are cursive");

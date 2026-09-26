@@ -1,7 +1,7 @@
 export const STORAGE_KEY = "williz-math-v1";
 export const STORE_VERSION = 2;
 
-const DIFFICULTIES = ["pictures", "easy", "medium", "hard"];
+const DIFFICULTIES = ["pictures", "easy", "medium", "hard", "table"];
 
 export const DEFAULT_MIX = {
   ops: ["add", "sub"],

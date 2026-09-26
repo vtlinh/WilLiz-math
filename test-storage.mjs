@@ -14,6 +14,7 @@ function assert(condition, message) {
 
 assert(normalizeDifficulty("challenge") === "hard", "challenge label is now hard");
 assert(normalizeDifficulty("hard") === "hard", "current hard stays hard");
+assert(normalizeDifficulty("table") === "table", "table difficulty is kept");
 assert(normalizeDifficulty("hard", { migrateOld: true }) === "medium", "old hard becomes medium");
 assert(normalizeDifficulty("medium", { migrateOld: true }) === "easy", "old medium is removed");
 assert(normalizeDifficulty("challenge", { migrateOld: true }) === "hard", "old challenge becomes hard");

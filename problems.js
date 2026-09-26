@@ -33,7 +33,9 @@ export function numericDifficulty(difficulty) {
 
 export function playOps(ops, difficulty) {
   const list = Array.isArray(ops) ? ops : [];
-  return difficulty === "pictures" ? list.filter((op) => op !== "div") : [...list];
+  if (difficulty === "pictures") return list.filter((op) => op !== "div");
+  if (difficulty === "table") return list.includes("mul") ? ["mul"] : [];
+  return [...list];
 }
 
 function repeatedDivisorDividend(dividend, divisor) {

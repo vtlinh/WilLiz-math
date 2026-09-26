@@ -1,4 +1,4 @@
-import { generateProblem, playOps } from "./problems.js";
+import { generateProblem, parseAnswer, playOps } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
 import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields, worksheetSections } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
@@ -16,6 +16,7 @@ const els = {
   opRow: document.getElementById("op-row"),
   difficultyRow: document.getElementById("difficulty-row"),
   modeRow: document.getElementById("mode-row"),
+  modeBlock: document.getElementById("mode-block"),
   themeRow: document.getElementById("theme-row"),
   setupError: document.getElementById("setup-error"),
   startBtn: document.getElementById("start-btn"),
@@ -117,11 +118,19 @@ function syncSetupUi() {
     button.setAttribute("aria-pressed", String(on));
     button.title = blocked ? "Pictures has no division" : "";
   }
+  const tableOn = settings.ops.includes("mul");
+  if (!tableOn && settings.difficulty === "table") {
+    settings.difficulty = "easy";
+    persistSettings();
+  }
   for (const button of els.difficultyRow.querySelectorAll("[data-difficulty]")) {
     const on = button.dataset.difficulty === settings.difficulty;
+    button.hidden = button.dataset.difficulty === "table" && !tableOn;
     button.classList.toggle("is-selected", on);
     button.setAttribute("aria-checked", String(on));
   }
+  const tableRound = settings.difficulty === "table";
+  els.modeBlock.hidden = tableRound;
   for (const button of els.modeRow.querySelectorAll("[data-mode]")) {
     button.classList.toggle("is-selected", button.dataset.mode === settings.mode);
   }
@@ -135,7 +144,9 @@ function syncSetupUi() {
   const ops = playOps(settings.ops, settings.difficulty)
     .map((op) => symbols[op])
     .join(" ") || "no operations";
-  els.mixSummary.textContent = `${settings.learner} · ${modeMeta(settings.mode).label} · ${settings.difficulty} · ${ops}`;
+  els.mixSummary.textContent = settings.difficulty === "table"
+    ? `${settings.learner} · × table`
+    : `${settings.learner} · ${modeMeta(settings.mode).label} · ${settings.difficulty} · ${ops}`;
   if (settings.ops.length) els.setupError.hidden = true;
 }
 
@@ -347,13 +358,14 @@ function startRound() {
   setLearnerOpen(false);
   setSettingsOpen(false);
 
-  const meta = modeMeta(settings.mode);
+  const tableRound = settings.difficulty === "table";
+  const meta = tableRound ? { label: "× table", limit: null, timed: false } : modeMeta(settings.mode);
   round = {
     ...meta,
     learner: settings.learner,
     ops,
     difficulty: settings.difficulty,
-    mode: settings.mode,
+    mode: tableRound ? "table" : settings.mode,
     startedAt: Date.now(),
     endsAt: meta.timed ? Date.now() + meta.durationMs : null,
     asked: 0,
@@ -365,7 +377,7 @@ function startRound() {
     attempts: [],
   };
 
-  els.playWho.textContent = `${round.learner} · ${meta.label} · ${round.difficulty}`;
+  els.playWho.textContent = tableRound ? `${round.learner} · × table` : `${round.learner} · ${meta.label} · ${round.difficulty}`;
   showScreen("play");
   paintStars();
   nextProblem();
@@ -390,6 +402,8 @@ function paintProblem(reveal = false) {
       active: current.active,
       reveal,
       section: current.section ?? 0,
+      locks: current.locks,
+      wrong: current.wrong,
     }),
   );
   els.problem.classList.toggle("is-sheet", current.difficulty !== "easy");
@@ -400,10 +414,25 @@ function paintProblem(reveal = false) {
 
 function nextProblem() {
   awaitingAdvance = false;
-  current = generateProblem(round.ops, round.difficulty, round.lastKey);
+  if (round.difficulty === "table") {
+    current = {
+      op: "mul",
+      difficulty: "table",
+      a: 2,
+      b: 9,
+      answer: 0,
+      prompt: "× table",
+      key: "table",
+    };
+  } else {
+    current = generateProblem(round.ops, round.difficulty, round.lastKey);
+  }
   current.missed = false;
   current.fields = worksheetFields(current);
   current.fills = current.fields.map(() => "");
+  current.locks = current.fields.map(() => false);
+  current.wrong = current.fields.map(() => false);
+  current.graded = false;
   current.sections = worksheetSections(current.fields);
   current.section = 0;
   current.active = current.sections[0]?.[0] ?? 0;
@@ -418,7 +447,7 @@ function nextProblem() {
 
 function paintStars() {
   const row = els.starRow;
-  if (!round) {
+  if (!round || round.difficulty === "table") {
     row.hidden = true;
     row.replaceChildren();
     delete row.dataset.stars;
@@ -472,6 +501,12 @@ function paintStars() {
 function updateProgress() {
   if (!round) return;
   paintStars();
+  if (round.difficulty === "table") {
+    const filled = current?.fills?.filter((fill) => fill !== "").length ?? 0;
+    const total = current?.fields?.length ?? 0;
+    els.playProgress.textContent = `${filled} / ${total}`;
+    return;
+  }
   if (isPracticePlay()) {
     paintPlayStat();
     return;
@@ -550,9 +585,44 @@ function sectionSlice() {
   };
 }
 
+function submitTable() {
+  if (!fieldsReady(current.fills)) return;
+  const matches = current.fields.map((field, index) => parseAnswer(current.fills[index]) === field.answer);
+  if (!current.graded) {
+    current.graded = true;
+    round.answered = current.fields.length;
+    round.correct = matches.filter(Boolean).length;
+    round.streak = matches.every(Boolean) ? 1 : 0;
+    round.bestStreak = round.streak;
+  }
+  matches.forEach((ok, index) => {
+    current.locks[index] = ok;
+    current.wrong[index] = !ok;
+  });
+  updateProgress();
+  if (matches.every(Boolean)) {
+    els.feedback.textContent = "Nice. That’s right.";
+    els.feedback.className = "feedback is-good";
+    paintProblem(true);
+    awaitingAdvance = true;
+    window.setTimeout(() => {
+      if (round && awaitingAdvance) finishRound();
+    }, 700);
+    return;
+  }
+  current.active = matches.findIndex((ok) => !ok);
+  els.feedback.textContent = "Not quite. Try this step again.";
+  els.feedback.className = "feedback is-bad";
+  paintProblem(false);
+}
+
 function submitAnswer(event) {
   event.preventDefault();
   if (!round || awaitingAdvance) return;
+  if (current?.difficulty === "table") {
+    submitTable();
+    return;
+  }
   const slice = sectionSlice();
   if (!fieldsReady(slice.fills)) return;
   const ok = fieldsMatch(slice.fills, slice.fields);
@@ -583,7 +653,8 @@ function bestKey() {
 }
 
 function roundHasWork() {
-  return (round?.answered || 0) > 0;
+  if ((round?.answered || 0) > 0) return true;
+  return round?.difficulty === "table" && Boolean(current?.fills?.some((fill) => fill));
 }
 
 function clearUnstartedRound() {
@@ -656,13 +727,22 @@ function toggleOp(op) {
   } else {
     settings.ops = [...settings.ops, op];
   }
+  if (settings.difficulty === "table" && !settings.ops.includes("mul")) settings.difficulty = "easy";
   persistSettings();
   syncSetupUi();
+}
+
+function nextUnlocked(from, step) {
+  for (let index = from + step; index >= 0 && index < current.fills.length; index += step) {
+    if (!current.locks?.[index]) return index;
+  }
+  return from;
 }
 
 function setActiveSlot(index) {
   if (!current || awaitingAdvance) return;
   if (!Number.isInteger(index) || index < 0 || index >= current.fills.length) return;
+  if (current.locks?.[index]) return;
   if ((current.fields[index]?.step ?? 0) !== current.section) return;
   current.active = index;
   paintProblem(false);
@@ -672,6 +752,7 @@ function pressKey(key) {
   if (!current || awaitingAdvance) return;
   const slot = current.active ?? 0;
   const field = current.fields[slot];
+  if (current.locks?.[slot]) return;
   if (field?.unit === "cell") {
     if (key === "back") {
       if (current.fills[slot]) {
@@ -694,6 +775,17 @@ function pressKey(key) {
     return;
   }
   let value = current.fills[slot] ?? "";
+  if (key === "back" && !value && current.difficulty === "table") {
+    current.active = nextUnlocked(slot, -1);
+    if (current.active !== slot && !current.locks?.[current.active]) {
+      current.fills[current.active] = (current.fills[current.active] ?? "").slice(0, -1);
+      if (current.wrong) current.wrong[current.active] = false;
+    }
+    els.input.value = current.fills[current.active] ?? "";
+    paintProblem(false);
+    updateProgress();
+    return;
+  }
   if (key === "back") {
     value = value.slice(0, -1);
   } else if (key === "-" || key === "−") {
@@ -704,8 +796,15 @@ function pressKey(key) {
     if (!width || digits < width) value += key;
   }
   current.fills[slot] = value;
-  els.input.value = value;
+  if (current.wrong) current.wrong[slot] = false;
+  if (current.difficulty === "table" && key !== "back" && key !== "-" && key !== "−") {
+    const width = String(Math.abs(Number(field?.answer))).length;
+    const digits = value.replace(/[-−]/g, "").length;
+    if (width && digits >= width) current.active = nextUnlocked(slot, 1);
+  }
+  els.input.value = current.fills[current.active] ?? "";
   paintProblem(false);
+  if (current.difficulty === "table") updateProgress();
 }
 
 els.learnerBtn.addEventListener("click", (event) => {

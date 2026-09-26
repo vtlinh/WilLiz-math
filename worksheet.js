@@ -5,7 +5,24 @@ function digitList(value) {
   return String(value).split("").map((d) => (d === "-" ? "−" : d));
 }
 
+export function tableFields() {
+  const fields = [];
+  for (let row = 2; row <= 9; row += 1) {
+    for (let col = row; col <= 9; col += 1) {
+      fields.push({
+        id: `r${row}-c${col}`,
+        row,
+        col,
+        answer: row * col,
+        index: fields.length,
+      });
+    }
+  }
+  return fields;
+}
+
 export function worksheetFields(problem) {
+  if (problem.difficulty === "table") return tableFields();
   if (problem.difficulty === "pictures" || problem.difficulty === "easy") {
     return [{ id: "total", answer: problem.answer }];
   }
@@ -774,7 +791,63 @@ function renderInlineProblem(problem, { fills = [], active = 0, reveal = false }
   return root;
 }
 
+function tableLabel(text) {
+  const el = document.createElement("span");
+  el.className = "times-label";
+  el.textContent = text;
+  return el;
+}
+
+export function renderTableSheet(_problem, { fills = [], active = 0, reveal = false, locks = [], wrong = [] } = {}) {
+  const factors = [2, 3, 4, 5, 6, 7, 8, 9];
+  const fields = tableFields();
+  const byKey = new Map(fields.map((field) => [`${field.row}:${field.col}`, field]));
+  const root = document.createElement("div");
+  root.className = "times-table";
+  root.append(tableLabel("×"));
+  for (const factor of factors) root.append(tableLabel(String(factor)));
+  for (const row of factors) {
+    root.append(tableLabel(String(row)));
+    for (const col of factors) {
+      const field = byKey.get(`${row}:${col}`);
+      if (!field) {
+        const skip = document.createElement("span");
+        skip.className = "times-skip";
+        skip.setAttribute("aria-hidden", "true");
+        root.append(skip);
+        continue;
+      }
+      const cell = document.createElement("span");
+      cell.className = "times-cell";
+      const width = String(field.answer).length;
+      const typed = fills[field.index] ?? "";
+      const locked = Boolean(reveal || locks[field.index]);
+      if (locked) {
+        cell.textContent = reveal || typed ? (reveal ? String(field.answer) : typed) : "";
+        cell.classList.add("is-locked");
+      } else if (typed && typed !== "-" && typed !== "−") {
+        cell.textContent = typed;
+      } else {
+        cell.textContent = "_".repeat(width);
+        cell.classList.add("is-placeholder");
+      }
+      if (wrong[field.index] && !locked) cell.classList.add("is-wrong");
+      if (!locked) {
+        markFill(cell, {
+          slot: field.index,
+          active: active === field.index,
+          reveal: false,
+          label: `Fill ${row} × ${col}`,
+        });
+      }
+      root.append(cell);
+    }
+  }
+  return root;
+}
+
 export function renderProblemView(problem, options = {}) {
+  if (problem.difficulty === "table") return renderTableSheet(problem, options);
   if (problem.difficulty === "pictures") return renderPictureSheet(problem, options);
   if (problem.difficulty === "easy") return renderInlineProblem(problem, options);
   if (problem.op === "mul") return renderMultiplicationSheet(problem, options);
