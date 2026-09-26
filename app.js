@@ -420,35 +420,11 @@ function paintProblem(reveal = false) {
   fitDivisionSheet();
 }
 
-function divisionFitBudget() {
-  const problem = els.problem;
-  const panel = problem.closest(".panel") ?? problem;
-  const panelStyle = getComputedStyle(panel);
-  const panelPad = parseFloat(panelStyle.paddingBottom) || 0;
-  const page = document.querySelector(".page");
-  const pagePad = page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0;
-  const bodyPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
-  const panelContentBottom = panel.getBoundingClientRect().bottom - panelPad;
-  const limit = Math.min(panelContentBottom, window.innerHeight - pagePad - bodyPad);
-  const screen = problem.parentElement;
-  const gapValue = screen ? parseFloat(getComputedStyle(screen).rowGap || getComputedStyle(screen).gap) : 0;
-  const gap = Number.isFinite(gapValue) ? gapValue : 0;
-  let below = 0;
-  let followers = 0;
-  for (let node = problem.nextElementSibling; node; node = node.nextElementSibling) {
-    if (node.hidden || node.classList.contains("hidden")) continue;
-    const style = getComputedStyle(node);
-    below += node.getBoundingClientRect().height;
-    below += (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0);
-    followers += 1;
-  }
-  if (followers && gap) below += gap * followers;
-  const viewportRoom = limit - problem.getBoundingClientRect().top - below;
-  const slot = problem.clientHeight;
-  return {
-    width: problem.clientWidth,
-    height: Math.max(0, Math.min(slot, viewportRoom)),
-  };
+function divisionOverflows(problem, sheet) {
+  const pageOverflow = document.documentElement.scrollHeight - window.innerHeight;
+  const innerOverflow = problem.scrollHeight - problem.clientHeight;
+  const widthOverflow = sheet.scrollWidth - problem.clientWidth;
+  return pageOverflow > 0 || innerOverflow > 4 || widthOverflow > 1;
 }
 
 function fitDivisionSheet() {
@@ -463,29 +439,36 @@ function fitDivisionSheet() {
   sheet.style.marginBottom = "";
 
   const natural = parseFloat(getComputedStyle(sheet).fontSize);
-  const budget = divisionFitBudget();
-  if (budget.width < 8 || budget.height < 8 || !Number.isFinite(natural)) return;
+  if (!Number.isFinite(natural)) return;
 
   const fits = (px) => {
     sheet.style.setProperty("--sheet-digit", `${px}px`);
-    return sheet.scrollWidth <= budget.width + 1 && sheet.offsetHeight <= budget.height + 1;
+    return !divisionOverflows(problem, sheet);
   };
 
-  if (fits(natural)) {
-    sheet.style.removeProperty("--sheet-digit");
-    return;
-  }
+  if (!divisionOverflows(problem, sheet)) return;
 
   const size = largestSizeThatFits(8, Math.floor(natural), fits);
   sheet.style.setProperty("--sheet-digit", `${size}px`);
-  if (sheet.scrollWidth <= budget.width + 1 && sheet.offsetHeight <= budget.height + 1) return;
+  if (!divisionOverflows(problem, sheet)) return;
 
-  const scale = Math.min(budget.width / sheet.scrollWidth, budget.height / sheet.offsetHeight);
+  const pageOverflow = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const innerOverflow = Math.max(0, problem.scrollHeight - problem.clientHeight);
+  const widthOverflow = Math.max(0, sheet.scrollWidth - problem.clientWidth);
+  const scale = Math.min(
+    widthOverflow > 0 ? problem.clientWidth / sheet.scrollWidth : 1,
+    pageOverflow + innerOverflow > 0 ? sheet.offsetHeight / (sheet.offsetHeight + pageOverflow + innerOverflow) : 1,
+  );
   if (scale > 0 && scale < 1) {
     sheet.style.transformOrigin = "top left";
     sheet.style.transform = `scale(${scale})`;
     sheet.style.marginRight = `${sheet.offsetWidth * (scale - 1)}px`;
     sheet.style.marginBottom = `${sheet.offsetHeight * (scale - 1)}px`;
+    if (divisionOverflows(problem, sheet)) {
+      sheet.style.transform = "";
+      sheet.style.marginRight = "";
+      sheet.style.marginBottom = "";
+    }
   }
 }
 

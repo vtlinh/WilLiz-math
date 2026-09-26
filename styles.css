@@ -1321,6 +1321,115 @@ body.celebrate-static .results-headline {
   }
 }
 
+@media (max-height: 760px) {
+  html:has(.sheet-div),
+  body:has(.sheet-div) {
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .page:has(.sheet-div) {
+    height: 100%;
+    min-height: 0;
+    padding-top: 72px;
+    padding-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page:has(.sheet-div) main,
+  .page:has(.sheet-div) #play-screen {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page:has(.sheet-div) #play-screen {
+    overflow: hidden;
+  }
+
+  .page:has(.sheet-div) .problem.is-div-fit {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  #play-screen:has(.sheet-div) .keypad {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-height: 700px) {
+  .page:has(.sheet-div) {
+    padding-bottom: 6px;
+  }
+
+  .page:has(.sheet-div) .panel {
+    padding: 8px 12px;
+  }
+
+  #play-screen:has(.sheet-div) .keypad {
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  #play-screen:has(.sheet-div) .keypad button {
+    min-height: 34px;
+  }
+
+  #play-screen:has(.sheet-div) .feedback {
+    min-height: 1.1em;
+  }
+
+  #play-screen:has(.sheet-div) .star-row {
+    min-height: 0;
+    margin-top: 4px;
+  }
+
+  #play-screen:has(.sheet-div) .primary.compact {
+    padding: 8px 12px;
+  }
+}
+
+@media (max-height: 480px) {
+  .page:has(.sheet-div) {
+    padding-top: 60px;
+    padding-bottom: 4px;
+  }
+
+  .page:has(.sheet-div) .panel {
+    padding: 4px 8px;
+  }
+
+  .page:has(.sheet-div) .problem.is-div-fit {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  #play-screen:has(.sheet-div) .keypad {
+    gap: 3px;
+  }
+
+  #play-screen:has(.sheet-div) .keypad button {
+    min-height: 26px;
+    padding: 0;
+  }
+
+  #play-screen:has(.sheet-div) .feedback {
+    min-height: 0;
+    margin: 0;
+  }
+
+  #play-screen:has(.sheet-div) .star-row {
+    display: none;
+  }
+
+  #play-screen:has(.sheet-div) .primary.compact {
+    padding: 6px 10px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chip,
   .seg-btn,
