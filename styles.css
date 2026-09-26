@@ -639,8 +639,14 @@ legend {
 }
 
 .sheet-div {
-  width: fit-content;
+  width: max-content;
+  max-width: none;
   margin-inline: auto;
+  font-size: var(--sheet-digit);
+}
+
+.problem.is-div-fit {
+  overflow: hidden;
 }
 
 .div-work {
@@ -649,7 +655,7 @@ legend {
 
 .div-digits {
   display: grid;
-  grid-template-columns: 1.1rem repeat(var(--cols), minmax(1.2rem, 1.6rem)) 1.1rem;
+  grid-template-columns: 0.7em repeat(var(--cols), minmax(0.95em, 1.1em)) 0.7em;
   justify-content: start;
 }
 
@@ -666,11 +672,24 @@ legend {
 .div-divisor {
   display: grid;
   place-items: center;
-  min-width: 2.6rem;
-  padding: 0 0.35rem 0 0;
+  min-width: 1.8em;
+  padding: 0 0.28em 0 0;
   font-family: "Fraunces", Georgia, serif;
-  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  font-size: 1em;
   font-variant-numeric: tabular-nums;
+}
+
+.sheet-div .sheet-cell {
+  min-height: 1.15em;
+  font-size: 1em;
+}
+
+.sheet-div .sheet-cell.is-arrow {
+  font-size: 0.75em;
+}
+
+.sheet-div .div-digits.is-sub {
+  margin-bottom: 0.12em;
 }
 
 .div-divisor.is-spacer {
@@ -1212,9 +1231,12 @@ body.celebrate-static .results-headline {
     min-height: 1.2rem;
   }
 
-  .div-divisor {
-    min-width: 1.8rem;
-    font-size: clamp(1.05rem, 4vw, 1.45rem);
+  #play-screen:has(.sheet-div) .keypad {
+    flex: 0 0 auto;
+  }
+
+  #play-screen:has(.sheet-div) .keypad button {
+    min-height: 44px;
   }
 
   .sheet-pic {

@@ -1,6 +1,13 @@
 import { generateProblem, parseAnswer, playOps } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
-import { fieldsMatch, fieldsReady, renderProblemView, worksheetFields, worksheetSections } from "./worksheet.js";
+import {
+  fieldsMatch,
+  fieldsReady,
+  largestSizeThatFits,
+  renderProblemView,
+  worksheetFields,
+  worksheetSections,
+} from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
 import { bestNote, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
@@ -410,6 +417,76 @@ function paintProblem(reveal = false) {
   els.form.classList.add("is-sheet-fill");
   els.input.hidden = true;
   syncSubmitLabel();
+  fitDivisionSheet();
+}
+
+function divisionFitBudget() {
+  const problem = els.problem;
+  const panel = problem.closest(".panel") ?? problem;
+  const panelStyle = getComputedStyle(panel);
+  const panelPad = parseFloat(panelStyle.paddingBottom) || 0;
+  const page = document.querySelector(".page");
+  const pagePad = page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0;
+  const bodyPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+  const panelContentBottom = panel.getBoundingClientRect().bottom - panelPad;
+  const limit = Math.min(panelContentBottom, window.innerHeight - pagePad - bodyPad);
+  const screen = problem.parentElement;
+  const gapValue = screen ? parseFloat(getComputedStyle(screen).rowGap || getComputedStyle(screen).gap) : 0;
+  const gap = Number.isFinite(gapValue) ? gapValue : 0;
+  let below = 0;
+  let followers = 0;
+  for (let node = problem.nextElementSibling; node; node = node.nextElementSibling) {
+    if (node.hidden || node.classList.contains("hidden")) continue;
+    const style = getComputedStyle(node);
+    below += node.getBoundingClientRect().height;
+    below += (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0);
+    followers += 1;
+  }
+  if (followers && gap) below += gap * followers;
+  const viewportRoom = limit - problem.getBoundingClientRect().top - below;
+  const slot = problem.clientHeight;
+  return {
+    width: problem.clientWidth,
+    height: Math.max(0, Math.min(slot, viewportRoom)),
+  };
+}
+
+function fitDivisionSheet() {
+  const problem = els.problem;
+  const sheet = problem.querySelector(":scope > .sheet-div");
+  problem.classList.toggle("is-div-fit", Boolean(sheet));
+  if (!sheet) return;
+
+  sheet.style.removeProperty("--sheet-digit");
+  sheet.style.transform = "";
+  sheet.style.marginRight = "";
+  sheet.style.marginBottom = "";
+
+  const natural = parseFloat(getComputedStyle(sheet).fontSize);
+  const budget = divisionFitBudget();
+  if (budget.width < 8 || budget.height < 8 || !Number.isFinite(natural)) return;
+
+  const fits = (px) => {
+    sheet.style.setProperty("--sheet-digit", `${px}px`);
+    return sheet.scrollWidth <= budget.width + 1 && sheet.offsetHeight <= budget.height + 1;
+  };
+
+  if (fits(natural)) {
+    sheet.style.removeProperty("--sheet-digit");
+    return;
+  }
+
+  const size = largestSizeThatFits(8, Math.floor(natural), fits);
+  sheet.style.setProperty("--sheet-digit", `${size}px`);
+  if (sheet.scrollWidth <= budget.width + 1 && sheet.offsetHeight <= budget.height + 1) return;
+
+  const scale = Math.min(budget.width / sheet.scrollWidth, budget.height / sheet.offsetHeight);
+  if (scale > 0 && scale < 1) {
+    sheet.style.transformOrigin = "top left";
+    sheet.style.transform = `scale(${scale})`;
+    sheet.style.marginRight = `${sheet.offsetWidth * (scale - 1)}px`;
+    sheet.style.marginBottom = `${sheet.offsetHeight * (scale - 1)}px`;
+  }
 }
 
 function nextProblem() {
@@ -969,6 +1046,9 @@ showScreen(launchScreen, { replace: true });
 watchScreenWake();
 holdScreenAwake();
 hideSystemNavigation();
+window.addEventListener("resize", () => {
+  if (screen === "play") fitDivisionSheet();
+});
 window.addEventListener("popstate", handleHistoryPop);
 window.addEventListener("pageshow", () => {
   if (screen === "setup") lockHomeHistory();

@@ -44,7 +44,7 @@ icon-512.png
 ## Problem rules
 
 - Subtraction answers are never negative, and subtraction is never `X − X`, `X − 1`, or `X − 0`.
-- Division is exact and never `X ÷ X`. Easy is a flat `[10–99] ÷ [2–9]` equation and also skips a dividend made only of the divisor digit (`22 ÷ 2`). Medium is a 3–5 digit dividend by 3–9. Hard is a 4–7 digit dividend by a two-digit divisor.
+- Division is exact and never `X ÷ X`. Easy is a flat `[10–99] ÷ [2–9]` equation and also skips a dividend made only of the divisor digit (`22 ÷ 2`). Medium is a 3–5 digit dividend by 3–9. Hard is a 4–7 digit dividend by a two-digit divisor. Vertical division shrinks its type so the working fits on the screen without scrolling.
 - Multiplication puts the larger factor on top. Easy and picture multiplication are `[2–9] × [2–9]`.
 - Medium multiplication is 2–3 digits by 3–9. Hard is 3–5 digits by 2–3 digits.
 - Easy problems are one flat equation. Medium and hard addition and subtraction are vertical, filled from right to left, with a cursive carry or borrow box two type sizes smaller whenever a column needs one.

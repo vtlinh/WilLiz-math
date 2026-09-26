@@ -5,6 +5,26 @@ function digitList(value) {
   return String(value).split("").map((d) => (d === "-" ? "−" : d));
 }
 
+export function largestSizeThatFits(min, max, fits) {
+  const low = Math.ceil(min);
+  const high = Math.floor(max);
+  if (high <= low) return low;
+  if (fits(high)) return high;
+  let lo = low;
+  let hi = high;
+  let best = low;
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (fits(mid)) {
+      best = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return best;
+}
+
 export function tableFields() {
   const fields = [];
   for (let row = 2; row <= 9; row += 1) {

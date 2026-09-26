@@ -8,6 +8,7 @@ import {
   planMultiplication,
   planSubtraction,
   displayDigit,
+  largestSizeThatFits,
   tableFields,
   worksheetFields,
   worksheetSections,
@@ -386,5 +387,9 @@ assert(worksheetFields({ difficulty: "table", answer: 0 }).length === 36, "table
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 assert(css.includes('font-family: "Caveat", "Segoe Script", "Apple Chancery", cursive'), "carry digits are cursive");
 assert(css.includes("calc(var(--sheet-digit) / 1.5625)"), "carry digits are two sizes smaller");
+assert(css.includes(".problem.is-div-fit"), "vertical division can shrink to the screen");
+assert(largestSizeThatFits(8, 34, (size) => size <= 18) === 18, "division type uses the largest size that fits");
+assert(largestSizeThatFits(8, 34, () => true) === 34, "a short division keeps the full type size");
+assert(largestSizeThatFits(8, 34, () => false) === 8, "a crowded division can drop to the smallest type size");
 
 console.log("worksheet checks passed");
