@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import {
+  applyAutoFills,
   fieldsMatch,
   fieldsReady,
+  learnerFieldsReady,
   multiplicationCarryStack,
   planAddition,
   planDivision,
@@ -364,6 +366,61 @@ assert(fieldsMatch(divFills, divLines), "matching every div digit");
 const wrongQuotient = [...divFills];
 wrongQuotient[0] = "9";
 assert(!fieldsMatch(wrongQuotient, divLines), "quotient only is not enough");
+
+assert(
+  divLines.filter((field) => field.auto).map((field) => field.kind).every((kind) => kind === "remain" || kind === "bring"),
+  "only subtract digits and bring-downs are automatic",
+);
+assert(
+  divLines.filter((field) => field.kind === "remain" || field.kind === "bring").every((field) => field.auto),
+  "every subtract digit and bring-down is automatic",
+);
+assert(!divLines.some((field) => (field.kind === "digit" || field.kind === "product") && field.auto), "the learner fills quotient and multiply");
+
+const firstStep = divSteps[0];
+const blankDiv = divLines.map(() => "");
+const typedStep = [...blankDiv];
+for (const index of firstStep) {
+  if (!divLines[index].auto) typedStep[index] = String(divLines[index].answer);
+}
+const quotientOnly = firstStep.map((index, at) => (at === 0 ? "5" : ""));
+assert(!learnerFieldsReady(quotientOnly, firstStep.map((i) => divLines[i])), "a partly filled step is not ready");
+assert(
+  learnerFieldsReady(firstStep.map((i) => typedStep[i]), firstStep.map((i) => divLines[i])),
+  "quotient and multiply alone make a step ready",
+);
+const autoStep = applyAutoFills(divLines, typedStep, firstStep);
+assert(
+  firstStep.map((index) => autoStep[index]).join(",") === "5,1,2,0,1,0,3",
+  "a right multiply row fills 13 − 12 = 1, 0, and brings down 3",
+);
+assert(fieldsMatch(firstStep.map((i) => autoStep[i]), firstStep.map((i) => divLines[i])), "the auto-filled step is correct");
+assert(autoStep.slice(firstStep.at(-1) + 1).every((fill) => fill === ""), "later steps stay blank");
+
+const partlyTyped = [...typedStep];
+partlyTyped[firstStep.find((index) => divLines[index].kind === "product")] = "";
+assert(
+  applyAutoFills(divLines, partlyTyped, firstStep).filter((_, index) => divLines[index].auto && firstStep.includes(index)).every((fill) => fill === ""),
+  "an unfinished multiply row leaves subtract and bring-down blank",
+);
+const wrongProduct = [...autoStep];
+wrongProduct[firstStep.find((index) => divLines[index].kind === "product")] = "9";
+assert(
+  applyAutoFills(divLines, wrongProduct, firstStep).filter((_, index) => divLines[index].auto && firstStep.includes(index)).every((fill) => fill === ""),
+  "a wrong multiply row clears subtract and bring-down",
+);
+assert(!fieldsMatch(firstStep.map((i) => applyAutoFills(divLines, wrongProduct, firstStep)[i]), firstStep.map((i) => divLines[i])), "a wrong multiply row does not pass Next");
+
+const lastStep = divSteps.at(-1);
+const lastTyped = [...divFills].map((value, index) => (divLines[index].auto && lastStep.includes(index) ? "" : value));
+assert(
+  lastStep.map((index) => applyAutoFills(divLines, lastTyped, lastStep)[index]).join(",") === "3,7,2,0",
+  "the last step fills its 0 remainder with no bring-down",
+);
+assert(
+  worksheetFields({ a: 256, b: 7, op: "mul", answer: 1792, difficulty: "medium" }).every((field) => !field.auto),
+  "multiplication has no automatic cells",
+);
 
 const hardMulSheet = worksheetFields({ a: 256, b: 7, op: "mul", answer: 1792, difficulty: "medium" });
 assert(hardMulSheet.length > 1, "medium 3-digit × 1-digit has working slots");

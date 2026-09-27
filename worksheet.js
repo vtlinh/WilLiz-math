@@ -65,6 +65,21 @@ export function fieldsReady(fills) {
   return fills.length > 0 && fills.every((fill) => parseAnswer(fill) !== null);
 }
 
+export function learnerFieldsReady(fills, fields) {
+  return fieldsReady(fills.filter((_, index) => !fields[index]?.auto));
+}
+
+// Subtract digits and bring-downs appear only once that step's multiply row is right.
+export function applyAutoFills(fields, fills, indexes) {
+  const next = [...fills];
+  const auto = indexes.filter((index) => fields[index]?.auto);
+  if (!auto.length) return next;
+  const products = indexes.filter((index) => fields[index]?.kind === "product");
+  const ready = products.length > 0 && products.every((index) => parseAnswer(fills[index]) === fields[index].answer);
+  for (const index of auto) next[index] = ready ? String(fields[index].answer) : "";
+  return next;
+}
+
 export function fieldsMatch(fills, fields) {
   if (fills.length !== fields.length) return false;
   return fills.every((fill, index) => parseAnswer(fill) === fields[index].answer);
@@ -343,7 +358,9 @@ function cellsFromSlots(cols, fields, fills, active, reveal, { section = Infinit
   return emptyCols(cols).map((_, col) => {
     const field = byCol.get(col);
     if (!field) return "";
-    return slotCell(field, fills, active, reveal, { locked: !reveal && (field.step ?? 0) < section });
+    return slotCell(field, fills, active, reveal, {
+      locked: !reveal && (field.auto || (field.step ?? 0) < section),
+    });
   });
 }
 
@@ -466,7 +483,7 @@ export function planDivision(dividend, divisor) {
   return plan;
 }
 
-function placedNumberSlots(slots, { value, endIndex, idPrefix, kind, line, step = 0 }) {
+function placedNumberSlots(slots, { value, endIndex, idPrefix, kind, line, step = 0, auto = false }) {
   const digits = String(value).split("").map(Number);
   const start = endIndex - digits.length + 1;
   digits.forEach((digit, index) => {
@@ -477,6 +494,7 @@ function placedNumberSlots(slots, { value, endIndex, idPrefix, kind, line, step 
       step,
       col: start + index,
       answer: digit,
+      ...(auto ? { auto: true } : {}),
     });
   });
 }
@@ -507,6 +525,7 @@ function divisionSlots(plan) {
       kind: "remain",
       line: `remain-${index}`,
       step: index,
+      auto: true,
     });
     if (step.bringDown !== null) {
       pushSlot(slots, {
@@ -516,6 +535,7 @@ function divisionSlots(plan) {
         step: index,
         col: step.endIndex + 1,
         answer: step.bringDown,
+        auto: true,
       });
     }
   });

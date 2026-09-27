@@ -1,9 +1,11 @@
 import { generateProblem, parseAnswer, playOps } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
 import {
+  applyAutoFills,
   fieldsMatch,
   fieldsReady,
   largestSizeThatFits,
+  learnerFieldsReady,
   renderProblemView,
   worksheetFields,
   worksheetSections,
@@ -686,7 +688,7 @@ function submitAnswer(event) {
     return;
   }
   const slice = sectionSlice();
-  if (!fieldsReady(slice.fills)) return;
+  if (!learnerFieldsReady(slice.fills, slice.fields)) return;
   const ok = fieldsMatch(slice.fills, slice.fields);
   if (!ok) {
     current.missed = true;
@@ -804,7 +806,7 @@ function nextUnlocked(from, step) {
 function setActiveSlot(index) {
   if (!current || awaitingAdvance) return;
   if (!Number.isInteger(index) || index < 0 || index >= current.fills.length) return;
-  if (current.locks?.[index]) return;
+  if (current.locks?.[index] || current.fields[index]?.auto) return;
   if ((current.fields[index]?.step ?? 0) !== current.section) return;
   current.active = index;
   paintProblem(false);
@@ -827,11 +829,13 @@ function pressKey(key) {
       current.fills[slot] = key.slice(-1);
       if (
         slot + 1 < current.fills.length &&
-        (current.fields[slot + 1]?.step ?? 0) === current.section
+        (current.fields[slot + 1]?.step ?? 0) === current.section &&
+        !current.fields[slot + 1]?.auto
       ) {
         current.active = slot + 1;
       }
     }
+    current.fills = applyAutoFills(current.fields, current.fills, current.sections[current.section] ?? []);
     els.input.value = current.fills[current.active] ?? "";
     paintProblem(false);
     return;
