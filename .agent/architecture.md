@@ -48,7 +48,7 @@ icon-512.png
 - Multiplication puts the larger factor on top. Easy and picture multiplication are `[2–9] × [2–9]`.
 - Medium multiplication is 2–3 digits by 3–9. Hard is 3–5 digits by 2–3 digits.
 - Easy problems are one flat equation. Medium and hard addition and subtraction are vertical, filled from right to left, with a cursive carry or borrow box two type sizes smaller whenever a column needs one.
-- `table` difficulty is a single 2–9 multiplication grid for × only. Products below the diagonal are not filled. There is no mode.
+- `table` difficulty is a single 2–9 multiplication grid for × only. Selecting it deselects every other operation (`ops` becomes `["mul"]`, and `storage.js` normalizes stored table mixes the same way). Products below the diagonal are not filled. There is no mode.
 - Addition never uses `+ 0` or `+ 1`. No operation uses 0 or 1 as an operand.
 
 Keep generation in `problems.js` so `test-problems.mjs` can import it without the DOM.

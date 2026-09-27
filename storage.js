@@ -44,9 +44,11 @@ export function defaultMix() {
 
 function copyMix(mix, { migrateOld = false } = {}) {
   const source = mix && typeof mix === "object" ? mix : {};
+  const difficulty = normalizeDifficulty(source.difficulty, { migrateOld });
+  const ops = Array.isArray(source.ops) ? [...source.ops] : [...DEFAULT_MIX.ops];
   return {
-    ops: Array.isArray(source.ops) ? [...source.ops] : [...DEFAULT_MIX.ops],
-    difficulty: normalizeDifficulty(source.difficulty, { migrateOld }),
+    ops: difficulty === "table" && ops.includes("mul") ? ["mul"] : ops,
+    difficulty,
     mode: normalizeMode(source.mode),
     theme: normalizeTheme(source.theme),
   };
