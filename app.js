@@ -400,6 +400,8 @@ function isLastSection() {
 
 function syncSubmitLabel() {
   els.submitBtn.textContent = isLastSection() ? "Submit" : "Next";
+  const waiting = current?.difficulty === "table" && !fieldsReady(current.fills);
+  els.submitBtn.classList.toggle("is-waiting", waiting);
 }
 
 function paintProblem(reveal = false) {

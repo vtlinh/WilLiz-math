@@ -832,6 +832,10 @@ legend {
   flex: 1;
 }
 
+#submit-btn.is-waiting {
+  visibility: hidden;
+}
+
 #answer-input {
   flex: 1;
   min-width: 0;
