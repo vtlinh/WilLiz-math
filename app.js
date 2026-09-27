@@ -787,7 +787,7 @@ function toggleOp(op) {
   } else {
     settings.ops = [...settings.ops, op];
   }
-  if (settings.difficulty === "table" && !settings.ops.includes("mul")) settings.difficulty = "easy";
+  if (settings.difficulty === "table" && settings.ops.join(",") !== "mul") settings.difficulty = "easy";
   persistSettings();
   syncSetupUi();
 }
@@ -892,6 +892,7 @@ els.difficultyRow.addEventListener("click", (event) => {
   const button = event.target.closest("[data-difficulty]");
   if (!button) return;
   settings.difficulty = button.dataset.difficulty;
+  if (settings.difficulty === "table") settings.ops = ["mul"];
   persistSettings();
   syncSetupUi();
 });

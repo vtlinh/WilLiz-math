@@ -46,6 +46,11 @@ assert(personMix(fresh, "Liz").theme === "dark", "liz keeps default dark");
 assert(personMix(fresh, "Liz").difficulty === "hard", "written challenge becomes hard");
 assert(fresh.lastLearner === "Liz", "last writer is current learner");
 
+writePersonMix(fresh, "Guest", { ops: ["add", "mul", "div"], difficulty: "table", mode: "practice" });
+assert(personMix(fresh, "Guest").ops.join(",") === "mul", "table keeps only ×");
+writePersonMix(fresh, "Guest", { ops: ["add"], difficulty: "table", mode: "practice" });
+assert(personMix(fresh, "Guest").ops.join(",") === "add", "table without × leaves ops alone");
+
 const reloaded = normalizeStore(JSON.parse(JSON.stringify(fresh)));
 assert(personMix(reloaded, "Will").mode === "sprint10", "round-trip will sprint");
 assert(personMix(reloaded, "Will").difficulty === "medium", "round-trip will");
