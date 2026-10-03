@@ -469,8 +469,9 @@ legend {
   display: inline-flex;
   align-items: center;
   gap: 0.32em;
+  margin-top: 0.12em;
   font-family: "Fraunces", Georgia, serif;
-  font-size: clamp(2.2rem, 9vw, 4.2rem);
+  font-size: clamp(2.2rem, 8vw, 3.6rem);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
