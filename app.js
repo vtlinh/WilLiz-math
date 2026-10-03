@@ -1,4 +1,4 @@
-import { generateProblem, parseAnswer, playOps } from "./problems.js";
+import { PICTURELESS_OPS, SYMBOLS, generateProblem, parseAnswer, playOps } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
 import {
   applyAutoFills,
@@ -120,12 +120,12 @@ function syncSetupUi() {
     button.classList.toggle("is-selected", button.dataset.learner === settings.learner);
   }
   for (const button of els.opRow.querySelectorAll("[data-op]")) {
-    const blocked = settings.difficulty === "pictures" && button.dataset.op === "div";
+    const blocked = pictureBlocked(button.dataset.op);
     const on = !blocked && settings.ops.includes(button.dataset.op);
     button.disabled = blocked;
     button.classList.toggle("is-selected", on);
     button.setAttribute("aria-pressed", String(on));
-    button.title = blocked ? "Pictures has no division" : "";
+    button.title = blocked ? `Pictures has no ${button.dataset.op === "frac" ? "fractions" : "division"}` : "";
   }
   const tableOn = settings.ops.includes("mul");
   if (!tableOn && settings.difficulty === "table") {
@@ -149,14 +149,17 @@ function syncSetupUi() {
     button.setAttribute("aria-checked", String(on));
   }
   applyTheme();
-  const symbols = { add: "+", sub: "−", mul: "×", div: "÷" };
   const ops = playOps(settings.ops, settings.difficulty)
-    .map((op) => symbols[op])
-    .join(" ") || "no operations";
+    .map((op) => SYMBOLS[op])
+    .join(" ") || "no topics";
   els.mixSummary.textContent = settings.difficulty === "table"
     ? `${settings.learner} · × table`
     : `${settings.learner} · ${modeMeta(settings.mode).label} · ${settings.difficulty} · ${ops}`;
   if (settings.ops.length) els.setupError.hidden = true;
+}
+
+function pictureBlocked(op) {
+  return settings.difficulty === "pictures" && PICTURELESS_OPS.includes(op);
 }
 
 function persistSettings() {
@@ -417,7 +420,7 @@ function paintProblem(reveal = false) {
       wrong: current.wrong,
     }),
   );
-  els.problem.classList.toggle("is-sheet", current.difficulty !== "easy");
+  els.problem.classList.toggle("is-sheet", current.difficulty !== "easy" && current.op !== "frac");
   els.form.classList.add("is-sheet-fill");
   els.input.hidden = true;
   syncSubmitLabel();
@@ -785,7 +788,7 @@ function finishRound({ to = "results" } = {}) {
 }
 
 function toggleOp(op) {
-  if (settings.difficulty === "pictures" && op === "div") return;
+  if (pictureBlocked(op)) return;
   if (settings.ops.includes(op)) {
     settings.ops = settings.ops.filter((item) => item !== op);
   } else {
@@ -841,7 +844,8 @@ function pressKey(key) {
     return;
   }
   let value = current.fills[slot] ?? "";
-  if (key === "back" && !value && current.difficulty === "table") {
+  const stepsThroughBlanks = current.difficulty === "table" || current.op === "frac";
+  if (key === "back" && !value && stepsThroughBlanks) {
     current.active = nextUnlocked(slot, -1);
     if (current.active !== slot && !current.locks?.[current.active]) {
       current.fills[current.active] = (current.fills[current.active] ?? "").slice(0, -1);
@@ -863,7 +867,7 @@ function pressKey(key) {
   }
   current.fills[slot] = value;
   if (current.wrong) current.wrong[slot] = false;
-  if (current.difficulty === "table" && key !== "back" && key !== "-" && key !== "−") {
+  if (stepsThroughBlanks && key !== "back" && key !== "-" && key !== "−") {
     const width = String(Math.abs(Number(field?.answer))).length;
     const digits = value.replace(/[-−]/g, "").length;
     if (width && digits >= width) current.active = nextUnlocked(slot, 1);

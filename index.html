@@ -19,7 +19,7 @@
     </script>
     <meta
       name="description"
-      content="WilLiz Math — a focused arithmetic practice studio for addition, subtraction, multiplication, and division."
+      content="WilLiz Math — a focused arithmetic practice studio for addition, subtraction, multiplication, division, and equivalent fractions."
     />
     <title>WilLiz Math</title>
     <link rel="manifest" href="manifest.webmanifest" />
@@ -83,12 +83,13 @@
       <main>
         <section id="settings-screen" class="panel hidden" aria-labelledby="setup-title">
           <fieldset class="block">
-            <legend>Operations</legend>
-            <div class="chip-row" id="op-row" role="group" aria-label="Operations">
-              <button type="button" class="chip is-selected" data-op="add" aria-pressed="true">+</button>
-              <button type="button" class="chip is-selected" data-op="sub" aria-pressed="true">−</button>
-              <button type="button" class="chip" data-op="mul" aria-pressed="false">×</button>
-              <button type="button" class="chip" data-op="div" aria-pressed="false">÷</button>
+            <legend>Topics</legend>
+            <div class="chip-row" id="op-row" role="group" aria-label="Topics">
+              <button type="button" class="chip is-selected" data-op="add" aria-pressed="true" aria-label="Addition">+</button>
+              <button type="button" class="chip is-selected" data-op="sub" aria-pressed="true" aria-label="Subtraction">−</button>
+              <button type="button" class="chip" data-op="mul" aria-pressed="false" aria-label="Multiplication">×</button>
+              <button type="button" class="chip" data-op="div" aria-pressed="false" aria-label="Division">÷</button>
+              <button type="button" class="chip" data-op="frac" aria-pressed="false" aria-label="Equivalent fractions">½</button>
             </div>
           </fieldset>
 
@@ -137,7 +138,7 @@
             </div>
           </fieldset>
 
-          <p id="setup-error" class="error" hidden>Choose at least one operation to start.</p>
+          <p id="setup-error" class="error" hidden>Choose at least one topic to start.</p>
         </section>
 
         <section id="setup-screen" class="panel" aria-labelledby="home-title">

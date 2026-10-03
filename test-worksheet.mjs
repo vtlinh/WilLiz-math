@@ -441,6 +441,25 @@ assert(table.find((field) => field.row === 9 && field.col === 9)?.answer === 81,
 assert(!table.some((field) => field.row > field.col), "products below the diagonal are left blank");
 assert(worksheetFields({ difficulty: "table", answer: 0 }).length === 36, "table difficulty uses the grid");
 
+const screenshot = {
+  op: "frac",
+  difficulty: "medium",
+  terms: [
+    { num: 5, den: 6, blank: null },
+    { num: 15, den: 18, blank: "den" },
+    { num: 20, den: 24, blank: "num" },
+  ],
+};
+const fracFields = worksheetFields(screenshot);
+assert(fracFields.map((field) => field.letter).join("") === "AB", "fraction blanks are A then B");
+assert(fracFields.map((field) => field.answer).join(",") === "18,20", "5/6 = 15/A = B/24 is A = 18, B = 20");
+assert(worksheetSections(fracFields).length === 1, "both fraction blanks are submitted together");
+assert(fieldsMatch(["18", "20"], fracFields), "A = 18, B = 20 is right");
+assert(!fieldsMatch(["24", "15"], fracFields), "A = 24, B = 15 is wrong");
+assert(!fieldsMatch(["18", "18"], fracFields), "A = 18, B = 18 is wrong");
+const easyFrac = worksheetFields({ ...screenshot, difficulty: "easy", terms: screenshot.terms.slice(0, 2) });
+assert(easyFrac.length === 1 && easyFrac[0].answer === 18, "easy fractions have a single blank");
+
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 assert(css.includes('font-family: "Caveat", "Segoe Script", "Apple Chancery", cursive'), "carry digits are cursive");
 assert(css.includes("calc(var(--sheet-digit) / 1.5625)"), "carry digits are two sizes smaller");

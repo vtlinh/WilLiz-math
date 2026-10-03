@@ -286,7 +286,7 @@ legend {
 }
 
 .chip-row {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .chip,
@@ -463,6 +463,59 @@ legend {
 .inline-blank.is-active {
   border-bottom-color: var(--sage);
   color: var(--ink);
+}
+
+.fraction-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(2.2rem, 9vw, 4.2rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.frac {
+  display: inline-grid;
+  justify-items: center;
+  row-gap: 0.08em;
+}
+
+.frac-bar {
+  justify-self: stretch;
+  min-width: 1.4ch;
+  border-top: 0.07em solid var(--ink);
+}
+
+.frac-eq {
+  color: var(--muted);
+}
+
+.frac-part {
+  min-width: 1ch;
+  text-align: center;
+}
+
+.frac-blank {
+  min-width: 2.2ch;
+  padding: 0.04em 0.12em;
+  border: 0.05em solid color-mix(in srgb, var(--ink) 28%, transparent);
+  border-radius: 0.16em;
+  background: var(--lift);
+}
+
+.frac-blank.is-placeholder {
+  color: color-mix(in srgb, var(--bad) 72%, var(--ink));
+  font-weight: 680;
+}
+
+.frac-blank.is-fill {
+  cursor: pointer;
+}
+
+.frac-blank.is-active {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 0.04em color-mix(in srgb, var(--sage) 45%, transparent);
 }
 
 .times-table {
@@ -1126,10 +1179,13 @@ body.celebrate-static .results-headline {
     font-size: 0.82rem;
   }
 
-  .chip-row,
   .mode-grid,
   .stats {
     grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .chip-row {
     gap: 6px;
   }
 
@@ -1208,6 +1264,10 @@ body.celebrate-static .results-headline {
 
   .problem-inline {
     font-size: clamp(2rem, 10vw, 3.2rem);
+  }
+
+  .fraction-row {
+    font-size: clamp(1.7rem, 8vw, 2.6rem);
   }
 
   .times-table {

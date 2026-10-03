@@ -10,7 +10,7 @@ export function missMessage(problem) {
   if (problem?.difficulty === "pictures") {
     return `Not quite. ${problem.prompt} = ${problem.answer}`;
   }
-  if (problem?.op === "div" || problem?.op === "mul" || problem?.op === "add" || problem?.op === "sub") {
+  if (problem?.op === "div" || problem?.op === "mul" || problem?.op === "add" || problem?.op === "sub" || problem?.op === "frac") {
     return "Not quite.";
   }
   return `Not quite. ${problem.prompt} = ${problem.answer}`;

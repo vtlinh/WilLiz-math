@@ -1,4 +1,4 @@
-import { SYMBOLS, parseAnswer } from "./problems.js";
+import { BLANK_LETTERS, SYMBOLS, parseAnswer } from "./problems.js";
 import { pickPicture, pictureSvg } from "./pictures.js";
 
 function digitList(value) {
@@ -41,8 +41,25 @@ export function tableFields() {
   return fields;
 }
 
+export function fractionFields(problem) {
+  const fields = [];
+  problem.terms.forEach((term, termIndex) => {
+    if (!term.blank) return;
+    fields.push({
+      id: `frac-${BLANK_LETTERS[fields.length]}`,
+      letter: BLANK_LETTERS[fields.length],
+      term: termIndex,
+      part: term.blank,
+      answer: term[term.blank],
+      index: fields.length,
+    });
+  });
+  return fields;
+}
+
 export function worksheetFields(problem) {
   if (problem.difficulty === "table") return tableFields();
+  if (problem.op === "frac") return fractionFields(problem);
   if (problem.difficulty === "pictures" || problem.difficulty === "easy") {
     return [{ id: "total", answer: problem.answer }];
   }
@@ -831,6 +848,55 @@ function renderInlineProblem(problem, { fills = [], active = 0, reveal = false }
   return root;
 }
 
+function fractionPart(value, field, { fills, active, reveal }) {
+  const el = document.createElement("span");
+  el.className = "frac-part";
+  if (!field) {
+    el.textContent = String(value);
+    return el;
+  }
+  el.classList.add("frac-blank");
+  const typed = fills[field.index] ?? "";
+  if (reveal) {
+    el.textContent = String(field.answer);
+  } else if (typed && typed !== "-" && typed !== "−") {
+    el.textContent = typed;
+  } else {
+    el.textContent = field.letter;
+    el.classList.add("is-placeholder");
+  }
+  markFill(el, { slot: field.index, active: active === field.index, reveal, label: `Fill ${field.letter}` });
+  return el;
+}
+
+export function renderFractionProblem(problem, { fills = [], active = 0, reveal = false } = {}) {
+  const fields = fractionFields(problem);
+  const root = document.createElement("div");
+  root.className = "fraction-row";
+  problem.terms.forEach((term, termIndex) => {
+    if (termIndex > 0) {
+      const eq = document.createElement("span");
+      eq.className = "frac-eq";
+      eq.textContent = "=";
+      root.append(eq);
+    }
+    const field = fields.find((item) => item.term === termIndex);
+    const frac = document.createElement("span");
+    frac.className = "frac";
+    const bar = document.createElement("span");
+    bar.className = "frac-bar";
+    bar.setAttribute("aria-hidden", "true");
+    frac.append(
+      fractionPart(term.num, field?.part === "num" ? field : null, { fills, active, reveal }),
+      bar,
+      fractionPart(term.den, field?.part === "den" ? field : null, { fills, active, reveal }),
+    );
+    root.append(frac);
+  });
+  root.setAttribute("aria-label", problem.prompt.replaceAll("/", " over "));
+  return root;
+}
+
 function tableLabel(text) {
   const el = document.createElement("span");
   el.className = "times-label";
@@ -888,6 +954,7 @@ export function renderTableSheet(_problem, { fills = [], active = 0, reveal = fa
 
 export function renderProblemView(problem, options = {}) {
   if (problem.difficulty === "table") return renderTableSheet(problem, options);
+  if (problem.op === "frac") return renderFractionProblem(problem, options);
   if (problem.difficulty === "pictures") return renderPictureSheet(problem, options);
   if (problem.difficulty === "easy") return renderInlineProblem(problem, options);
   if (problem.op === "mul") return renderMultiplicationSheet(problem, options);

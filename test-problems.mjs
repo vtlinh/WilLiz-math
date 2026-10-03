@@ -1,8 +1,12 @@
 import { readFileSync } from "node:fs";
-import { generateProblem, operandsAllowed, parseAnswer, playOps } from "./problems.js";
+import { gcd, generateProblem, makeFractionProblem, operandsAllowed, parseAnswer, playOps } from "./problems.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function settingsHtml() {
+  return readFileSync(new URL("./index.html", import.meta.url), "utf8");
 }
 
 const ops = ["add", "sub", "mul", "div"];
@@ -105,6 +109,44 @@ try {
   threw = true;
 }
 assert(threw, "pictures + only division is invalid");
+
+for (const difficulty of ["easy", "medium", "hard"]) {
+  for (let i = 0; i < 200; i += 1) {
+    const problem = generateProblem(["frac"], difficulty);
+    const [first, ...rest] = problem.terms;
+    const blanks = problem.terms.filter((term) => term.blank);
+    assert(problem.op === "frac" && problem.difficulty === difficulty, "fraction problem keeps its topic and level");
+    assert(!first.blank, "the first fraction is always shown");
+    assert(first.num < first.den, "fractions are proper");
+    for (const term of problem.terms) {
+      assert(term.num * first.den === term.den * first.num, `${problem.prompt} terms are equivalent`);
+      assert(Number.isInteger(term.num) && term.num >= 1, "numerators are whole and positive");
+    }
+    assert(new Set(problem.terms.map((term) => term.den)).size === problem.terms.length, "no fraction repeats");
+    assert(rest.every((term) => term.blank === "num" || term.blank === "den"), "every later fraction has one blank");
+    assert(problem.answer === blanks[0][blanks[0].blank], "answer is the first blank");
+    if (difficulty === "easy") {
+      assert(problem.terms.length === 2, "easy fractions have one blank");
+      assert(gcd(first.num, first.den) === 1, "easy starts in lowest terms");
+      assert(first.den <= 9, "easy denominators stay 2-9");
+    } else {
+      assert(problem.terms.length === 3, `${difficulty} fractions have two blanks`);
+      assert(problem.prompt.includes("A") && problem.prompt.includes("B"), "blanks are lettered A and B");
+    }
+    if (difficulty === "medium") {
+      assert(gcd(first.num, first.den) === 1 && first.den <= 9, "medium starts from a simple fraction");
+    }
+    if (difficulty === "hard") {
+      assert(gcd(first.num, first.den) > 1, "hard starts from an unreduced fraction");
+      assert(rest.some((term) => term.den < first.den), "hard asks for a scaled-down fraction");
+    }
+  }
+}
+assert(playOps(["add", "frac"], "pictures").join(",") === "add", "drop fractions in pictures");
+const fracPrompt = makeFractionProblem("medium").prompt;
+assert(/^\d+\/\d+ = (\d+|A)\/(\d+|A) = (\d+|B)\/(\d+|B)$/.test(fracPrompt), `prompt reads like 5/6 = 15/A = B/24 (${fracPrompt})`);
+assert(settingsHtml().includes('data-op="frac"'), "fractions chip is in settings");
+assert(settingsHtml().includes("<legend>Topics</legend>"), "the chooser is called Topics");
 
 assert(parseAnswer("") === null, "empty");
 assert(parseAnswer("12") === 12, "int");

@@ -1,4 +1,5 @@
-export const SYMBOLS = { add: "+", sub: "−", mul: "×", div: "÷" };
+export const SYMBOLS = { add: "+", sub: "−", mul: "×", div: "÷", frac: "½" };
+export const BLANK_LETTERS = ["A", "B"];
 
 export function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -6,6 +7,22 @@ export function randInt(min, max) {
 
 function pick(list) {
   return list[randInt(0, list.length - 1)];
+}
+
+function shuffled(list) {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = randInt(0, i);
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+export function gcd(a, b) {
+  let x = Math.abs(a);
+  let y = Math.abs(b);
+  while (y) [x, y] = [y, x % y];
+  return x;
 }
 
 function digitsMin(count) {
@@ -27,13 +44,15 @@ function exactDividend(divisor, minDigits, maxDigits) {
   return randInt(minQ, maxQ);
 }
 
+export const PICTURELESS_OPS = ["div", "frac"];
+
 export function numericDifficulty(difficulty) {
   return difficulty === "pictures" ? "easy" : difficulty;
 }
 
 export function playOps(ops, difficulty) {
   const list = Array.isArray(ops) ? ops : [];
-  if (difficulty === "pictures") return list.filter((op) => op !== "div");
+  if (difficulty === "pictures") return list.filter((op) => !PICTURELESS_OPS.includes(op));
   if (difficulty === "table") return list.includes("mul") ? ["mul"] : [];
   return [...list];
 }
@@ -51,14 +70,64 @@ export function operandsAllowed(op, a, b) {
   return true;
 }
 
+function simplestFraction(maxDen) {
+  for (;;) {
+    const den = randInt(2, maxDen);
+    const num = randInt(1, den - 1);
+    if (gcd(num, den) === 1) return { num, den };
+  }
+}
+
+function fractionScales(level) {
+  if (level === "easy") return [1, randInt(2, 5)];
+  if (level === "medium") return [1, ...shuffled([2, 3, 4, 5, 6]).slice(0, 2)];
+  const start = randInt(2, 6);
+  const down = randInt(1, start - 1);
+  const other = pick([2, 3, 4, 5, 6, 7, 8, 9].filter((k) => k !== start && k !== down));
+  return [start, ...shuffled([down, other])];
+}
+
+// Every term equals the first, so each blank is the other part times the same scale.
+export function makeFractionProblem(difficulty) {
+  const base = simplestFraction(difficulty === "hard" ? 12 : 9);
+  const terms = fractionScales(difficulty).map((scale, index) => ({
+    num: base.num * scale,
+    den: base.den * scale,
+    blank: index === 0 ? null : pick(["num", "den"]),
+  }));
+  let letter = 0;
+  const text = terms.map((term) => {
+    const name = term.blank ? BLANK_LETTERS[letter++] : "";
+    const num = term.blank === "num" ? name : term.num;
+    const den = term.blank === "den" ? name : term.den;
+    return `${num}/${den}`;
+  });
+  const first = terms.find((term) => term.blank);
+  return {
+    op: "frac",
+    difficulty,
+    terms,
+    a: terms[0].num,
+    b: terms[0].den,
+    answer: first[first.blank],
+    prompt: text.join(" = "),
+    key: `frac:${terms.map((term) => `${term.num}/${term.den}${term.blank ?? ""}`).join("=")}`,
+  };
+}
+
 export function generateProblem(ops, difficulty, previousKey = "") {
   const pool = playOps(ops, difficulty);
   if (!pool.length) {
-    throw new Error("At least one operation is required");
+    throw new Error("At least one topic is required");
   }
 
   const chosen = pick(pool);
   const level = numericDifficulty(difficulty);
+  if (chosen === "frac") {
+    let problem = makeFractionProblem(level);
+    for (let i = 0; i < 16 && problem.key === previousKey; i += 1) problem = makeFractionProblem(level);
+    return problem;
+  }
   const pictures = difficulty === "pictures";
   let a;
   let b;
