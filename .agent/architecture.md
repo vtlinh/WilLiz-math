@@ -10,7 +10,7 @@ storage.js          per-learner settings and bests
 problems.js         generateProblem, parseAnswer
 pictures.js         kid-friendly fruit, toy, and school-supply drawings
 worksheet.js        long multiplication and long division layouts
-celebrate.js        perfect-score confetti and fireworks
+celebrate.js        90%-and-up confetti and fireworks
 stars.js            quiz 20% stars and unlimited 10-correct-set stars
 scoring.js          first-try credit and results Correct as `correct / answered`
 cheers.js           50 correct-answer cheers and tiered results congratulations
@@ -18,7 +18,7 @@ test-problems.mjs   Node checks for the generator
 test-storage.mjs    Node checks for per-learner storage
 test-worksheet.mjs  Node checks for worksheet layouts
 test-pictures.mjs   Node checks for the Pictures object set
-test-celebrate.mjs  Node checks for when a perfect score celebrates
+test-celebrate.mjs  Node checks for when a 90%+ score celebrates
 test-stars.mjs      Node checks for quiz and unlimited progress stars
 test-scoring.mjs    Node checks for first-try credit and the results Correct ratio
 test-pwa.mjs        Node checks for the installable app manifest

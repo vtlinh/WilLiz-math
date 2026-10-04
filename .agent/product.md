@@ -39,7 +39,7 @@ Easy is a flat equation (`15 ÷ 3 = _`, `5 × 3 = __`), not a column stack. Medi
 - A child can start a round in one screen and get immediate right/wrong feedback.
 - A correct answer shows one of 50 short cheers (“Nailed it!”, “Number ninja!”), centered right below the exercise. Every cheer appears once before any repeats, and the same cheer never shows twice in a row.
 - The results screen congratulates in a style that fits the round: perfect, great (80%+), good (50%+), growing, or warm-up (none correct). Each tier has several titles and headlines with their own look (trophy shine, rainbow, twinkling stars, rocket, medal, sunrise, sprout), picked at random.
-- A perfect score (100% correct, at least one answer) on Pictures, Medium, or Hard plays confetti and fireworks. Easy does not.
+- A score of 90% or more (first-try correct over answered, at least one answer) on Pictures, Medium, Hard, or × table plays confetti and fireworks. Easy does not. The results title and headline are centered.
 - A quiz earns a small star at the bottom of the play screen for each 20% of the round answered correctly, up to five.
 - Unlimited practice and sprint award a star for each all-correct set of 10 problems, counted from the first problem. After 7 stars the tray switches to `X ★`.
 - A newly earned star starts super large over the exercise and shrinks down into its spot in the tray, then glows for its first 10 seconds.
