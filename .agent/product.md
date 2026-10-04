@@ -41,7 +41,7 @@ Easy is a flat equation (`15 ÷ 3 = _`, `5 × 3 = __`), not a column stack. Medi
 - The results screen congratulates in a style that fits the round: perfect, great (80%+), good (50%+), growing, or warm-up (none correct). Each tier has several titles and headlines with their own look (trophy shine, rainbow, twinkling stars, rocket, medal, sunrise, sprout), picked at random.
 - A score of 90% or more (first-try correct over answered, at least one answer) on Pictures, Medium, Hard, or × table plays confetti and fireworks. Easy does not. The results title and headline are centered.
 - A quiz earns a small star at the bottom of the play screen for each 20% of the round answered correctly, up to five.
-- Unlimited practice and sprint award a star for each all-correct set of 10 problems, counted from the first problem. After 7 stars the tray switches to `X ★`.
+- Unlimited practice and sprint award a star for every 10 first-try correct answers in a row. A miss restarts the count, and so does each star. After 7 stars the tray switches to `X ★`.
 - A newly earned star starts super large over the exercise and shrinks down into its spot in the tray, then glows for its first 10 seconds.
 - The same files work locally and at `https://vtlinh.github.io/WilLiz-math/` after Pages is enabled.
 - Chrome can install the site as an app from the address bar or the browser menu.
