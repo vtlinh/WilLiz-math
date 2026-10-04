@@ -976,8 +976,13 @@ legend {
   text-shadow: 0 1px 0 rgba(61, 39, 16, 0.15);
 }
 
-.star.is-in {
-  animation: star-in 420ms cubic-bezier(0.22, 1.35, 0.36, 1);
+.star.is-in,
+.star-compact.is-in .star {
+  position: relative;
+  z-index: 5;
+  animation:
+    star-in 1200ms cubic-bezier(0.33, 1, 0.68, 1),
+    star-glow 10s ease-in-out;
 }
 
 .star-compact {
@@ -990,22 +995,47 @@ legend {
   color: var(--ink);
 }
 
-.star-compact.is-in {
-  animation: star-in 420ms cubic-bezier(0.22, 1.35, 0.36, 1);
-}
-
 .star-count {
   font-variant-numeric: tabular-nums;
 }
 
 @keyframes star-in {
   from {
-    transform: scale(0.2) translateY(10px);
+    transform: translateY(-28vh) scale(9) rotate(-30deg);
     opacity: 0;
   }
-  to {
-    transform: scale(1) translateY(0);
+  15% {
     opacity: 1;
+  }
+  to {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes star-glow {
+  0%,
+  100% {
+    text-shadow: 0 1px 0 rgba(61, 39, 16, 0.15);
+  }
+  8%,
+  32%,
+  56%,
+  80% {
+    text-shadow:
+      0 0 6px var(--gold),
+      0 0 16px var(--gold),
+      0 0 32px var(--gold),
+      0 0 48px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+  20%,
+  44%,
+  68%,
+  90% {
+    text-shadow:
+      0 0 5px var(--gold),
+      0 0 14px var(--gold),
+      0 0 26px color-mix(in srgb, var(--gold) 50%, transparent);
   }
 }
 
@@ -1799,7 +1829,7 @@ body.celebrate-static .results-headline {
   }
 
   .star.is-in,
-  .star-compact.is-in,
+  .star-compact.is-in .star,
   #results-screen[data-cheer] #results-title,
   #results-screen[data-cheer] #results-title::before,
   #results-screen[data-cheer] #results-title::after {
