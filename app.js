@@ -12,7 +12,7 @@ import {
 } from "./worksheet.js";
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
-import { bestNote, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
+import { bestNote, correctFeedback, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
 import { cheerDeck, resultCheer } from "./cheers.js";
 
 const els = {
@@ -602,8 +602,7 @@ function mark(correct) {
     } else {
       round.streak = 0;
     }
-    els.feedback.textContent = cheers.next();
-    els.feedback.className = "feedback is-good";
+    showCorrectFeedback();
     paintProblem(true);
   } else {
     round.streak = 0;
@@ -611,6 +610,12 @@ function mark(correct) {
     els.feedback.className = "feedback is-bad";
     paintProblem(true);
   }
+}
+
+function showCorrectFeedback() {
+  const cheer = correctFeedback(current.missed, cheers);
+  els.feedback.textContent = cheer;
+  els.feedback.className = cheer ? "feedback is-good" : "feedback";
 }
 
 function recordAttempt(correct) {
@@ -667,14 +672,14 @@ function submitTable() {
     round.streak = matches.every(Boolean) ? 1 : 0;
     round.bestStreak = round.streak;
   }
+  if (!matches.every(Boolean)) current.missed = true;
   matches.forEach((ok, index) => {
     current.locks[index] = ok;
     current.wrong[index] = !ok;
   });
   updateProgress();
   if (matches.every(Boolean)) {
-    els.feedback.textContent = cheers.next();
-    els.feedback.className = "feedback is-good";
+    showCorrectFeedback();
     paintProblem(true);
     advanceAfterCheer({ finish: true });
     return;

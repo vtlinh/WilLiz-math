@@ -2,6 +2,10 @@ export function creditsAnswer(correct, missed) {
   return Boolean(correct && !missed);
 }
 
+export function correctFeedback(missed, deck) {
+  return missed ? "" : deck.next();
+}
+
 export function formatCorrectCount(correct, answered) {
   return `${Number(correct) || 0} / ${Number(answered) || 0}`;
 }

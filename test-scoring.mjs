@@ -1,4 +1,4 @@
-import { bestNote, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
+import { bestNote, correctFeedback, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -11,6 +11,12 @@ assert(creditsAnswer(true, false) === true, "first-try correct scores");
 assert(creditsAnswer(true, true) === false, "correct after a miss scores 0");
 assert(creditsAnswer(false, true) === false, "a miss scores 0");
 assert(creditsAnswer(false, false) === false, "wrong first try scores 0");
+
+let drawn = 0;
+const deck = { next: () => `Cheer ${(drawn += 1)}` };
+assert(correctFeedback(false, deck) === "Cheer 1", "first-try correct gets a cheer");
+assert(correctFeedback(true, deck) === "", "correct after a miss gets no cheer");
+assert(drawn === 1, "a fixed miss does not use up a cheer from the deck");
 
 const div220 = { op: "div", a: 220, b: 20, answer: 11, prompt: "220 ÷ 20" };
 assert(missMessage(div220) === "Not quite.", "long division does not rewrite 220 ÷ 20 = 11");
