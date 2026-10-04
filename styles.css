@@ -1004,6 +1004,280 @@ legend {
   margin-top: 0;
 }
 
+#results-screen {
+  --cheer-ink: var(--ink);
+  --cheer-fill: none;
+  --cheer-glyph: var(--gold);
+}
+
+#results-screen[data-cheer="trophy"] {
+  --cheer-ink: #f0c450;
+  --cheer-fill: linear-gradient(100deg, #e3b03a 0%, #fff1c1 45%, #e3b03a 60%, #f6d365 100%);
+}
+
+#results-screen[data-cheer="rainbow"] {
+  --cheer-ink: #e3b03a;
+  --cheer-fill: linear-gradient(90deg, #f07167, #e3b03a, #7dceb0, #6aa7ff, #c08cff, #f07167);
+}
+
+#results-screen[data-cheer="stars"] {
+  --cheer-ink: #e3b03a;
+  --cheer-glyph: #fff1c1;
+}
+
+#results-screen[data-cheer="rocket"] {
+  --cheer-ink: #e07a5f;
+  --cheer-fill: linear-gradient(90deg, #e07a5f, #e3b03a);
+}
+
+#results-screen[data-cheer="medal"] {
+  --cheer-ink: #e3b03a;
+}
+
+#results-screen[data-cheer="sunrise"] {
+  --cheer-ink: #f4a261;
+  --cheer-fill: linear-gradient(90deg, #f4a261, #e9c46a);
+}
+
+#results-screen[data-cheer="sprout"] {
+  --cheer-ink: #7dceb0;
+  --cheer-fill: linear-gradient(90deg, #7dceb0, #b5e48c);
+  --cheer-glyph: #7dceb0;
+}
+
+:root[data-theme="light"] #results-screen[data-cheer="trophy"] {
+  --cheer-ink: #a86b00;
+  --cheer-fill: linear-gradient(100deg, #a86b00 0%, #d9a21b 45%, #a86b00 60%, #8a5600 100%);
+}
+
+:root[data-theme="light"] #results-screen[data-cheer="rainbow"] {
+  --cheer-ink: #a86b00;
+  --cheer-fill: linear-gradient(90deg, #b42318, #a86b00, #2f6b56, #2457b5, #6d3fc0, #b42318);
+}
+
+:root[data-theme="light"] #results-screen[data-cheer="stars"],
+:root[data-theme="light"] #results-screen[data-cheer="medal"] {
+  --cheer-ink: #a86b00;
+  --cheer-glyph: #c98a0b;
+}
+
+:root[data-theme="light"] #results-screen[data-cheer="rocket"] {
+  --cheer-ink: #c85a3c;
+  --cheer-fill: linear-gradient(90deg, #c85a3c, #a86b00);
+}
+
+:root[data-theme="light"] #results-screen[data-cheer="sunrise"] {
+  --cheer-ink: #c2541b;
+  --cheer-fill: linear-gradient(90deg, #c2541b, #a86b00);
+}
+
+:root[data-theme="light"] #results-screen[data-cheer="sprout"] {
+  --cheer-ink: #2f6b56;
+  --cheer-fill: linear-gradient(90deg, #2f6b56, #4f7a1f);
+  --cheer-glyph: #2f6b56;
+}
+
+#results-screen[data-cheer]::before {
+  background: var(--cheer-ink);
+}
+
+#results-screen[data-cheer] #results-title {
+  align-self: flex-start;
+  display: inline-block;
+  color: var(--cheer-ink);
+  animation: cheer-rise 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  #results-screen[data-cheer="trophy"] #results-title,
+  #results-screen[data-cheer="rainbow"] #results-title,
+  #results-screen[data-cheer="rocket"] #results-title,
+  #results-screen[data-cheer="sunrise"] #results-title,
+  #results-screen[data-cheer="sprout"] #results-title {
+    background: var(--cheer-fill);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+#results-screen[data-cheer="trophy"] #results-title {
+  animation:
+    cheer-pop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.4) both,
+    cheer-shine 2.4s ease-in-out 0.4s infinite;
+}
+
+#results-screen[data-cheer="trophy"] #results-title::before,
+#results-screen[data-cheer="trophy"] #results-title::after {
+  content: "★";
+  color: var(--cheer-glyph);
+  -webkit-text-fill-color: var(--cheer-glyph);
+  margin: 0 0.3em;
+  font-size: 0.8em;
+}
+
+#results-screen[data-cheer="rainbow"] #results-title {
+  animation:
+    cheer-pop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.4) both,
+    cheer-shine 3s linear infinite;
+}
+
+#results-screen[data-cheer="stars"] #results-title::before,
+#results-screen[data-cheer="stars"] #results-title::after {
+  content: "✦";
+  display: inline-block;
+  margin: 0 0.3em;
+  font-size: 0.75em;
+  color: var(--cheer-glyph);
+  animation: cheer-twinkle 1.2s ease-in-out infinite;
+}
+
+#results-screen[data-cheer="stars"] #results-title::after {
+  animation-delay: 0.6s;
+}
+
+#results-screen[data-cheer="rocket"] #results-title {
+  animation: cheer-launch 0.75s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+#results-screen[data-cheer="rocket"] #results-title::after {
+  content: "";
+  display: block;
+  height: 4px;
+  margin-top: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, transparent, var(--cheer-ink));
+  transform-origin: right;
+  animation: cheer-trail 0.9s ease-out 0.3s both;
+}
+
+#results-screen[data-cheer="medal"] #results-title {
+  animation: cheer-bounce 0.8s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+#results-screen[data-cheer="medal"] #results-title::before {
+  content: "✓";
+  display: inline-grid;
+  place-items: center;
+  width: 1.3em;
+  height: 1.3em;
+  margin-right: 0.4em;
+  border-radius: 50%;
+  background: var(--cheer-ink);
+  color: var(--card);
+  font-size: 0.8em;
+  vertical-align: 0.1em;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cheer-ink) 35%, transparent);
+}
+
+#results-screen[data-cheer="sunrise"] #results-title {
+  animation: cheer-rise 0.9s ease-out both;
+}
+
+#results-screen[data-cheer="sprout"] #results-title {
+  transform-origin: left bottom;
+  animation: cheer-grow 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+#results-screen[data-cheer="sprout"] #results-title::before {
+  content: "✿";
+  margin-right: 0.35em;
+  font-size: 0.85em;
+  color: var(--cheer-glyph);
+  -webkit-text-fill-color: var(--cheer-glyph);
+}
+
+@keyframes cheer-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cheer-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cheer-shine {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes cheer-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.6) rotate(45deg);
+  }
+}
+
+@keyframes cheer-launch {
+  from {
+    opacity: 0;
+    transform: translate(-30px, 30px) rotate(-4deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes cheer-trail {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes cheer-bounce {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes cheer-grow {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .stats {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -1506,7 +1780,10 @@ body.celebrate-static .results-headline {
   }
 
   .star.is-in,
-  .star-compact.is-in {
+  .star-compact.is-in,
+  #results-screen[data-cheer] #results-title,
+  #results-screen[data-cheer] #results-title::before,
+  #results-screen[data-cheer] #results-title::after {
     animation: none;
   }
 }

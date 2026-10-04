@@ -13,6 +13,7 @@ import {
 import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.js";
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
 import { bestNote, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
+import { cheerDeck, resultCheer } from "./cheers.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -39,6 +40,7 @@ const els = {
   feedback: document.getElementById("feedback"),
   keypad: document.getElementById("keypad"),
   starRow: document.getElementById("star-row"),
+  resultsTitle: document.getElementById("results-title"),
   headline: document.getElementById("results-headline"),
   statCorrect: document.getElementById("stat-correct"),
   statAccuracy: document.getElementById("stat-accuracy"),
@@ -72,6 +74,7 @@ let current = null;
 let timerId = null;
 let awaitingAdvance = false;
 let screen = "setup";
+const cheers = cheerDeck();
 
 function loadStore() {
   let raw = null;
@@ -602,7 +605,7 @@ function mark(correct) {
     } else {
       round.streak = 0;
     }
-    els.feedback.textContent = "Nice. That’s right.";
+    els.feedback.textContent = cheers.next();
     els.feedback.className = "feedback is-good";
     paintProblem(true);
   } else {
@@ -668,7 +671,7 @@ function submitTable() {
   });
   updateProgress();
   if (matches.every(Boolean)) {
-    els.feedback.textContent = "Nice. That’s right.";
+    els.feedback.textContent = cheers.next();
     els.feedback.className = "feedback is-good";
     paintProblem(true);
     awaitingAdvance = true;
@@ -772,10 +775,11 @@ function finishRound({ to = "results" } = {}) {
   if (improved) store.bests[key] = round.correct;
   saveStore(store);
 
-  const name = round.learner;
-  els.headline.textContent = round.correct
-    ? `${name} banked ${round.correct} correct answer${round.correct === 1 ? "" : "s"}.`
-    : `${name} is warmed up. Try one more pass.`;
+  const cheer = resultCheer({ name: round.learner, answered: round.answered, correct: round.correct });
+  els.results.dataset.cheer = cheer.style;
+  els.results.dataset.tier = cheer.tier;
+  els.resultsTitle.textContent = cheer.title;
+  els.headline.textContent = cheer.headline;
   els.statCorrect.textContent = formatCorrectCount(round.correct, round.answered);
   els.statCorrect.setAttribute("aria-label", `${round.correct} of ${round.answered} correct`);
   els.statAccuracy.textContent = `${accuracy}%`;
