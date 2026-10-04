@@ -7,17 +7,15 @@ export function progressStars(correct, total) {
 }
 
 export function unlimitedStars(attempts) {
-  if (!Array.isArray(attempts) || attempts.length < UNLIMITED_STAR_SET) return 0;
+  if (!Array.isArray(attempts)) return 0;
   let stars = 0;
-  for (let i = 0; i + UNLIMITED_STAR_SET <= attempts.length; i += UNLIMITED_STAR_SET) {
-    let clean = true;
-    for (let j = 0; j < UNLIMITED_STAR_SET; j += 1) {
-      if (!attempts[i + j]) {
-        clean = false;
-        break;
-      }
+  let run = 0;
+  for (const clean of attempts) {
+    run = clean ? run + 1 : 0;
+    if (run === UNLIMITED_STAR_SET) {
+      stars += 1;
+      run = 0;
     }
-    if (clean) stars += 1;
   }
   return stars;
 }

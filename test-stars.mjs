@@ -28,6 +28,12 @@ assert(unlimitedStars(twenty) === 2, "two clean sets");
 assert(unlimitedStars(seventy) === 7, "seven stars");
 assert(unlimitedStars(eighty) === 8, "eight stars");
 assert(unlimitedStars(Array(10).fill(false)) === 0, "ten misses");
+assert(unlimitedStars([false, ...ten]) === 1, "ten in a row after a miss earns a star");
+assert(unlimitedStars([...Array(5).fill(true), false, ...ten]) === 1, "a run can start anywhere");
+assert(unlimitedStars(Array(19).fill(true)) === 1, "19 in a row is one star");
+assert(unlimitedStars([...nine, false, ...nine]) === 0, "a miss restarts the count");
+assert(unlimitedStars([...ten, ...nine, false, ...ten]) === 2, "the count restarts after each star");
+assert(unlimitedStars([true, true, true, false, ...twenty]) === 2, "twenty in a row after a miss is two stars");
 
 assert(compactStarCount(7) === false, "seven stay as icons");
 assert(compactStarCount(8) === true, "eight compact");
