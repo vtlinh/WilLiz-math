@@ -14,6 +14,7 @@ import { playCelebration, shouldCelebrate, stopCelebration } from "./celebrate.j
 import { compactStarCount, progressStars, unlimitedStars } from "./stars.js";
 import { bestNote, correctFeedback, creditsAnswer, formatCorrectCount, missMessage, resultsTimeMs } from "./scoring.js";
 import { cheerDeck, resultCheer } from "./cheers.js";
+import { LEARNERS, reassignRun, recordRun, runMix, runWhen } from "./history.js";
 
 const els = {
   setup: document.getElementById("setup-screen"),
@@ -60,6 +61,11 @@ const els = {
   leaveDialog: document.getElementById("leave-dialog"),
   leaveStay: document.getElementById("leave-stay"),
   leaveConfirm: document.getElementById("leave-confirm"),
+  history: document.getElementById("history-screen"),
+  historyBtn: document.getElementById("history-btn"),
+  historyTitle: document.getElementById("history-title"),
+  historyList: document.getElementById("history-list"),
+  historyEmpty: document.getElementById("history-empty"),
 };
 
 const settings = {
@@ -196,6 +202,74 @@ function setSettingsOpen(open) {
   showScreen("setup", { replace: true });
 }
 
+function setHistoryOpen(open) {
+  if (open) {
+    setLearnerOpen(false);
+    showScreen("history");
+    return;
+  }
+  if (screen !== "history") return;
+  if (history.state?.screen === "history") {
+    history.back();
+    return;
+  }
+  showScreen("setup", { replace: true });
+}
+
+function paintHistory() {
+  const runs = loadStore().history;
+  els.historyEmpty.hidden = runs.length > 0;
+  els.historyList.replaceChildren(...runs.map(historyItem));
+}
+
+function historyItem(run) {
+  const item = document.createElement("li");
+  item.className = "history-item";
+
+  const top = document.createElement("div");
+  top.className = "history-top";
+  const when = document.createElement("time");
+  when.dateTime = new Date(run.at).toISOString();
+  when.textContent = runWhen(run.at);
+  const score = document.createElement("strong");
+  score.className = "history-score";
+  score.textContent = formatCorrectCount(run.correct, run.answered);
+  score.setAttribute("aria-label", `${run.correct} of ${run.answered} correct`);
+  top.append(when, score);
+
+  const mix = document.createElement("p");
+  mix.className = "history-mix";
+  mix.textContent = `${runMix(run)} · ${formatTime(run.timeMs)}`;
+
+  const who = document.createElement("div");
+  who.className = "history-who";
+  who.setAttribute("role", "radiogroup");
+  who.setAttribute("aria-label", "Who played this run");
+  for (const name of LEARNERS) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "seg-btn";
+    button.dataset.run = run.id;
+    button.dataset.learner = name;
+    button.setAttribute("role", "radio");
+    const on = run.learner === name;
+    button.classList.toggle("is-selected", on);
+    button.setAttribute("aria-checked", String(on));
+    button.textContent = name;
+    who.append(button);
+  }
+
+  item.append(top, mix, who);
+  return item;
+}
+
+function switchRunLearner(id, learner) {
+  const store = loadStore();
+  store.history = reassignRun(store.history, id, learner);
+  saveStore(store);
+  paintHistory();
+}
+
 function isPracticePlay() {
   return screen === "play" && round?.mode === "practice";
 }
@@ -213,20 +287,23 @@ function paintPlayStat() {
 function syncPlayChrome() {
   const play = screen === "play";
   const settingsPage = screen === "settings";
+  const historyPage = screen === "history";
+  const subPage = settingsPage || historyPage;
   const practice = isPracticePlay();
-  const showBack = play || settingsPage;
+  const showBack = play || subPage;
   els.sessionBack.hidden = !showBack;
   els.sessionBack.classList.toggle("is-hidden", !showBack);
   els.sessionBack.tabIndex = showBack ? 0 : -1;
-  els.sessionBack.setAttribute("aria-label", settingsPage ? "Back to home" : "Back");
+  els.sessionBack.setAttribute("aria-label", subPage ? "Back to home" : "Back");
   els.setupTitle.hidden = !settingsPage;
-  els.actionHome.hidden = play || settingsPage;
+  els.historyTitle.hidden = !historyPage;
+  els.actionHome.hidden = play || subPage;
   els.playStat.hidden = !practice;
-  els.settingsBtn.hidden = play || settingsPage;
+  els.settingsBtn.hidden = play || subPage;
   els.settingsBtn.classList.toggle("is-open", settingsPage);
   els.settingsBtn.setAttribute("aria-expanded", String(settingsPage));
   els.playMeta.hidden = practice;
-  if (play || settingsPage) setLearnerOpen(false);
+  if (play || subPage) setLearnerOpen(false);
   if (practice) paintPlayStat();
 }
 
@@ -254,8 +331,10 @@ function isLeaveOpen() {
 }
 
 function paintScreen(name) {
-  screen = name === "play" || name === "settings" || name === "results" ? name : "setup";
+  screen = ["play", "settings", "results", "history"].includes(name) ? name : "setup";
+  if (screen === "history") paintHistory();
   els.setup.classList.toggle("hidden", screen !== "setup");
+  els.history.classList.toggle("hidden", screen !== "history");
   els.play.classList.toggle("hidden", screen !== "play");
   els.results.classList.toggle("hidden", screen !== "results");
   els.settings.classList.toggle("hidden", screen !== "settings");
@@ -777,6 +856,18 @@ function finishRound({ to = "results" } = {}) {
   const previous = store.bests[key] ?? 0;
   const improved = round.correct > previous;
   if (improved) store.bests[key] = round.correct;
+  store.history = recordRun(store.history, {
+    id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+    at: Date.now(),
+    learner: round.learner,
+    mode: round.mode,
+    difficulty: round.difficulty,
+    ops: round.ops,
+    correct: round.correct,
+    answered: round.answered,
+    timeMs: elapsed,
+    bestStreak: round.bestStreak,
+  });
   saveStore(store);
 
   const cheer = resultCheer({ name: round.learner, answered: round.answered, correct: round.correct });
@@ -943,6 +1034,10 @@ els.sessionBack.addEventListener("click", () => {
     setSettingsOpen(false);
     return;
   }
+  if (screen === "history") {
+    setHistoryOpen(false);
+    return;
+  }
   if (isLeaveOpen()) {
     setLeaveOpen(false);
     return;
@@ -964,9 +1059,16 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   setSettingsOpen(false);
+  setHistoryOpen(false);
 });
 
 els.startBtn.addEventListener("click", startRound);
+els.historyBtn.addEventListener("click", () => setHistoryOpen(true));
+els.historyList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-run][data-learner]");
+  if (!button) return;
+  switchRunLearner(button.dataset.run, button.dataset.learner);
+});
 els.input.addEventListener("pointerdown", (event) => {
   event.preventDefault();
 });
@@ -1046,7 +1148,7 @@ function watchScreenWake() {
 }
 
 restoreSettings();
-const launchScreen = location.hash === "#settings" ? "settings" : "setup";
+const launchScreen = location.hash === "#settings" || location.hash === "#history" ? location.hash.slice(1) : "setup";
 showScreen(launchScreen, { replace: true });
 watchScreenWake();
 holdScreenAwake();

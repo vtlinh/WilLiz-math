@@ -1,3 +1,5 @@
+import { normalizeHistory } from "./history.js";
+
 export const STORAGE_KEY = "williz-math-v1";
 export const STORE_VERSION = 2;
 
@@ -82,6 +84,7 @@ export function emptyStore() {
     lastLearner: "Will",
     people: {},
     bests: {},
+    history: [],
     storeVersion: STORE_VERSION,
   };
 }
@@ -108,6 +111,7 @@ export function normalizeStore(raw) {
     }
   }
 
+  store.history = normalizeHistory(raw.history);
   if (raw.lastLearner) store.lastLearner = raw.lastLearner;
   return store;
 }

@@ -42,6 +42,7 @@
           </svg>
         </button>
         <h2 id="setup-title" class="action-title" hidden>Settings</h2>
+        <h2 id="history-title" class="action-title" hidden>History</h2>
         <div class="action-start" id="action-home">
           <div class="learner-menu" id="learner-menu">
             <button
@@ -144,6 +145,12 @@
           <h2 id="home-title">Ready when you are</h2>
           <p id="mix-summary" class="mix-summary"></p>
           <button type="button" id="start-btn" class="primary">Start</button>
+          <button type="button" id="history-btn" class="ghost history-btn">History</button>
+        </section>
+
+        <section id="history-screen" class="panel hidden" aria-labelledby="history-title">
+          <p id="history-empty" class="history-empty">No runs yet. Solve at least one problem and the run shows up here.</p>
+          <ol id="history-list" class="history-list"></ol>
         </section>
 
         <section id="play-screen" class="panel hidden" aria-labelledby="problem">
