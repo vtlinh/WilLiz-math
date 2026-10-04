@@ -18,7 +18,7 @@ On the home page the action bar keeps one avatar on the left, WilLiz Math immedi
 3. Appearance: Dark (default) or Light.
 4. Mode: Practice (unlimited, retry allowed), Quiz of 10, Quiz of 20, a 10-minute sprint, or a 30-minute sprint. The mode list is hidden for × table.
 
-There is no Skip. Every mode stays on a problem until the answer is correct, then advances. A miss on that problem scores 0 even after they get it right.
+There is no Skip. Every mode stays on a problem until the answer is correct, then waits 2 seconds on the solved problem and its cheer before it advances (or shows results after the last quiz answer or a solved × table). A miss on that problem scores 0 even after they get it right.
 
 There is no End round button. During an exercise the action bar has no avatar and no settings icon. ← asks to confirm, then shows the results screen, once at least one exercise is done. Before that, ← returns home with no dialog. Back while that dialog is open closes it and returns to the exercise. Practice also shows an X/Y score. Results Correct is first-try correct over submitted answers, written `10 / 11` when they scored 10 of 11. The play screen does not repeat the learner/mode/difficulty line or a second correct count.
 
@@ -37,11 +37,12 @@ Easy is a flat equation (`15 ÷ 3 = _`, `5 × 3 = __`), not a column stack. Medi
 ## Success
 
 - A child can start a round in one screen and get immediate right/wrong feedback.
-- A correct answer shows one of 50 short cheers (“Nailed it!”, “Number ninja!”). Every cheer appears once before any repeats, and the same cheer never shows twice in a row.
+- A correct answer shows one of 50 short cheers (“Nailed it!”, “Number ninja!”), centered right below the exercise. Every cheer appears once before any repeats, and the same cheer never shows twice in a row.
 - The results screen congratulates in a style that fits the round: perfect, great (80%+), good (50%+), growing, or warm-up (none correct). Each tier has several titles and headlines with their own look (trophy shine, rainbow, twinkling stars, rocket, medal, sunrise, sprout), picked at random.
 - A perfect score (100% correct, at least one answer) on Pictures, Medium, or Hard plays confetti and fireworks. Easy does not.
 - A quiz earns a small star at the bottom of the play screen for each 20% of the round answered correctly, up to five.
 - Unlimited practice and sprint award a star for each all-correct set of 10 problems, counted from the first problem. After 7 stars the tray switches to `X ★`.
+- A newly earned star starts super large over the exercise and shrinks down into its spot in the tray, then glows for its first 10 seconds.
 - The same files work locally and at `https://vtlinh.github.io/WilLiz-math/` after Pages is enabled.
 - Chrome can install the site as an app from the address bar or the browser menu.
 - The installed phone app covers the screen and hides the system navigation buttons. A browser tab keeps the browser’s own controls. iOS still shows the home indicator.
