@@ -1,7 +1,7 @@
 export const CELEBRATE_DIFFICULTIES = ["pictures", "medium", "hard", "table"];
 
 export function shouldCelebrate({ answered = 0, correct = 0, difficulty = "" } = {}) {
-  return answered > 0 && correct === answered && CELEBRATE_DIFFICULTIES.includes(difficulty);
+  return answered > 0 && correct * 10 >= answered * 9 && CELEBRATE_DIFFICULTIES.includes(difficulty);
 }
 
 const COLORS = ["#e3b03a", "#c85a3c", "#2f6b56", "#fff8eb", "#7c3aed", "#2563eb", "#f97316"];
