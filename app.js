@@ -1,4 +1,4 @@
-import { PICTURELESS_OPS, SYMBOLS, generateProblem, parseAnswer, playOps } from "./problems.js";
+import { PICTURELESS_OPS, SYMBOLS, generateProblem, parseAnswer, playOps, roundDifficulty, tableTopic } from "./problems.js";
 import { STORAGE_KEY, normalizeStore, normalizeTheme, personMix, writePersonMix } from "./storage.js";
 import {
   applyAutoFills,
@@ -24,6 +24,7 @@ const els = {
   learnerAvatar: document.getElementById("learner-avatar"),
   learnerPanel: document.getElementById("learner-panel"),
   opRow: document.getElementById("op-row"),
+  difficultyBlock: document.getElementById("difficulty-block"),
   difficultyRow: document.getElementById("difficulty-row"),
   modeRow: document.getElementById("mode-row"),
   modeBlock: document.getElementById("mode-block"),
@@ -130,18 +131,13 @@ function syncSetupUi() {
     button.setAttribute("aria-pressed", String(on));
     button.title = blocked ? `Pictures has no ${button.dataset.op === "frac" ? "fractions" : "division"}` : "";
   }
-  const tableOn = settings.ops.includes("mul");
-  if (!tableOn && settings.difficulty === "table") {
-    settings.difficulty = "easy";
-    persistSettings();
-  }
   for (const button of els.difficultyRow.querySelectorAll("[data-difficulty]")) {
     const on = button.dataset.difficulty === settings.difficulty;
-    button.hidden = button.dataset.difficulty === "table" && !tableOn;
     button.classList.toggle("is-selected", on);
     button.setAttribute("aria-checked", String(on));
   }
-  const tableRound = settings.difficulty === "table";
+  const tableRound = tableTopic(settings.ops);
+  els.difficultyBlock.hidden = tableRound;
   els.modeBlock.hidden = tableRound;
   for (const button of els.modeRow.querySelectorAll("[data-mode]")) {
     button.classList.toggle("is-selected", button.dataset.mode === settings.mode);
@@ -155,14 +151,14 @@ function syncSetupUi() {
   const ops = playOps(settings.ops, settings.difficulty)
     .map((op) => SYMBOLS[op])
     .join(" ") || "no topics";
-  els.mixSummary.textContent = settings.difficulty === "table"
+  els.mixSummary.textContent = tableRound
     ? `${settings.learner} · × table`
     : `${settings.learner} · ${modeMeta(settings.mode).label} · ${settings.difficulty} · ${ops}`;
   if (settings.ops.length) els.setupError.hidden = true;
 }
 
 function pictureBlocked(op) {
-  return settings.difficulty === "pictures" && PICTURELESS_OPS.includes(op);
+  return settings.difficulty === "pictures" && !tableTopic(settings.ops) && PICTURELESS_OPS.includes(op);
 }
 
 function persistSettings() {
@@ -373,13 +369,13 @@ function startRound() {
   setLearnerOpen(false);
   setSettingsOpen(false);
 
-  const tableRound = settings.difficulty === "table";
+  const tableRound = tableTopic(settings.ops);
   const meta = tableRound ? { label: "× table", limit: null, timed: false } : modeMeta(settings.mode);
   round = {
     ...meta,
     learner: settings.learner,
     ops,
-    difficulty: settings.difficulty,
+    difficulty: roundDifficulty(settings.ops, settings.difficulty),
     mode: tableRound ? "table" : settings.mode,
     startedAt: Date.now(),
     endsAt: meta.timed ? Date.now() + meta.durationMs : null,
@@ -717,7 +713,7 @@ function submitAnswer(event) {
 function bestKey() {
   const learner = round?.learner ?? settings.learner;
   const mode = round?.mode ?? settings.mode;
-  const difficulty = round?.difficulty ?? settings.difficulty;
+  const difficulty = round?.difficulty ?? roundDifficulty(settings.ops, settings.difficulty);
   const ops = round?.ops ?? settings.ops;
   return `${learner}|${mode}|${difficulty}|${ops.slice().sort().join(",")}`;
 }
@@ -795,10 +791,14 @@ function toggleOp(op) {
   if (pictureBlocked(op)) return;
   if (settings.ops.includes(op)) {
     settings.ops = settings.ops.filter((item) => item !== op);
+  } else if (op === "table") {
+    settings.ops = ["table"];
+  } else if (tableTopic(settings.ops)) {
+    settings.ops = [op];
+    if (settings.difficulty === "pictures" && PICTURELESS_OPS.includes(op)) settings.difficulty = "easy";
   } else {
     settings.ops = [...settings.ops, op];
   }
-  if (settings.difficulty === "table" && settings.ops.join(",") !== "mul") settings.difficulty = "easy";
   persistSettings();
   syncSetupUi();
 }
@@ -906,7 +906,6 @@ els.difficultyRow.addEventListener("click", (event) => {
   const button = event.target.closest("[data-difficulty]");
   if (!button) return;
   settings.difficulty = button.dataset.difficulty;
-  if (settings.difficulty === "table") settings.ops = ["mul"];
   persistSettings();
   syncSetupUi();
 });

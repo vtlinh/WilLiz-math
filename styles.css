@@ -286,7 +286,11 @@ legend {
 }
 
 .chip-row {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 1.9fr) repeat(3, minmax(0, 1fr));
+}
+
+.chip-table {
+  white-space: nowrap;
 }
 
 .chip,

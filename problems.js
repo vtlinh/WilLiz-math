@@ -50,11 +50,19 @@ export function numericDifficulty(difficulty) {
   return difficulty === "pictures" ? "easy" : difficulty;
 }
 
+export function tableTopic(ops) {
+  return Array.isArray(ops) && ops.includes("table");
+}
+
 export function playOps(ops, difficulty) {
   const list = Array.isArray(ops) ? ops : [];
+  if (tableTopic(list)) return ["table"];
   if (difficulty === "pictures") return list.filter((op) => !PICTURELESS_OPS.includes(op));
-  if (difficulty === "table") return list.includes("mul") ? ["mul"] : [];
   return [...list];
+}
+
+export function roundDifficulty(ops, difficulty) {
+  return tableTopic(ops) ? "table" : difficulty;
 }
 
 function repeatedDivisorDividend(dividend, divisor) {

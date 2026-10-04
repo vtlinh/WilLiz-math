@@ -1,7 +1,7 @@
 export const STORAGE_KEY = "williz-math-v1";
 export const STORE_VERSION = 2;
 
-const DIFFICULTIES = ["pictures", "easy", "medium", "hard", "table"];
+const DIFFICULTIES = ["pictures", "easy", "medium", "hard"];
 
 export const DEFAULT_MIX = {
   ops: ["add", "sub"],
@@ -45,9 +45,11 @@ export function defaultMix() {
 function copyMix(mix, { migrateOld = false } = {}) {
   const source = mix && typeof mix === "object" ? mix : {};
   const difficulty = normalizeDifficulty(source.difficulty, { migrateOld });
-  const ops = Array.isArray(source.ops) ? [...source.ops] : [...DEFAULT_MIX.ops];
+  let ops = Array.isArray(source.ops) ? [...source.ops] : [...DEFAULT_MIX.ops];
+  if (source.difficulty === "table" && ops.includes("mul")) ops = ["table"];
+  if (ops.includes("table")) ops = ["table"];
   return {
-    ops: difficulty === "table" && ops.includes("mul") ? ["mul"] : ops,
+    ops,
     difficulty,
     mode: normalizeMode(source.mode),
     theme: normalizeTheme(source.theme),
@@ -57,6 +59,10 @@ function copyMix(mix, { migrateOld = false } = {}) {
 function migrateBestKey(key, migrateOld) {
   const parts = String(key).split("|");
   if (parts.length < 3) return key;
+  if (parts[2] === "table") {
+    parts[3] = "table";
+    return parts.join("|");
+  }
   parts[2] = normalizeDifficulty(parts[2], { migrateOld });
   return parts.join("|");
 }

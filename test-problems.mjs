@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { gcd, generateProblem, makeFractionProblem, operandsAllowed, parseAnswer, playOps } from "./problems.js";
+import { gcd, generateProblem, makeFractionProblem, operandsAllowed, parseAnswer, playOps, roundDifficulty } from "./problems.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -84,8 +84,11 @@ for (const op of ops) {
   }
 }
 
-assert(playOps(["add", "mul", "div"], "table").join(",") === "mul", "table uses multiplication only");
-assert(playOps(["add", "sub"], "table").length === 0, "table needs the × operation");
+assert(playOps(["table"], "hard").join(",") === "table", "× table topic plays the grid only");
+assert(playOps(["table"], "pictures").join(",") === "table", "× table ignores the difficulty");
+assert(playOps(["add", "table"], "easy").join(",") === "table", "× table stands alone");
+assert(roundDifficulty(["table"], "medium") === "table", "× table rounds use the grid level");
+assert(roundDifficulty(["mul"], "medium") === "medium", "other topics keep their difficulty");
 assert(playOps(["add", "div"], "pictures").join(",") === "add", "drop division in pictures");
 assert(playOps(["div"], "pictures").length === 0, "pictures cannot be division-only");
 assert(operandsAllowed("div", 22, 2) === false, "22 ÷ 2 is an obvious divide");
@@ -161,5 +164,9 @@ const hardAt = settings.indexOf('data-difficulty="hard"');
 assert(picturesAt !== -1 && picturesAt < easyAt, "pictures hardness comes before easy");
 assert(easyAt < mediumAt && mediumAt < hardAt, "easy, medium, then hard");
 assert(!settings.includes('data-difficulty="challenge"'), "challenge difficulty is gone");
+assert(!settings.includes('data-difficulty="table"'), "× table is not a difficulty");
+const tableChipAt = settings.indexOf('data-op="table"');
+const mulChipAt = settings.indexOf('data-op="mul"');
+assert(settings.indexOf('data-op="sub"') < tableChipAt && tableChipAt < mulChipAt, "× table topic sits right before ×");
 
 console.log("problem generator checks passed");

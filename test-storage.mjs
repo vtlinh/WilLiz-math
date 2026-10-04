@@ -14,7 +14,7 @@ function assert(condition, message) {
 
 assert(normalizeDifficulty("challenge") === "hard", "challenge label is now hard");
 assert(normalizeDifficulty("hard") === "hard", "current hard stays hard");
-assert(normalizeDifficulty("table") === "table", "table difficulty is kept");
+assert(normalizeDifficulty("table") === "easy", "× table is no longer a difficulty");
 assert(normalizeDifficulty("hard", { migrateOld: true }) === "medium", "old hard becomes medium");
 assert(normalizeDifficulty("medium", { migrateOld: true }) === "easy", "old medium is removed");
 assert(normalizeDifficulty("challenge", { migrateOld: true }) === "hard", "old challenge becomes hard");
@@ -47,9 +47,17 @@ assert(personMix(fresh, "Liz").difficulty === "hard", "written challenge becomes
 assert(fresh.lastLearner === "Liz", "last writer is current learner");
 
 writePersonMix(fresh, "Guest", { ops: ["add", "mul", "div"], difficulty: "table", mode: "practice" });
-assert(personMix(fresh, "Guest").ops.join(",") === "mul", "table keeps only ×");
+assert(personMix(fresh, "Guest").ops.join(",") === "table", "old × table difficulty becomes the × table topic");
+assert(personMix(fresh, "Guest").difficulty === "easy", "old × table difficulty falls back to easy");
 writePersonMix(fresh, "Guest", { ops: ["add"], difficulty: "table", mode: "practice" });
-assert(personMix(fresh, "Guest").ops.join(",") === "add", "table without × leaves ops alone");
+assert(personMix(fresh, "Guest").ops.join(",") === "add", "old table without × leaves ops alone");
+writePersonMix(fresh, "Guest", { ops: ["add", "table"], difficulty: "hard", mode: "practice" });
+assert(personMix(fresh, "Guest").ops.join(",") === "table", "× table topic stands alone");
+assert(personMix(fresh, "Guest").difficulty === "hard", "× table keeps the saved difficulty for later");
+
+const oldTableBest = normalizeStore({ storeVersion: 2, bests: { "Will|table|table|mul": 30, "Will|practice|easy|mul": 5 } });
+assert(oldTableBest.bests["Will|table|table|table"] === 30, "old × table best moves to the topic key");
+assert(oldTableBest.bests["Will|practice|easy|mul"] === 5, "easy × best is untouched");
 
 const reloaded = normalizeStore(JSON.parse(JSON.stringify(fresh)));
 assert(personMix(reloaded, "Will").mode === "sprint10", "round-trip will sprint");
