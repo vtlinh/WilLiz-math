@@ -415,16 +415,6 @@ legend {
   display: none;
 }
 
-.problem-label {
-  margin: 18px 0 0;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--sage);
-  text-align: center;
-}
-
 .problem-stage {
   display: flex;
   flex-direction: column;
@@ -434,7 +424,7 @@ legend {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 4px 0 8px;
+  margin: 24px 0 8px;
   font-size: clamp(3rem, 12vw, 5.4rem);
   line-height: 0.95;
   text-align: center;
@@ -1572,11 +1562,6 @@ body.celebrate-static .results-headline {
 
   .play-meta p {
     margin: 0;
-  }
-
-  .problem-label {
-    margin: 0;
-    font-size: 0.68rem;
   }
 
   .problem-stage {
