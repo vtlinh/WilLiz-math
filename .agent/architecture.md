@@ -13,6 +13,7 @@ worksheet.js        long multiplication and long division layouts
 celebrate.js        perfect-score confetti and fireworks
 stars.js            quiz 20% stars and unlimited 10-correct-set stars
 scoring.js          first-try credit and results Correct as `correct / answered`
+cheers.js           50 correct-answer cheers and tiered results congratulations
 test-problems.mjs   Node checks for the generator
 test-storage.mjs    Node checks for per-learner storage
 test-worksheet.mjs  Node checks for worksheet layouts
@@ -21,6 +22,7 @@ test-celebrate.mjs  Node checks for when a perfect score celebrates
 test-stars.mjs      Node checks for quiz and unlimited progress stars
 test-scoring.mjs    Node checks for first-try credit and the results Correct ratio
 test-pwa.mjs        Node checks for the installable app manifest
+test-cheers.mjs     Node checks for the cheer deck and results congratulations
 manifest.webmanifest Chrome install manifest (relative start_url)
 sw.js               caches the static shell
 icon-192.png
@@ -37,7 +39,7 @@ icon-512.png
 5. Addition, subtraction, multiplication, division, and fractions are rendered by `worksheet.js`. Fractions use `renderFractionProblem`: stacked fractions joined by `=`, with lettered boxes (A, B) for the blanks. Easy renders a flat equation. Pictures difficulty uses the counting-object sheet with drawings from `pictures.js` (fruit, toys, pencils/pens/erasers). `worksheetFields(problem)` lists every fillable working line.
 6. The keypad writes `current.fills[current.active]`. Multi-step worksheets use `worksheetSections` and **Next** until the last section, then **Submit**. Multiplication slots are one digit (or carry) and stay in the current section. Each partial row is the full product of the top number times that bottom digit, with the carry added into the next place (`26 × 2` → `52`). Carry rows stack above the top factor, newest on top, and the final sum also has carry boxes. Vertical addition and subtraction fill from the ones place toward the left and include a carry or borrow box when that column needs one. Every carry is two type sizes smaller than a working digit and cursive. Shifted rows do not write placeholder zeros. Division shows one quotient digit per section. Its subtract and bring-down slots are `auto`; `applyAutoFills` fills them after each keypress once that section’s multiply row is correct. A miss stays on the problem so they can fix it; that problem still scores 0.
 7. Quiz rounds paint a bottom star tray with `progressStars(correct, limit)` so a star animates in at each 20% correct. Unlimited rounds use `unlimitedStars(attempts)` for each all-correct set of 10 from the first problem, then `X ★` after 7 icons.
-8. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves. Results Correct is `formatCorrectCount(correct, answered)` (`10 / 11`). Accuracy uses the same pair.
+8. Finish writes `bests[learner|mode|difficulty|ops]` when the correct-count improves. Results Correct is `formatCorrectCount(correct, answered)` (`10 / 11`). Accuracy uses the same pair. `resultCheer` from `cheers.js` picks the results title and headline for the round’s tier and sets `data-cheer` (the visual style) and `data-tier` on `#results-screen`; `styles.css` styles each `data-cheer`. During play, a correct answer’s feedback comes from a `cheerDeck`, a shuffled pass over all 50 `CORRECT_CHEERS`.
 9. `holdScreenAwake` requests a screen Wake Lock while the page is visible and re-acquires it after a hide or `pageshow`, so the device does not sleep during practice.
 10. The install manifest prefers `fullscreen`, then `standalone`. On a phone, `hideSystemNavigation` asks for fullscreen with the system navigation hidden when the installed app is not already covering the screen. A normal browser tab does not.
 

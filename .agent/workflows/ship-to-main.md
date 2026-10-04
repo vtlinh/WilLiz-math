@@ -15,6 +15,7 @@ node --experimental-default-type=module test-celebrate.mjs
 node --experimental-default-type=module test-stars.mjs
 node --experimental-default-type=module test-scoring.mjs
 node --experimental-default-type=module test-pwa.mjs
+node --experimental-default-type=module test-cheers.mjs
 ```
 
 2. If either command fails, stop and fix.
