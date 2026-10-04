@@ -8,6 +8,7 @@ WilLiz Math is a browser arithmetic studio for Will and Liz. It is a static site
 - **Guest** is a third preset for anyone else.
 - Each person’s last mix (topics, difficulty, mode, appearance) is remembered in `localStorage`, so switching learners does not ask them to set it up again. Dark mode is the default.
 - Personal bests stay in that same browser store, keyed by person and mix.
+- History keeps the last 20 runs that solved at least one problem, newest first, across all learners. The home page has a **History** button under Start. History replaces the action bar chrome with ← and History, like Settings. Each run shows its date and time, score (`9 / 10`), mix, and time spent, plus Will / Liz / Guest buttons to switch who played it (for a run played under the wrong name). Switching only moves that history entry; personal bests are not recalculated. A round left before solving anything is not stored.
 
 ## What a round is
 

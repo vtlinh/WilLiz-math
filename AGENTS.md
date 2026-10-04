@@ -23,6 +23,7 @@ node --experimental-default-type=module test-stars.mjs
 node --experimental-default-type=module test-scoring.mjs
 node --experimental-default-type=module test-pwa.mjs
 node --experimental-default-type=module test-cheers.mjs
+node --experimental-default-type=module test-history.mjs
 ```
 
 After those pass, merge the commits into `main` and push. See `.agent/rules/git.md`.
