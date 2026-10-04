@@ -75,6 +75,7 @@ let current = null;
 let timerId = null;
 let awaitingAdvance = false;
 let screen = "setup";
+const ADVANCE_DELAY_MS = 2000;
 const cheers = cheerDeck();
 
 function loadStore() {
@@ -630,16 +631,21 @@ function afterAnswer(correct) {
 
   const done = round.limit && round.answered >= round.limit;
   if (done) {
-    window.setTimeout(finishRound, 700);
+    advanceAfterCheer({ finish: true });
     return;
   }
 
-  if (correct) {
-    awaitingAdvance = true;
-    window.setTimeout(() => {
-      if (round && awaitingAdvance) nextProblem();
-    }, 550);
-  }
+  if (correct) advanceAfterCheer();
+}
+
+function advanceAfterCheer({ finish = false } = {}) {
+  awaitingAdvance = true;
+  window.setTimeout(() => {
+    if (!round || !awaitingAdvance) return;
+    if (!finish) nextProblem();
+    else if (isLeaveOpen()) leavePractice();
+    else finishRound();
+  }, ADVANCE_DELAY_MS);
 }
 
 function sectionSlice() {
@@ -670,10 +676,7 @@ function submitTable() {
     els.feedback.textContent = cheers.next();
     els.feedback.className = "feedback is-good";
     paintProblem(true);
-    awaitingAdvance = true;
-    window.setTimeout(() => {
-      if (round && awaitingAdvance) finishRound();
-    }, 700);
+    advanceAfterCheer({ finish: true });
     return;
   }
   current.active = matches.findIndex((ok) => !ok);

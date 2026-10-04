@@ -425,11 +425,16 @@ legend {
   text-align: center;
 }
 
+.problem-stage {
+  display: flex;
+  flex-direction: column;
+}
+
 .problem {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 4px 0 18px;
+  margin: 4px 0 8px;
   font-size: clamp(3rem, 12vw, 5.4rem);
   line-height: 0.95;
   text-align: center;
@@ -473,7 +478,7 @@ legend {
   display: inline-flex;
   align-items: center;
   gap: 0.32em;
-  margin-top: 0.12em;
+  padding-top: 0.12em;
   font-family: "Fraunces", Georgia, serif;
   font-size: clamp(2.2rem, 8vw, 3.6rem);
   font-variant-numeric: tabular-nums;
@@ -916,7 +921,9 @@ legend {
 
 .feedback {
   min-height: 1.5em;
+  margin: 0 0 12px;
   font-weight: 800;
+  text-align: center;
 }
 
 .feedback.is-good {
@@ -1533,8 +1540,14 @@ body.celebrate-static .results-headline {
     font-size: 0.68rem;
   }
 
-  .problem {
+  .problem-stage {
     flex: 1 1 auto;
+    min-height: 0;
+    justify-content: center;
+  }
+
+  .problem {
+    flex: 0 1 auto;
     min-height: 0;
     margin: 0;
     overflow: auto;
@@ -1614,8 +1627,9 @@ body.celebrate-static .results-headline {
   }
 
   .feedback {
+    flex: 0 0 auto;
     min-height: 1.15em;
-    margin: 0;
+    margin: 4px 0 0;
     font-size: 0.92rem;
   }
 
@@ -1693,8 +1707,14 @@ body.celebrate-static .results-headline {
     overflow: hidden;
   }
 
-  .page:has(.sheet-div) .problem.is-div-fit {
+  .page:has(.sheet-div) .problem-stage {
     flex: 1 1 auto;
+    min-height: 0;
+    justify-content: center;
+  }
+
+  .page:has(.sheet-div) .problem.is-div-fit {
+    flex: 0 1 auto;
     min-height: 0;
   }
 
@@ -1743,11 +1763,6 @@ body.celebrate-static .results-headline {
 
   .page:has(.sheet-div) .panel {
     padding: 4px 8px;
-  }
-
-  .page:has(.sheet-div) .problem.is-div-fit {
-    flex: 1 1 auto;
-    min-height: 0;
   }
 
   #play-screen:has(.sheet-div) .keypad {
